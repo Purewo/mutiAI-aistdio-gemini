@@ -13,6 +13,8 @@ Use the backend repository commit `356ae35` as the contract baseline. The author
 - `docs/backend-contract/architecture/TASK_PLAN_ARTIFACT_HANDOFF.md`
 - `docs/backend-contract/architecture/M2_3_PARALLEL_ARTIFACT_ACCESS_USAGE.md`
 - `docs/backend-contract/acceptance/M2_1_RUNTIME_POLICY.md`
+- `docs/LOCAL_INTEGRATION_REVIEW.md`
+- `fixtures/api/README.md`
 
 Do not redefine backend resource shapes in the frontend repository. If a screen needs a field that is not in the OpenAPI snapshot, stop and report the missing contract instead of inventing one.
 
@@ -63,6 +65,10 @@ Task submission must send a unique `Idempotency-Key` and set `orchestration_mode
 
 The Artifact content endpoint is owner-scoped and returns the declared media type. Use its default inline response for preview when the browser supports the media type, and add `download=true` for explicit download. Treat 409 integrity or release-state errors as unavailable results rather than attempting a direct filesystem fallback.
 
+Google AI Studio cannot reach the local backend. Use the checked-in API fixtures for UI development and empty, waiting, failed, completed, linear, parallel, Artifact, usage, approval, and event states. The fixtures are captured from the real FastAPI application at backend commit `356ae35`; do not extend them with invented fields.
+
+Use relative `/api/v1` requests by default and include browser credentials for the HttpOnly session cookie. Keep the API base configurable for local integration. Do not require a remote deployment: the project integrator runs the backend and frontend locally.
+
 ## State mapping
 
 Treat these as product states, not LangGraph states:
@@ -112,4 +118,4 @@ Render plan topology from `execution_plan.steps[*].plan_step_id` and `dependency
 - Completed, failed, cancelled, and needs-revision task states are visibly distinct.
 - Browser console has no uncaught errors, and network requests match the OpenAPI contract.
 
-After Gemini submits the frontend change, Codex will run the frontend against the real local backend and perform browser verification before calling M3 complete.
+After Gemini submits the frontend change, Codex pulls the branch, runs the frontend against the real local backend, and performs browser verification before calling M3 complete. Codex does not modify Gemini's implementation during this review. Reproducible issues are reported to the project owner, and Gemini submits the fixes.

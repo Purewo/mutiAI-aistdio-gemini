@@ -1,0 +1,149 @@
+{
+  "task_id": "1bf56bf4-c18c-4a79-b350-7fb725c81d70",
+  "organization_id": "e107ec24-426c-41b2-8d45-625a8ad47983",
+  "organization_spec_version_id": "82d3ba7f-dc4c-4be1-b638-6c2dbc7107c0",
+  "request": "FIXTURE_LINEAR: Run a strict linear plan.",
+  "orchestration_mode": "planned",
+  "status": "created",
+  "result_summary": null,
+  "assignments": [
+    {
+      "assignment_id": "7541311c-f4f0-53b5-9bed-c7e96b2cbcab",
+      "assignment_key": "lead.plan",
+      "assignment_kind": "lead_plan",
+      "agent_role_key": "lead",
+      "instructions": "Act as the organization lead within this responsibility boundary: Plan and review bounded work.\n\nDesign one supported execution plan for the original request. Choose either a strict linear chain or a pure parallel specialist fan-out followed by lead_review. Do not combine serial and parallel specialist stages. Use only the already published organization roles below. Do not add or persist new formal roles, do not execute specialist work, and do not modify project files. Return only JSON matching the supplied TaskExecutionPlanSpec schema. The final step must be your lead_review. That lead_review must consume the final specialist Artifact and set output_contracts to an empty array. It returns a review decision through the review response contract and must not declare a new Artifact. For a parallel plan, every specialist must be dependency-free, must declare at least one output Artifact, and lead_review must depend on every specialist and declare every specialist output contract as an input.\n\nOriginal request:\nFIXTURE_LINEAR: Run a strict linear plan.\n\nPublished OrganizationSpec:\n{\n  \"schema_version\": \"1.0\",\n  \"name\": \"Fixture Engineering Organization\",\n  \"description\": \"Contract-derived frontend fixture organization.\",\n  \"roles\": [\n    {\n      \"role_key\": \"lead\",\n      \"name\": \"Organization Lead\",\n      \"responsibility\": \"Plan and review bounded work.\",\n      \"is_lead\": true,\n      \"reports_to\": null,\n      \"runtime_binding_key\": \"codex-local-default\"\n    },\n    {\n      \"role_key\": \"linear_a\",\n      \"name\": \"Linear Worker A\",\n      \"responsibility\": \"Produce the first linear Artifact.\",\n      \"is_lead\": false,\n      \"reports_to\": \"lead\",\n      \"runtime_binding_key\": \"codex-local-default\"\n    },\n    {\n      \"role_key\": \"linear_b\",\n      \"name\": \"Linear Worker B\",\n      \"responsibility\": \"Consume A and produce B.\",\n      \"is_lead\": false,\n      \"reports_to\": \"lead\",\n      \"runtime_binding_key\": \"codex-local-default\"\n    },\n    {\n      \"role_key\": \"parallel_a\",\n      \"name\": \"Parallel Worker A\",\n      \"responsibility\": \"Produce parallel Artifact A.\",\n      \"is_lead\": false,\n      \"reports_to\": \"lead\",\n      \"runtime_binding_key\": \"codex-local-default\"\n    },\n    {\n      \"role_key\": \"parallel_b\",\n      \"name\": \"Parallel Worker B\",\n      \"responsibility\": \"Produce parallel Artifact B.\",\n      \"is_lead\": false,\n      \"reports_to\": \"lead\",\n      \"runtime_binding_key\": \"codex-local-default\"\n    },\n    {\n      \"role_key\": \"waiting_worker\",\n      \"name\": \"Waiting Worker\",\n      \"responsibility\": \"Expose a waiting Runtime state.\",\n      \"is_lead\": false,\n      \"reports_to\": \"lead\",\n      \"runtime_binding_key\": \"codex-local-default\"\n    },\n    {\n      \"role_key\": \"failing_worker\",\n      \"name\": \"Failing Worker\",\n      \"responsibility\": \"Expose a failed Runtime state.\",\n      \"is_lead\": false,\n      \"reports_to\": \"lead\",\n      \"runtime_binding_key\": \"codex-local-default\"\n    }\n  ]\n}",
+      "acceptance_criteria": "Return only a valid TaskExecutionPlanSpec using existing roles, using either the supported strict-linear or pure-parallel shape and ending in lead_review whose output_contracts is empty.",
+      "execution_id": "4648adbc-c363-5033-97d6-1c0939cec23d",
+      "plan_step_id": null,
+      "status": "completed",
+      "result_summary": "{\"schema_version\": \"1.0\", \"summary\": \"Run a strict linear Artifact chain, then lead review.\", \"initial_input_contracts\": [], \"steps\": [{\"step_key\": \"linear_a\", \"role_key\": \"linear_a\", \"step_kind\": \"specialist\", \"objective\": \"Produce linear Artifact A.\", \"acceptance_criteria\": \"Publish valid JSON A.\", \"depends_on\": [], \"input_contracts\": [], \"output_contracts\": [{\"contract_key\": \"linear.a.v1\", \"schema_version\": \"1.0\", \"media_type\": \"application/json\", \"file_name\": \"a.json\"}]}, {\"step_key\": \"linear_b\", \"role_key\": \"linear_b\", \"step_kind\": \"specialist\", \"objective\": \"Consume A and produce linear Artifact B.\", \"acceptance_criteria\": \"Publish valid JSON B.\", \"depends_on\": [\"linear_a\"], \"input_contracts\": [\"linear.a.v1\"], \"output_contracts\": [{\"contract_key\": \"linear.b.v1\", \"schema_version\": \"1.0\", \"media_type\": \"application/json\", \"file_name\": \"b.json\"}]}, {\"step_key\": \"linear_review\", \"role_key\": \"lead\", \"step_kind\": \"lead_review\", \"objective\": \"Review the final linear Artifact.\", \"acceptance_criteria\": \"Accept valid Artifact B.\", \"depends_on\": [\"linear_b\"], \"input_contracts\": [\"linear.b.v1\"], \"output_contracts\": []}]}",
+      "runtime_execution": {
+        "runtime_execution_id": "f5100e5d-233a-4cfc-8281-d59e427fb5b6",
+        "execution_id": "4648adbc-c363-5033-97d6-1c0939cec23d",
+        "provider": "fake",
+        "runtime_binding_id": "4578d127-6cf5-4176-a359-cb8d6be06741",
+        "runtime_binding_key": "codex-local-default",
+        "requested_model": null,
+        "actual_model": "fixture-model",
+        "reasoning_effort": null,
+        "security_mode": "demo_full_access",
+        "approval_policy": "never",
+        "sandbox_mode": "danger-full-access",
+        "network_access": true,
+        "status": "completed",
+        "runtime_job_id": "fixture:4648adbc-c363-5033-97d6-1c0939cec23d",
+        "thread_id": null,
+        "turn_id": null,
+        "workspace_id": null,
+        "result_summary": "{\"schema_version\": \"1.0\", \"summary\": \"Run a strict linear Artifact chain, then lead review.\", \"initial_input_contracts\": [], \"steps\": [{\"step_key\": \"linear_a\", \"role_key\": \"linear_a\", \"step_kind\": \"specialist\", \"objective\": \"Produce linear Artifact A.\", \"acceptance_criteria\": \"Publish valid JSON A.\", \"depends_on\": [], \"input_contracts\": [], \"output_contracts\": [{\"contract_key\": \"linear.a.v1\", \"schema_version\": \"1.0\", \"media_type\": \"application/json\", \"file_name\": \"a.json\"}]}, {\"step_key\": \"linear_b\", \"role_key\": \"linear_b\", \"step_kind\": \"specialist\", \"objective\": \"Consume A and produce linear Artifact B.\", \"acceptance_criteria\": \"Publish valid JSON B.\", \"depends_on\": [\"linear_a\"], \"input_contracts\": [\"linear.a.v1\"], \"output_contracts\": [{\"contract_key\": \"linear.b.v1\", \"schema_version\": \"1.0\", \"media_type\": \"application/json\", \"file_name\": \"b.json\"}]}, {\"step_key\": \"linear_review\", \"role_key\": \"lead\", \"step_kind\": \"lead_review\", \"objective\": \"Review the final linear Artifact.\", \"acceptance_criteria\": \"Accept valid Artifact B.\", \"depends_on\": [\"linear_b\"], \"input_contracts\": [\"linear.b.v1\"], \"output_contracts\": []}]}",
+        "wait_reason": null,
+        "reserved_tokens": 0,
+        "charged_tokens": 60,
+        "usage_status": "reported",
+        "input_tokens": 44,
+        "cached_input_tokens": 4,
+        "output_tokens": 16,
+        "reasoning_output_tokens": 3,
+        "total_tokens": 60,
+        "context_compactions": 0
+      }
+    }
+  ],
+  "execution_plan": {
+    "plan_id": "bed8f84d-9c87-509c-88b5-cea5e000b32a",
+    "plan_version": 1,
+    "schema_version": "1.0",
+    "definition_hash": "0f06486a0252414dca93dd9f44419b8847ef37866d40e8d376604f05ac3e8555",
+    "source": "lead.plan",
+    "status": "validated",
+    "summary": "Run a strict linear Artifact chain, then lead review.",
+    "validation_summary": "Validated as a strict linear M2.3 plan.",
+    "initial_input_contracts": [],
+    "steps": [
+      {
+        "plan_step_id": "1e08db16-ecee-5919-9df5-2ae659a56f3c",
+        "step_key": "linear_a",
+        "role_key": "linear_a",
+        "step_kind": "specialist",
+        "sequence": 0,
+        "objective": "Produce linear Artifact A.",
+        "acceptance_criteria": "Publish valid JSON A.",
+        "input_contracts": [],
+        "output_contracts": [
+          {
+            "contract_key": "linear.a.v1",
+            "schema_version": "1.0",
+            "media_type": "application/json",
+            "file_name": "a.json"
+          }
+        ],
+        "dependency_step_ids": [],
+        "status": "ready",
+        "assignment_id": null,
+        "input_bindings": [],
+        "created_at": "2026-07-25T12:54:44.109765Z",
+        "ready_at": "2026-07-25T12:54:44.108766Z",
+        "completed_at": null
+      },
+      {
+        "plan_step_id": "3a1c5e52-eeed-547f-9a81-3770a7af4ef2",
+        "step_key": "linear_b",
+        "role_key": "linear_b",
+        "step_kind": "specialist",
+        "sequence": 1,
+        "objective": "Consume A and produce linear Artifact B.",
+        "acceptance_criteria": "Publish valid JSON B.",
+        "input_contracts": [
+          "linear.a.v1"
+        ],
+        "output_contracts": [
+          {
+            "contract_key": "linear.b.v1",
+            "schema_version": "1.0",
+            "media_type": "application/json",
+            "file_name": "b.json"
+          }
+        ],
+        "dependency_step_ids": [
+          "1e08db16-ecee-5919-9df5-2ae659a56f3c"
+        ],
+        "status": "pending_dependency",
+        "assignment_id": null,
+        "input_bindings": [],
+        "created_at": "2026-07-25T12:54:44.109765Z",
+        "ready_at": null,
+        "completed_at": null
+      },
+      {
+        "plan_step_id": "1cbd44fa-daee-5111-86e6-3aaa2ae66a05",
+        "step_key": "linear_review",
+        "role_key": "lead",
+        "step_kind": "lead_review",
+        "sequence": 2,
+        "objective": "Review the final linear Artifact.",
+        "acceptance_criteria": "Accept valid Artifact B.",
+        "input_contracts": [
+          "linear.b.v1"
+        ],
+        "output_contracts": [],
+        "dependency_step_ids": [
+          "3a1c5e52-eeed-547f-9a81-3770a7af4ef2"
+        ],
+        "status": "pending_dependency",
+        "assignment_id": null,
+        "input_bindings": [],
+        "created_at": "2026-07-25T12:54:44.109765Z",
+        "ready_at": null,
+        "completed_at": null
+      }
+    ],
+    "created_at": "2026-07-25T12:54:44.107766Z",
+    "activated_at": null,
+    "completed_at": null
+  },
+  "artifacts": [],
+  "created_at": "2026-07-25T12:54:43.984359Z",
+  "updated_at": "2026-07-25T12:54:44.124771Z",
+  "completed_at": null
+}

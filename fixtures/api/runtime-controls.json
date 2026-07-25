@@ -1,0 +1,14 @@
+{
+  "provider": "fake",
+  "max_concurrent_executions": 2,
+  "active_executions": 0,
+  "token_budget_limit": null,
+  "token_reservation_per_execution": null,
+  "tokens_reserved": 0,
+  "tokens_consumed": 60,
+  "tokens_remaining": null,
+  "provider_capacity_status": "available",
+  "provider_capacity_reason": null,
+  "provider_capacity_resets_at": null,
+  "provider_capacity_observed_at": "2026-07-25T12:57:27.768026Z"
+}

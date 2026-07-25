@@ -1,0 +1,73 @@
+{
+  "spec_version_id": "82d3ba7f-dc4c-4be1-b638-6c2dbc7107c0",
+  "organization_id": "e107ec24-426c-41b2-8d45-625a8ad47983",
+  "version_number": 1,
+  "status": "confirmed",
+  "spec": {
+    "schema_version": "1.0",
+    "name": "Fixture Engineering Organization",
+    "description": "Contract-derived frontend fixture organization.",
+    "roles": [
+      {
+        "role_key": "lead",
+        "name": "Organization Lead",
+        "responsibility": "Plan and review bounded work.",
+        "is_lead": true,
+        "reports_to": null,
+        "runtime_binding_key": "codex-local-default"
+      },
+      {
+        "role_key": "linear_a",
+        "name": "Linear Worker A",
+        "responsibility": "Produce the first linear Artifact.",
+        "is_lead": false,
+        "reports_to": "lead",
+        "runtime_binding_key": "codex-local-default"
+      },
+      {
+        "role_key": "linear_b",
+        "name": "Linear Worker B",
+        "responsibility": "Consume A and produce B.",
+        "is_lead": false,
+        "reports_to": "lead",
+        "runtime_binding_key": "codex-local-default"
+      },
+      {
+        "role_key": "parallel_a",
+        "name": "Parallel Worker A",
+        "responsibility": "Produce parallel Artifact A.",
+        "is_lead": false,
+        "reports_to": "lead",
+        "runtime_binding_key": "codex-local-default"
+      },
+      {
+        "role_key": "parallel_b",
+        "name": "Parallel Worker B",
+        "responsibility": "Produce parallel Artifact B.",
+        "is_lead": false,
+        "reports_to": "lead",
+        "runtime_binding_key": "codex-local-default"
+      },
+      {
+        "role_key": "waiting_worker",
+        "name": "Waiting Worker",
+        "responsibility": "Expose a waiting Runtime state.",
+        "is_lead": false,
+        "reports_to": "lead",
+        "runtime_binding_key": "codex-local-default"
+      },
+      {
+        "role_key": "failing_worker",
+        "name": "Failing Worker",
+        "responsibility": "Expose a failed Runtime state.",
+        "is_lead": false,
+        "reports_to": "lead",
+        "runtime_binding_key": "codex-local-default"
+      }
+    ]
+  },
+  "source_request": null,
+  "created_at": "2026-07-25T12:54:43.908577Z",
+  "confirmed_at": "2026-07-25T12:54:43.923576Z",
+  "published_at": null
+}

@@ -1,6 +1,6 @@
 # Gemini frontend instructions
 
-Read `docs/GEMINI_HANDOFF.md` before changing the frontend.
+Read `docs/GEMINI_HANDOFF.md`, `docs/M3_FRONTEND_TASK_PACKET.md`, and `docs/LOCAL_INTEGRATION_REVIEW.md` before changing the frontend.
 
 ## Rules
 
@@ -14,7 +14,8 @@ Read `docs/GEMINI_HANDOFF.md` before changing the frontend.
 - V1 has no drag-and-drop organization editor, autonomous role creation, organization invitations, or member management.
 - Always implement loading, empty, error, and reconnect states when their contract is available.
 - Keep visual components independent from transport details by using a small typed client layer.
+- Use repository fixtures when AI Studio cannot reach the local backend. Do not invent replacement responses.
 
 ## Handoff expectation
 
-A frontend commit is a candidate implementation. The project integrator performs real-backend integration and browser verification before merging it into a release branch.
+A frontend commit is a candidate implementation. The project integrator pulls it into the local checkout, performs real-backend integration and browser verification, and reports reproducible defects. The integrator does not modify Gemini's implementation during review. Gemini owns the corrective code changes and commits.

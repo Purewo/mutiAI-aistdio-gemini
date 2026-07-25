@@ -1,0 +1,147 @@
+{
+  "task_id": "a8217ffa-6521-4def-8dec-b7e4239eb75a",
+  "organization_id": "e107ec24-426c-41b2-8d45-625a8ad47983",
+  "organization_spec_version_id": "82d3ba7f-dc4c-4be1-b638-6c2dbc7107c0",
+  "request": "FIXTURE_PARALLEL: Run two independent branches.",
+  "orchestration_mode": "planned",
+  "status": "created",
+  "result_summary": null,
+  "assignments": [
+    {
+      "assignment_id": "d7cf3e21-0339-5e95-8271-a427d2dc4297",
+      "assignment_key": "lead.plan",
+      "assignment_kind": "lead_plan",
+      "agent_role_key": "lead",
+      "instructions": "Act as the organization lead within this responsibility boundary: Provide the Organization Lead fixture boundary.\n\nDesign one supported execution plan for the original request. Choose either a strict linear chain or a pure parallel specialist fan-out followed by lead_review. Do not combine serial and parallel specialist stages. Use only the already published organization roles below. Do not add or persist new formal roles, do not execute specialist work, and do not modify project files. Return only JSON matching the supplied TaskExecutionPlanSpec schema. The final step must be your lead_review. That lead_review must consume the final specialist Artifact and set output_contracts to an empty array. It returns a review decision through the review response contract and must not declare a new Artifact. For a parallel plan, every specialist must be dependency-free, must declare at least one output Artifact, and lead_review must depend on every specialist and declare every specialist output contract as an input.\n\nOriginal request:\nFIXTURE_PARALLEL: Run two independent branches.\n\nPublished OrganizationSpec:\n{\n  \"schema_version\": \"1.0\",\n  \"name\": \"Fixture State Organization\",\n  \"description\": \"Real API state fixtures.\",\n  \"roles\": [\n    {\n      \"role_key\": \"lead\",\n      \"name\": \"Organization Lead\",\n      \"responsibility\": \"Provide the Organization Lead fixture boundary.\",\n      \"is_lead\": true,\n      \"reports_to\": null,\n      \"runtime_binding_key\": \"codex-local-default\"\n    },\n    {\n      \"role_key\": \"parallel_a\",\n      \"name\": \"Parallel Worker A\",\n      \"responsibility\": \"Provide the Parallel Worker A fixture boundary.\",\n      \"is_lead\": false,\n      \"reports_to\": \"lead\",\n      \"runtime_binding_key\": \"codex-local-default\"\n    },\n    {\n      \"role_key\": \"parallel_b\",\n      \"name\": \"Parallel Worker B\",\n      \"responsibility\": \"Provide the Parallel Worker B fixture boundary.\",\n      \"is_lead\": false,\n      \"reports_to\": \"lead\",\n      \"runtime_binding_key\": \"codex-local-default\"\n    },\n    {\n      \"role_key\": \"waiting_worker\",\n      \"name\": \"Waiting Worker\",\n      \"responsibility\": \"Provide the Waiting Worker fixture boundary.\",\n      \"is_lead\": false,\n      \"reports_to\": \"lead\",\n      \"runtime_binding_key\": \"codex-local-default\"\n    },\n    {\n      \"role_key\": \"failing_worker\",\n      \"name\": \"Failing Worker\",\n      \"responsibility\": \"Provide the Failing Worker fixture boundary.\",\n      \"is_lead\": false,\n      \"reports_to\": \"lead\",\n      \"runtime_binding_key\": \"codex-local-default\"\n    }\n  ]\n}",
+      "acceptance_criteria": "Return only a valid TaskExecutionPlanSpec using existing roles, using either the supported strict-linear or pure-parallel shape and ending in lead_review whose output_contracts is empty.",
+      "execution_id": "e800d09f-01a9-5b38-87ff-ccc7ca26f327",
+      "plan_step_id": null,
+      "status": "completed",
+      "result_summary": "{\"schema_version\": \"1.0\", \"summary\": \"Run two independent specialists, then join at lead review.\", \"initial_input_contracts\": [], \"steps\": [{\"step_key\": \"parallel_a\", \"role_key\": \"parallel_a\", \"step_kind\": \"specialist\", \"objective\": \"Run parallel_a for the frontend fixture.\", \"acceptance_criteria\": \"Publish the declared JSON Artifact.\", \"depends_on\": [], \"input_contracts\": [], \"output_contracts\": [{\"contract_key\": \"parallel.a.v1\", \"schema_version\": \"1.0\", \"media_type\": \"application/json\", \"file_name\": \"a.json\"}]}, {\"step_key\": \"parallel_b\", \"role_key\": \"parallel_b\", \"step_kind\": \"specialist\", \"objective\": \"Run parallel_b for the frontend fixture.\", \"acceptance_criteria\": \"Publish the declared JSON Artifact.\", \"depends_on\": [], \"input_contracts\": [], \"output_contracts\": [{\"contract_key\": \"parallel.b.v1\", \"schema_version\": \"1.0\", \"media_type\": \"application/json\", \"file_name\": \"b.json\"}]}, {\"step_key\": \"parallel_review\", \"role_key\": \"lead\", \"step_kind\": \"lead_review\", \"objective\": \"Review all released fixture Artifacts.\", \"acceptance_criteria\": \"Return a structured acceptance decision.\", \"depends_on\": [\"parallel_a\", \"parallel_b\"], \"input_contracts\": [\"parallel.a.v1\", \"parallel.b.v1\"], \"output_contracts\": []}]}",
+      "runtime_execution": {
+        "runtime_execution_id": "67512154-ec4c-4fe1-b83d-66fd7e9ca328",
+        "execution_id": "e800d09f-01a9-5b38-87ff-ccc7ca26f327",
+        "provider": "fake",
+        "runtime_binding_id": "acd527c3-8896-40f1-bc24-d5f14d8d8c63",
+        "runtime_binding_key": "codex-local-default",
+        "requested_model": null,
+        "actual_model": "fixture-model",
+        "reasoning_effort": null,
+        "security_mode": "demo_full_access",
+        "approval_policy": "never",
+        "sandbox_mode": "danger-full-access",
+        "network_access": true,
+        "status": "completed",
+        "runtime_job_id": "fixture:e800d09f-01a9-5b38-87ff-ccc7ca26f327",
+        "thread_id": null,
+        "turn_id": null,
+        "workspace_id": null,
+        "result_summary": "{\"schema_version\": \"1.0\", \"summary\": \"Run two independent specialists, then join at lead review.\", \"initial_input_contracts\": [], \"steps\": [{\"step_key\": \"parallel_a\", \"role_key\": \"parallel_a\", \"step_kind\": \"specialist\", \"objective\": \"Run parallel_a for the frontend fixture.\", \"acceptance_criteria\": \"Publish the declared JSON Artifact.\", \"depends_on\": [], \"input_contracts\": [], \"output_contracts\": [{\"contract_key\": \"parallel.a.v1\", \"schema_version\": \"1.0\", \"media_type\": \"application/json\", \"file_name\": \"a.json\"}]}, {\"step_key\": \"parallel_b\", \"role_key\": \"parallel_b\", \"step_kind\": \"specialist\", \"objective\": \"Run parallel_b for the frontend fixture.\", \"acceptance_criteria\": \"Publish the declared JSON Artifact.\", \"depends_on\": [], \"input_contracts\": [], \"output_contracts\": [{\"contract_key\": \"parallel.b.v1\", \"schema_version\": \"1.0\", \"media_type\": \"application/json\", \"file_name\": \"b.json\"}]}, {\"step_key\": \"parallel_review\", \"role_key\": \"lead\", \"step_kind\": \"lead_review\", \"objective\": \"Review all released fixture Artifacts.\", \"acceptance_criteria\": \"Return a structured acceptance decision.\", \"depends_on\": [\"parallel_a\", \"parallel_b\"], \"input_contracts\": [\"parallel.a.v1\", \"parallel.b.v1\"], \"output_contracts\": []}]}",
+        "wait_reason": null,
+        "reserved_tokens": 0,
+        "charged_tokens": 60,
+        "usage_status": "reported",
+        "input_tokens": 44,
+        "cached_input_tokens": 4,
+        "output_tokens": 16,
+        "reasoning_output_tokens": 3,
+        "total_tokens": 60,
+        "context_compactions": 0
+      }
+    }
+  ],
+  "execution_plan": {
+    "plan_id": "aeccadca-fb60-50f6-91f9-26ea5737797d",
+    "plan_version": 1,
+    "schema_version": "1.0",
+    "definition_hash": "08e6217a72f42c938e337b971ade08403c1cd46f52f3ab2dae978c396ddb0f73",
+    "source": "lead.plan",
+    "status": "validated",
+    "summary": "Run two independent specialists, then join at lead review.",
+    "validation_summary": "Validated as a pure parallel M2.3 plan.",
+    "initial_input_contracts": [],
+    "steps": [
+      {
+        "plan_step_id": "143d649c-f879-592f-a456-f8e6be9d3cc3",
+        "step_key": "parallel_a",
+        "role_key": "parallel_a",
+        "step_kind": "specialist",
+        "sequence": 0,
+        "objective": "Run parallel_a for the frontend fixture.",
+        "acceptance_criteria": "Publish the declared JSON Artifact.",
+        "input_contracts": [],
+        "output_contracts": [
+          {
+            "contract_key": "parallel.a.v1",
+            "schema_version": "1.0",
+            "media_type": "application/json",
+            "file_name": "a.json"
+          }
+        ],
+        "dependency_step_ids": [],
+        "status": "ready",
+        "assignment_id": null,
+        "input_bindings": [],
+        "created_at": "2026-07-25T12:56:21.590426Z",
+        "ready_at": "2026-07-25T12:56:21.590426Z",
+        "completed_at": null
+      },
+      {
+        "plan_step_id": "e2fe3523-835b-5a34-87aa-28f305b63517",
+        "step_key": "parallel_b",
+        "role_key": "parallel_b",
+        "step_kind": "specialist",
+        "sequence": 1,
+        "objective": "Run parallel_b for the frontend fixture.",
+        "acceptance_criteria": "Publish the declared JSON Artifact.",
+        "input_contracts": [],
+        "output_contracts": [
+          {
+            "contract_key": "parallel.b.v1",
+            "schema_version": "1.0",
+            "media_type": "application/json",
+            "file_name": "b.json"
+          }
+        ],
+        "dependency_step_ids": [],
+        "status": "ready",
+        "assignment_id": null,
+        "input_bindings": [],
+        "created_at": "2026-07-25T12:56:21.590426Z",
+        "ready_at": "2026-07-25T12:56:21.590426Z",
+        "completed_at": null
+      },
+      {
+        "plan_step_id": "2e67e653-e709-54c3-8038-91b4acaf2749",
+        "step_key": "parallel_review",
+        "role_key": "lead",
+        "step_kind": "lead_review",
+        "sequence": 2,
+        "objective": "Review all released fixture Artifacts.",
+        "acceptance_criteria": "Return a structured acceptance decision.",
+        "input_contracts": [
+          "parallel.a.v1",
+          "parallel.b.v1"
+        ],
+        "output_contracts": [],
+        "dependency_step_ids": [
+          "143d649c-f879-592f-a456-f8e6be9d3cc3",
+          "e2fe3523-835b-5a34-87aa-28f305b63517"
+        ],
+        "status": "pending_dependency",
+        "assignment_id": null,
+        "input_bindings": [],
+        "created_at": "2026-07-25T12:56:21.590426Z",
+        "ready_at": null,
+        "completed_at": null
+      }
+    ],
+    "created_at": "2026-07-25T12:56:21.589426Z",
+    "activated_at": null,
+    "completed_at": null
+  },
+  "artifacts": [],
+  "created_at": "2026-07-25T12:56:21.471384Z",
+  "updated_at": "2026-07-25T12:56:21.606427Z",
+  "completed_at": null
+}
