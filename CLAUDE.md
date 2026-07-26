@@ -1,6 +1,10 @@
-# mutiAI web frontend rules
+# Nexwork web frontend rules
 
-This repository owns the mutiAI web frontend only. It is the frontend main workspace.
+This repository owns the Nexwork web frontend only. It is the frontend main workspace.
+
+The product name is Nexwork. The repositories, the npm package name, and internal storage keys keep
+the historical working name `mutiAI` until a separate rename is planned, so `Purewo/mutiAI` and
+`mutiai-frontend` below are literal identifiers, not product naming.
 
 ## Ownership
 
@@ -17,7 +21,9 @@ they describe the old remote-collaborator workflow, this file takes precedence.
 ## Contract boundary
 
 - `Purewo/mutiAI` is the single source of truth for OpenAPI, `OrganizationSpec`, event schemas,
-  status enums, authentication, and the error envelope.
+  status enums, authentication, and the error envelope. Its `docs/CURRENT_STATUS.md` is the
+  authoritative handoff for the active milestone, ownership, baselines, and deferred scope; read it
+  before selecting work and prefer it over older documents.
 - Consume the snapshots under `contracts/`. Do not hand-write competing product types.
 - Never invent API endpoints, fields, status names, or permissions. If a screen needs a field that
   the snapshot does not define, report the missing contract instead of fabricating one.

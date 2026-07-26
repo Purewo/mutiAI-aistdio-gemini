@@ -1,5 +1,5 @@
 /**
- * Product types for the mutiAI API.
+ * Product types for the Nexwork API.
  *
  * Every type here is an alias into `schema.d.ts`, which is generated from the backend's
  * authoritative `contracts/openapi.v1.json` snapshot. Do not hand-write a competing shape for any

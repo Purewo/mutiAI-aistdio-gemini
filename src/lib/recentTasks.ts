@@ -18,6 +18,10 @@ export interface RecentTaskRecord {
   submitted_at: string;
 }
 
+/**
+ * Storage key kept at the historical working name on purpose: renaming it would silently discard
+ * records users already have, and it is never shown in the UI.
+ */
 const STORAGE_KEY = 'mutiai.recent-tasks.v1';
 const MAX_RECORDS = 20;
 

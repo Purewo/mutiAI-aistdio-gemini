@@ -1,5 +1,5 @@
 /**
- * Typed endpoint functions for the mutiAI API.
+ * Typed endpoint functions for the Nexwork API.
  *
  * One function per contracted route. Views import from here; they never build URLs or call `fetch`.
  * Response types come from `types.ts`, which aliases the generated OpenAPI schema, so a contract

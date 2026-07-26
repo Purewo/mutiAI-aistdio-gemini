@@ -37,7 +37,7 @@ export default function SidebarLayout() {
             <Sparkles className="h-4 w-4" aria-hidden="true" />
           </div>
           <h1 className="hidden bg-gradient-to-r from-slate-900 to-slate-600 bg-clip-text text-xl font-bold text-transparent lg:block">
-            mutiAI
+            Nexwork
           </h1>
         </div>
 

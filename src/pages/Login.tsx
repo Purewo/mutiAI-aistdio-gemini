@@ -71,7 +71,7 @@ export default function Login() {
             <Sparkles className="h-6 w-6" aria-hidden="true" />
           </motion.div>
           <h1 className="bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-3xl font-bold text-transparent">
-            mutiAI
+            Nexwork
           </h1>
           <p className="mt-2 font-medium text-slate-500">登录到您的工作区</p>
         </div>
