@@ -1,6 +1,6 @@
 # Gemini frontend instructions
 
-Read `docs/GEMINI_HANDOFF.md` before changing the frontend.
+Read `docs/GEMINI_HANDOFF.md`, `docs/M3_FRONTEND_TASK_PACKET.md`, `docs/M3_FRONTEND_IMPLEMENTATION_PLAN.md`, and `docs/LOCAL_INTEGRATION_REVIEW.md` before changing the frontend.
 
 ## Rules
 
@@ -14,8 +14,10 @@ Read `docs/GEMINI_HANDOFF.md` before changing the frontend.
 - V1 has no drag-and-drop organization editor, autonomous role creation, organization invitations, or member management.
 - Always implement loading, empty, error, and reconnect states when their contract is available.
 - Keep visual components independent from transport details by using a small typed client layer.
-- **Contract Exchange**: The public repository `https://github.com/Purewo/mutiAI-aistdio-gemini` is the source of truth for our current code and the place where backend developers put relevant documents (e.g., OpenAPI, schemas). If the user states that the backend has updated the contract, pull the latest files from there and inspect them.
+- Use repository fixtures first when AI Studio cannot reach the local backend.
+- You may create clearly labeled frontend-only mock data to inspect layout and visual states when the checked-in fixtures do not provide enough visual variety. Keep it outside `contracts/` and `fixtures/api/`, reuse only contracted fields and state values, and never present it as a captured backend response.
+- Mock mode must never silently replace a failed real API request. Keep the real API transport and mock/demo data source explicitly separable.
 
 ## Handoff expectation
 
-A frontend commit is a candidate implementation. The project integrator performs real-backend integration and browser verification before merging it into a release branch.
+A frontend commit is a candidate implementation. AI Studio mock and fixture checks are for frontend construction and visual review, not proof of real integration. After Gemini submits the code, the Codex project integrator pulls it, connects it to the real backend, performs browser verification, and reports reproducible defects. The integrator does not modify Gemini's implementation during review. Gemini owns the corrective code changes and commits.

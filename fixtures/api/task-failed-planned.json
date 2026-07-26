@@ -1,0 +1,120 @@
+{
+  "task_id": "20cd840d-da5d-43f5-87c7-b6dbf8831993",
+  "organization_id": "e107ec24-426c-41b2-8d45-625a8ad47983",
+  "organization_spec_version_id": "82d3ba7f-dc4c-4be1-b638-6c2dbc7107c0",
+  "request": "FIXTURE_FAILED: Surface a Runtime failure.",
+  "orchestration_mode": "planned",
+  "status": "created",
+  "result_summary": null,
+  "assignments": [
+    {
+      "assignment_id": "c6006314-2151-5501-b3b4-766efaced383",
+      "assignment_key": "lead.plan",
+      "assignment_kind": "lead_plan",
+      "agent_role_key": "lead",
+      "instructions": "Act as the organization lead within this responsibility boundary: Plan and review bounded work.\n\nDesign one supported execution plan for the original request. Choose either a strict linear chain or a pure parallel specialist fan-out followed by lead_review. Do not combine serial and parallel specialist stages. Use only the already published organization roles below. Do not add or persist new formal roles, do not execute specialist work, and do not modify project files. Return only JSON matching the supplied TaskExecutionPlanSpec schema. The final step must be your lead_review. That lead_review must consume the final specialist Artifact and set output_contracts to an empty array. It returns a review decision through the review response contract and must not declare a new Artifact. For a parallel plan, every specialist must be dependency-free, must declare at least one output Artifact, and lead_review must depend on every specialist and declare every specialist output contract as an input.\n\nOriginal request:\nFIXTURE_FAILED: Surface a Runtime failure.\n\nPublished OrganizationSpec:\n{\n  \"schema_version\": \"1.0\",\n  \"name\": \"Failed State Fixture Organization\",\n  \"description\": \"Real persisted failure state fixture.\",\n  \"roles\": [\n    {\n      \"role_key\": \"lead\",\n      \"name\": \"Organization Lead\",\n      \"responsibility\": \"Plan and review bounded work.\",\n      \"is_lead\": true,\n      \"reports_to\": null,\n      \"runtime_binding_key\": \"codex-local-default\"\n    },\n    {\n      \"role_key\": \"failing_worker\",\n      \"name\": \"Failing Worker\",\n      \"responsibility\": \"Expose the failed Runtime state.\",\n      \"is_lead\": false,\n      \"reports_to\": \"lead\",\n      \"runtime_binding_key\": \"codex-local-default\"\n    }\n  ]\n}",
+      "acceptance_criteria": "Return only a valid TaskExecutionPlanSpec using existing roles, using either the supported strict-linear or pure-parallel shape and ending in lead_review whose output_contracts is empty.",
+      "execution_id": "7d7e802a-840f-5d45-bad4-f2cdaf5d8ccf",
+      "plan_step_id": null,
+      "status": "completed",
+      "result_summary": "{\"schema_version\": \"1.0\", \"summary\": \"Expose one persisted failed Runtime execution.\", \"initial_input_contracts\": [], \"steps\": [{\"step_key\": \"failing_worker\", \"role_key\": \"failing_worker\", \"step_kind\": \"specialist\", \"objective\": \"Raise a controlled fixture Runtime failure.\", \"acceptance_criteria\": \"Persist the failed execution state.\", \"depends_on\": [], \"input_contracts\": [], \"output_contracts\": [{\"contract_key\": \"failed.result.v1\", \"schema_version\": \"1.0\", \"media_type\": \"application/json\", \"file_name\": \"failed.json\"}]}, {\"step_key\": \"failed_review\", \"role_key\": \"lead\", \"step_kind\": \"lead_review\", \"objective\": \"Review only a completed specialist result.\", \"acceptance_criteria\": \"Do not run after failure.\", \"depends_on\": [\"failing_worker\"], \"input_contracts\": [\"failed.result.v1\"], \"output_contracts\": []}]}",
+      "runtime_execution": {
+        "runtime_execution_id": "001fba29-a0bf-4d89-99d0-026d878678dc",
+        "execution_id": "7d7e802a-840f-5d45-bad4-f2cdaf5d8ccf",
+        "provider": "fake",
+        "runtime_binding_id": "d5f2adfa-072c-40fe-b286-6b3940e06ba3",
+        "runtime_binding_key": "codex-local-default",
+        "requested_model": null,
+        "actual_model": "fixture-model",
+        "reasoning_effort": null,
+        "security_mode": "demo_full_access",
+        "approval_policy": "never",
+        "sandbox_mode": "danger-full-access",
+        "network_access": true,
+        "status": "completed",
+        "runtime_job_id": "fixture:7d7e802a-840f-5d45-bad4-f2cdaf5d8ccf",
+        "thread_id": null,
+        "turn_id": null,
+        "workspace_id": null,
+        "result_summary": "{\"schema_version\": \"1.0\", \"summary\": \"Expose one persisted failed Runtime execution.\", \"initial_input_contracts\": [], \"steps\": [{\"step_key\": \"failing_worker\", \"role_key\": \"failing_worker\", \"step_kind\": \"specialist\", \"objective\": \"Raise a controlled fixture Runtime failure.\", \"acceptance_criteria\": \"Persist the failed execution state.\", \"depends_on\": [], \"input_contracts\": [], \"output_contracts\": [{\"contract_key\": \"failed.result.v1\", \"schema_version\": \"1.0\", \"media_type\": \"application/json\", \"file_name\": \"failed.json\"}]}, {\"step_key\": \"failed_review\", \"role_key\": \"lead\", \"step_kind\": \"lead_review\", \"objective\": \"Review only a completed specialist result.\", \"acceptance_criteria\": \"Do not run after failure.\", \"depends_on\": [\"failing_worker\"], \"input_contracts\": [\"failed.result.v1\"], \"output_contracts\": []}]}",
+        "wait_reason": null,
+        "reserved_tokens": 0,
+        "charged_tokens": 60,
+        "usage_status": "reported",
+        "input_tokens": 44,
+        "cached_input_tokens": 4,
+        "output_tokens": 16,
+        "reasoning_output_tokens": 3,
+        "total_tokens": 60,
+        "context_compactions": 0
+      }
+    }
+  ],
+  "execution_plan": {
+    "plan_id": "0e2907dc-bcf1-536e-a1d6-3892fe5ba9a2",
+    "plan_version": 1,
+    "schema_version": "1.0",
+    "definition_hash": "9f0062a2dcdb6cb32fc70fbae28fc9b1f711f9a716ec8783c31ad03e9fc5d244",
+    "source": "lead.plan",
+    "status": "validated",
+    "summary": "Expose one persisted failed Runtime execution.",
+    "validation_summary": "Validated as a strict linear M2.3 plan.",
+    "initial_input_contracts": [],
+    "steps": [
+      {
+        "plan_step_id": "16499180-a0f4-51ee-b12f-295a268c0c28",
+        "step_key": "failing_worker",
+        "role_key": "failing_worker",
+        "step_kind": "specialist",
+        "sequence": 0,
+        "objective": "Raise a controlled fixture Runtime failure.",
+        "acceptance_criteria": "Persist the failed execution state.",
+        "input_contracts": [],
+        "output_contracts": [
+          {
+            "contract_key": "failed.result.v1",
+            "schema_version": "1.0",
+            "media_type": "application/json",
+            "file_name": "failed.json"
+          }
+        ],
+        "dependency_step_ids": [],
+        "status": "ready",
+        "assignment_id": null,
+        "input_bindings": [],
+        "created_at": "2026-07-25T12:57:27.658610Z",
+        "ready_at": "2026-07-25T12:57:27.657610Z",
+        "completed_at": null
+      },
+      {
+        "plan_step_id": "6a82ab7f-4d81-5120-a802-df6db132eb1c",
+        "step_key": "failed_review",
+        "role_key": "lead",
+        "step_kind": "lead_review",
+        "sequence": 1,
+        "objective": "Review only a completed specialist result.",
+        "acceptance_criteria": "Do not run after failure.",
+        "input_contracts": [
+          "failed.result.v1"
+        ],
+        "output_contracts": [],
+        "dependency_step_ids": [
+          "16499180-a0f4-51ee-b12f-295a268c0c28"
+        ],
+        "status": "pending_dependency",
+        "assignment_id": null,
+        "input_bindings": [],
+        "created_at": "2026-07-25T12:57:27.658610Z",
+        "ready_at": null,
+        "completed_at": null
+      }
+    ],
+    "created_at": "2026-07-25T12:57:27.656611Z",
+    "activated_at": null,
+    "completed_at": null
+  },
+  "artifacts": [],
+  "created_at": "2026-07-25T12:57:27.531007Z",
+  "updated_at": "2026-07-25T12:57:27.673308Z",
+  "completed_at": null
+}
