@@ -92,6 +92,29 @@ export function ErrorState({
   );
 }
 
+/**
+ * Compact alert for a failed action inside an otherwise healthy view, such as a rejected confirm or
+ * publish. Shows the backend envelope values without replacing the surrounding content.
+ */
+export function InlineError({ error }: { error: unknown }) {
+  const apiError = error instanceof ApiError ? error : null;
+  return (
+    <div
+      role="alert"
+      className="rounded-xl border border-red-100 bg-red-50 px-4 py-3 text-sm leading-relaxed text-red-700"
+    >
+      <p>{describeApiError(error)}</p>
+      {apiError?.code || apiError?.requestId ? (
+        <p className="mt-1 font-mono text-xs text-red-500/80">
+          {apiError.code ? <span>{apiError.code}</span> : null}
+          {apiError.code && apiError.requestId ? <span> · </span> : null}
+          {apiError.requestId ? <span>request {apiError.requestId}</span> : null}
+        </p>
+      ) : null}
+    </div>
+  );
+}
+
 export type ConnectionStatus = 'connecting' | 'live' | 'reconnecting' | 'closed';
 
 /**

@@ -88,8 +88,18 @@ export interface RequestOptions {
   signal?: AbortSignal;
 }
 
+/**
+ * Error localization is backend-owned: the backend localizes `message` from this header while
+ * `code` stays stable across languages. The frontend displays the backend message as-is and never
+ * translates business errors itself.
+ */
+const ACCEPT_LANGUAGE = 'zh-CN';
+
 async function performRequest(path: string, options: RequestOptions): Promise<Response> {
-  const headers: Record<string, string> = { Accept: 'application/json' };
+  const headers: Record<string, string> = {
+    Accept: 'application/json',
+    'Accept-Language': ACCEPT_LANGUAGE,
+  };
   if (options.body !== undefined) headers['Content-Type'] = 'application/json';
   if (options.idempotencyKey) headers['Idempotency-Key'] = options.idempotencyKey;
 
@@ -156,6 +166,7 @@ export async function fetchArtifactContent(
   let response: Response;
   try {
     response = await fetch(resolveBackendUrl(backendUrl), {
+      headers: { 'Accept-Language': ACCEPT_LANGUAGE },
       credentials: 'include',
       signal,
     });

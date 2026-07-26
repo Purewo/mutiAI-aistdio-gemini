@@ -71,7 +71,10 @@ function parseEvent(raw: string): TaskEvent | null {
  * caller aborts. Resolves when the stream ends; it does not reconnect on its own.
  */
 export async function streamTaskEvents(taskId: string, options: EventStreamOptions): Promise<void> {
-  const headers: Record<string, string> = { Accept: 'text/event-stream' };
+  const headers: Record<string, string> = {
+    Accept: 'text/event-stream',
+    'Accept-Language': 'zh-CN',
+  };
   if (options.lastEventId) headers['Last-Event-ID'] = options.lastEventId;
 
   let response: Response;
