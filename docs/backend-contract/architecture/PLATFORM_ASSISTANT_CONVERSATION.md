@@ -101,6 +101,49 @@ Required facts:
 
 Runtime tool items, raw commands, hidden reasoning, and private model history are not AssistantMessage records.
 
+#### Rich content ownership
+
+`content_blocks` is the only rendering contract for a message. Each block carries
+a plain-text `text` fallback, and `content_schema_version` is stored on the
+message so clients can choose a compatible renderer. V1 uses validated blocks
+for Markdown, code, errors, attachments, product resource references, and
+product-backed diagrams. The legacy `text` field remains a compatibility
+projection and is not a source from which clients reconstruct structure.
+
+The Runtime output may contain ordinary `reply` Markdown and restricted
+`presentation_requests`. Those requests are hints, not a public rendering
+contract. The backend validates the request, checks the referenced resource's
+ownership, and builds the final block from product database facts. Models cannot
+provide diagram nodes, edges, URLs, storage paths, or copied product state.
+V1 does not accept Mermaid or arbitrary model-defined diagrams. Organization
+charts and execution-plan diagrams identify a persisted
+`OrganizationSpecVersion` or `TaskExecutionPlan`; the frontend renders them
+with the same graph components used by the organization and Task pages.
+
+#### Attachments
+
+Assistant uploads are separate product resources. The upload route returns an
+`attachment_id`; a later user message explicitly references that ID. The
+backend changes the resource from `uploaded` to `attached` in the same product
+transaction as the message. An unreferenced upload can be revoked, while an
+attached resource cannot be silently removed. Chat attachments never become
+Task input bindings. Binding one to a Task requires a future explicit,
+confirmed product Action.
+
+Attachments are stored below the configured assistant-attachment root, outside
+source repositories and all managed Runtime Workspaces. Public responses never
+contain `storage_relative_path`. Access is scoped by both conversation owner and
+conversation identity, and content downloads include the persisted SHA-256
+identity. The content route supports preview and explicit download; it does not
+grant Runtime filesystem access.
+
+The supported upload media types are JSON, PDF, XLSX, JPEG, PNG, WebP, CSV,
+Markdown, plain text, and tab-separated text. Each upload is capped by
+`assistant_attachment_max_bytes` (10 MiB by default). The assistant's
+`mutiai_get_attachment_content` tool is stricter: it reads only attached UTF-8
+JSON or text, refuses binary or malformed content, and refuses content over
+64 KiB without truncation or guessing.
+
 ### AssistantTurn
 
 Represents one product submission to an AssistantRuntimeAdapter.
@@ -125,9 +168,16 @@ Required facts:
 - Action identity, conversation, source Turn, type, target, and versioned payload.
 - Payload hash and stable idempotency identity.
 - Status: proposed, confirmed, executing, completed, failed, declined, cancelled, expired, or superseded.
-- Confirmation, execution, result, failure, and audit metadata.
+- Confirmation, execution, result, failure, and audit metadata. Failures persist
+  a stable code, original HTTP status, structured details, and an untranslated
+  fallback instead of a reader-specific translation.
 
 Organization confirmation/publication, Task submission, Task retry/cancellation, and Runtime approval decisions require a confirmed AssistantAction. Read-only queries and proposal drafts do not.
+
+Action list, detail, and decision responses localize `error_message` when the
+record is read, using the current request's `Accept-Language`. The same persisted
+failure can therefore be read in different languages without changing the
+record. Responses declare `Content-Language` and vary on `Accept-Language`.
 
 ### AssistantEvent
 
@@ -143,6 +193,11 @@ The implementation exposes resource-oriented routes under `/api/v1/assistant`:
 - `GET /conversations/{conversation_id}` and `POST /conversations/{conversation_id}/archive`.
 - `GET /conversations/{conversation_id}/messages` with cursor pagination.
 - `POST /conversations/{conversation_id}/messages` with `Idempotency-Key`.
+- `POST /conversations/{conversation_id}/attachments` with multipart upload.
+- `DELETE /conversations/{conversation_id}/attachments/{attachment_id}` to
+  revoke an unreferenced upload.
+- `GET /conversations/{conversation_id}/attachments/{attachment_id}/content`
+  for owner-scoped preview or `?download=true` download.
 - `GET /turns/{turn_id}` and `POST /turns/{turn_id}/cancel`.
 - `GET /conversations/{conversation_id}/actions` and `GET /actions/{action_id}`.
 - `POST /actions/{action_id}/decision` with `confirm` or `decline`.
@@ -186,10 +241,18 @@ Platform-assistant Threads:
 - Do not receive shell, filesystem, Git, terminal, or raw database authority.
 
 The current product-tool bridge can list and read organizations, read a
-published OrganizationSpec version, create proposal drafts, propose confirmed
-actions, list and read Tasks, read Task token usage, and read feasibility
-checks. Organization confirmation/publication, Task submission/retry/cancel,
-and approval decisions remain explicit `AssistantAction` mutations.
+published OrganizationSpec version, create proposal drafts, check Task
+feasibility, propose confirmed actions, list and read Actions and Tasks, read
+released JSON or text Artifact content up to 64 KiB, read Task token usage, and read
+feasibility checks. Organization confirmation/publication, Task
+submission/retry/cancel, and approval decisions remain explicit
+`AssistantAction` mutations.
+
+The Artifact content tool accepts only Task and Artifact identities. It reuses
+the product's owner scope, released-state, managed-root, byte-size, and SHA-256
+verification. It returns no storage path or Workspace identity, refuses binary
+and oversized content without partial truncation, and leaves those files on the
+controlled download path.
 
 The canonical feasibility policy is sourced from `skills/platform-assistant/references/system-prompt.md` and the detailed rules in `skills/platform-assistant/references/feasibility-rules.md`. The Runtime adapter injects the policy for every Thread generation and records the policy version or hash on each AssistantTurn. Deployment must not rely on a compressed Thread summary to preserve this law.
 

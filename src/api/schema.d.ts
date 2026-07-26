@@ -145,6 +145,57 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/assistant/conversations/{conversation_id}/attachments": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Upload Attachment */
+        post: operations["upload_attachment_api_v1_assistant_conversations__conversation_id__attachments_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/assistant/conversations/{conversation_id}/attachments/{attachment_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Revoke Attachment */
+        delete: operations["revoke_attachment_api_v1_assistant_conversations__conversation_id__attachments__attachment_id__delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/assistant/conversations/{conversation_id}/attachments/{attachment_id}/content": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Download Attachment */
+        get: operations["download_attachment_api_v1_assistant_conversations__conversation_id__attachments__attachment_id__content_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/assistant/conversations/{conversation_id}/messages": {
         parameters: {
             query?: never;
@@ -943,6 +994,10 @@ export interface components {
             } | null;
             /** Error Code */
             error_code: string | null;
+            /** Error Status Code */
+            error_status_code: number | null;
+            /** Error Details */
+            error_details: unknown | null;
             /** Error Message */
             error_message: string | null;
             /**
@@ -960,6 +1015,41 @@ export interface components {
          * @enum {string}
          */
         AssistantActionStatus: "proposed" | "confirmed" | "executing" | "completed" | "failed" | "declined" | "cancelled" | "expired" | "superseded";
+        /** AssistantAttachmentRef */
+        AssistantAttachmentRef: {
+            /** Attachment Id */
+            attachment_id: string;
+        };
+        /** AssistantAttachmentResponse */
+        AssistantAttachmentResponse: {
+            /** Attachment Id */
+            attachment_id: string;
+            /** Conversation Id */
+            conversation_id: string;
+            /** File Name */
+            file_name: string;
+            /** Media Type */
+            media_type: string;
+            /** Byte Size */
+            byte_size: number;
+            /** Sha256 */
+            sha256: string;
+            status: components["schemas"]["AssistantAttachmentStatus"];
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Attached At */
+            attached_at: string | null;
+            /** Revoked At */
+            revoked_at: string | null;
+        };
+        /**
+         * AssistantAttachmentStatus
+         * @enum {string}
+         */
+        AssistantAttachmentStatus: "uploaded" | "attached" | "revoked";
         /** AssistantConversationResponse */
         AssistantConversationResponse: {
             /** Conversation Id */
@@ -1014,12 +1104,12 @@ export interface components {
             sequence: number;
             role: components["schemas"]["AssistantMessageRole"];
             status: components["schemas"]["AssistantMessageStatus"];
+            /** Content Schema Version */
+            content_schema_version: string;
             /** Text */
             text: string;
             /** Content Blocks */
-            content_blocks: {
-                [key: string]: unknown;
-            }[];
+            content_blocks: (components["schemas"]["TextContentBlock"] | components["schemas"]["MarkdownContentBlock"] | components["schemas"]["CodeContentBlock"] | components["schemas"]["ErrorContentBlock"] | components["schemas"]["AttachmentContentBlock"] | components["schemas"]["ResourceRefContentBlock"] | components["schemas"]["DiagramContentBlock"])[];
             /** Attachment Refs */
             attachment_refs: {
                 [key: string]: unknown;
@@ -1116,9 +1206,32 @@ export interface components {
             /** Text */
             text: string;
             /** Attachment Refs */
-            attachment_refs?: {
-                [key: string]: unknown;
-            }[];
+            attachment_refs?: components["schemas"]["AssistantAttachmentRef"][];
+        };
+        /** AttachmentContentBlock */
+        AttachmentContentBlock: {
+            /** Text */
+            text: string;
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            type: "attachment";
+            /** Attachment Id */
+            attachment_id: string;
+            /** File Name */
+            file_name: string;
+            /** Media Type */
+            media_type: string;
+            /** Byte Size */
+            byte_size: number;
+            /** Sha256 */
+            sha256: string;
+        };
+        /** Body_upload_attachment_api_v1_assistant_conversations__conversation_id__attachments_post */
+        Body_upload_attachment_api_v1_assistant_conversations__conversation_id__attachments_post: {
+            /** File */
+            file: string;
         };
         /** ChangePasswordRequest */
         ChangePasswordRequest: {
@@ -1132,6 +1245,58 @@ export interface components {
              * Format: password
              */
             new_password: string;
+        };
+        /** CodeContentBlock */
+        CodeContentBlock: {
+            /** Text */
+            text: string;
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            type: "code";
+            /** Language */
+            language: string;
+            /** File Name */
+            file_name?: string | null;
+            /**
+             * Truncated
+             * @default false
+             */
+            truncated: boolean;
+        };
+        /** DiagramContentBlock */
+        DiagramContentBlock: {
+            /** Text */
+            text: string;
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            type: "diagram";
+            /**
+             * Template
+             * @enum {string}
+             */
+            template: "organization_chart" | "execution_plan";
+            /** Source */
+            source: components["schemas"]["OrganizationDiagramSource"] | components["schemas"]["TaskPlanDiagramSource"];
+        };
+        /** ErrorContentBlock */
+        ErrorContentBlock: {
+            /** Text */
+            text: string;
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            type: "error";
+            /** Code */
+            code: string;
+            /** Details */
+            details?: {
+                [key: string]: unknown;
+            } | unknown[] | string | number | boolean | null;
         };
         /** ErrorEnvelope */
         ErrorEnvelope: {
@@ -1232,6 +1397,21 @@ export interface components {
         LoginResponse: {
             user: components["schemas"]["UserResponse"];
         };
+        /** MarkdownContentBlock */
+        MarkdownContentBlock: {
+            /** Text */
+            text: string;
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            type: "markdown";
+            /**
+             * Truncated
+             * @default false
+             */
+            truncated: boolean;
+        };
         /** OrganizationDetailResponse */
         OrganizationDetailResponse: {
             /** Organization Id */
@@ -1253,6 +1433,18 @@ export interface components {
              */
             updated_at: string;
             current_published_spec: components["schemas"]["OrganizationSpec"] | null;
+        };
+        /** OrganizationDiagramSource */
+        OrganizationDiagramSource: {
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            kind: "organization_spec_version";
+            /** Organization Id */
+            organization_id: string;
+            /** Spec Version Id */
+            spec_version_id: string;
         };
         /** OrganizationProposalRequest */
         OrganizationProposalRequest: {
@@ -1379,6 +1571,25 @@ export interface components {
          * @enum {string}
          */
         PlanStepStatus: "pending_dependency" | "ready" | "submitted" | "running" | "waiting" | "validating_output" | "completed" | "blocked" | "failed" | "cancelled";
+        /** ResourceRefContentBlock */
+        ResourceRefContentBlock: {
+            /** Text */
+            text: string;
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            type: "resource_ref";
+            /**
+             * Resource Type
+             * @enum {string}
+             */
+            resource_type: "organization" | "organization_spec_version" | "task" | "plan" | "artifact" | "feasibility_check" | "runtime_binding";
+            /** Resource Id */
+            resource_id: string;
+            /** Label */
+            label: string;
+        };
         /** RuntimeBindingResponse */
         RuntimeBindingResponse: {
             /** Runtime Binding Id */
@@ -1714,6 +1925,18 @@ export interface components {
          * @enum {string}
          */
         TaskOrchestrationMode: "legacy" | "planned";
+        /** TaskPlanDiagramSource */
+        TaskPlanDiagramSource: {
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            kind: "task_plan";
+            /** Task Id */
+            task_id: string;
+            /** Plan Id */
+            plan_id: string;
+        };
         /** TaskResponse */
         TaskResponse: {
             /** Task Id */
@@ -1782,6 +2005,16 @@ export interface components {
             observed_total_tokens: number;
             /** Assignments */
             assignments: components["schemas"]["AssignmentTokenUsageResponse"][];
+        };
+        /** TextContentBlock */
+        TextContentBlock: {
+            /** Text */
+            text: string;
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            type: "text";
         };
         /** UpdateUserRequest */
         UpdateUserRequest: {
@@ -2183,6 +2416,24 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorEnvelope"];
                 };
             };
+            /** @description Request Entity Too Large */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unsupported Media Type */
+            415: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
             /** @description Unprocessable Entity */
             422: {
                 headers: {
@@ -2234,6 +2485,24 @@ export interface operations {
             };
             /** @description Conflict */
             409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Request Entity Too Large */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unsupported Media Type */
+            415: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -2299,6 +2568,260 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorEnvelope"];
                 };
             };
+            /** @description Request Entity Too Large */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unsupported Media Type */
+            415: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    upload_attachment_api_v1_assistant_conversations__conversation_id__attachments_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                conversation_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": components["schemas"]["Body_upload_attachment_api_v1_assistant_conversations__conversation_id__attachments_post"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AssistantAttachmentResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Request Entity Too Large */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unsupported Media Type */
+            415: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    revoke_attachment_api_v1_assistant_conversations__conversation_id__attachments__attachment_id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                conversation_id: string;
+                attachment_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AssistantAttachmentResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Request Entity Too Large */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unsupported Media Type */
+            415: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    download_attachment_api_v1_assistant_conversations__conversation_id__attachments__attachment_id__content_get: {
+        parameters: {
+            query?: {
+                download?: boolean;
+            };
+            header?: never;
+            path: {
+                conversation_id: string;
+                attachment_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Request Entity Too Large */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unsupported Media Type */
+            415: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
             /** @description Unprocessable Entity */
             422: {
                 headers: {
@@ -2353,6 +2876,24 @@ export interface operations {
             };
             /** @description Conflict */
             409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Request Entity Too Large */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unsupported Media Type */
+            415: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -2424,6 +2965,24 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorEnvelope"];
                 };
             };
+            /** @description Request Entity Too Large */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unsupported Media Type */
+            415: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
             /** @description Unprocessable Entity */
             422: {
                 headers: {
@@ -2475,6 +3034,24 @@ export interface operations {
             };
             /** @description Conflict */
             409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Request Entity Too Large */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unsupported Media Type */
+            415: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -2540,6 +3117,24 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorEnvelope"];
                 };
             };
+            /** @description Request Entity Too Large */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unsupported Media Type */
+            415: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
             /** @description Unprocessable Entity */
             422: {
                 headers: {
@@ -2598,6 +3193,24 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorEnvelope"];
                 };
             };
+            /** @description Request Entity Too Large */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unsupported Media Type */
+            415: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
             /** @description Unprocessable Entity */
             422: {
                 headers: {
@@ -2649,6 +3262,24 @@ export interface operations {
             };
             /** @description Conflict */
             409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Request Entity Too Large */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unsupported Media Type */
+            415: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -2718,6 +3349,24 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorEnvelope"];
                 };
             };
+            /** @description Request Entity Too Large */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unsupported Media Type */
+            415: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
             /** @description Unprocessable Entity */
             422: {
                 headers: {
@@ -2771,6 +3420,24 @@ export interface operations {
             };
             /** @description Conflict */
             409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Request Entity Too Large */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unsupported Media Type */
+            415: {
                 headers: {
                     [name: string]: unknown;
                 };
