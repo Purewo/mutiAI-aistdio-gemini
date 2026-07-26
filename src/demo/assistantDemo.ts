@@ -15,7 +15,7 @@
  * Everything here is replaced by the generated client when the assistant API enters OpenAPI.
  * Keep this file outside `src/api/`, `contracts/`, and `fixtures/`.
  */
-import type { OrganizationSpec } from '../api/types';
+import type { OrganizationSpec, WorkloadRequirements } from '../api/types';
 
 /** Binding key used by the backend's local demo configuration; user-editable product data. */
 const DEFAULT_BINDING_KEY = 'codex-local-default';
@@ -25,6 +25,7 @@ interface RoleSeed {
   name: string;
   responsibility: string;
   reports_to?: string;
+  capability_requirements?: WorkloadRequirements;
 }
 
 interface Template {
@@ -97,6 +98,40 @@ const REVIEWER_ROLE: RoleSeed = {
   responsibility: '校验产出的准确性、完整性与一致性。',
 };
 
+const GPU_KEYWORDS = /训练|GPU|gpu|显卡|渲染/;
+
+/**
+ * Structured workload requirements for the GPU demo role. These are real contracted
+ * `WorkloadRequirements` values; the backend validator evaluates them against the selected
+ * binding's capability profile, so this role demonstrates the genuine feasibility gate.
+ */
+const GPU_TRAINING_REQUIREMENTS: WorkloadRequirements = {
+  schema_version: '1.0',
+  os_families: [],
+  requires_gui: false,
+  requires_gpu: true,
+  min_gpu_memory_mb: null,
+  min_cpu_capacity: 'heavy',
+  min_memory_mb: null,
+  required_tools: [],
+  requires_network: false,
+  required_external_services: [],
+  required_hardware: [],
+  required_proprietary_software: [],
+  input_media_types: [],
+  output_media_types: [],
+  estimated_duration_seconds: null,
+  estimated_input_size_bytes: null,
+  resource_intensive: true,
+};
+
+const GPU_TRAINER_ROLE: RoleSeed = {
+  role_key: 'trainer',
+  name: '模型训练',
+  responsibility: '在 GPU 环境中运行训练与评估任务。',
+  capability_requirements: GPU_TRAINING_REQUIREMENTS,
+};
+
 export interface AssistantDraft {
   spec: OrganizationSpec;
   /** Templated reply the demo assistant shows alongside the structured draft. */
@@ -126,6 +161,9 @@ function buildSpec(template: Template, extraSpecialists: RoleSeed[]): Organizati
         is_lead: false,
         reports_to: seed.reports_to ?? 'lead',
         runtime_binding_key: DEFAULT_BINDING_KEY,
+        ...(seed.capability_requirements
+          ? { capability_requirements: seed.capability_requirements }
+          : {}),
       })),
     ],
   };
@@ -143,12 +181,25 @@ export function draftOrganization(message: string, previous: AssistantDraft | nu
     (previous ? TEMPLATES.find((candidate) => candidate.key === previous.templateKey) : undefined) ??
     FALLBACK_TEMPLATE;
 
-  const wantsReviewer =
-    REVIEWER_KEYWORDS.test(message) ||
-    (previous?.templateKey === template.key &&
-      previous.spec.roles.some((role) => role.role_key === REVIEWER_ROLE.role_key));
+  // Extra roles inherit from the draft being revised, unless the message asks to drop them —
+  // otherwise a blocked GPU proposal could never be revised back to a feasible one.
+  const removeIntent = /去掉|删除|移除|不需要|不要/.test(message);
+  const inherited = (roleKey: string) =>
+    previous?.templateKey === template.key &&
+    previous.spec.roles.some((role) => role.role_key === roleKey);
 
-  const spec = buildSpec(template, wantsReviewer ? [REVIEWER_ROLE] : []);
+  const mentionsReviewer = REVIEWER_KEYWORDS.test(message);
+  const mentionsGpu = GPU_KEYWORDS.test(message);
+  const wantsReviewer =
+    removeIntent && mentionsReviewer ? false : mentionsReviewer || inherited(REVIEWER_ROLE.role_key);
+  const wantsGpuTrainer =
+    removeIntent && mentionsGpu ? false : mentionsGpu || inherited(GPU_TRAINER_ROLE.role_key);
+
+  const extras: RoleSeed[] = [
+    ...(wantsReviewer ? [REVIEWER_ROLE] : []),
+    ...(wantsGpuTrainer ? [GPU_TRAINER_ROLE] : []),
+  ];
+  const spec = buildSpec(template, extras);
 
   const revising = previous !== null && previous.templateKey === template.key;
   const roleNames = spec.roles.map((role) => role.name).join('、');
@@ -163,9 +214,9 @@ export function draftOrganization(message: string, previous: AssistantDraft | nu
 export const DEMO_GREETING =
   '您好！我是平台小助理。请描述您想创建的 AI 组织，例如它要解决的问题和需要哪些岗位，我会起草一份结构化方案供您确认。';
 
-/** Suggested prompts for the empty conversation state. */
+/** Suggested prompts for the empty conversation state. The GPU one exercises the feasibility gate. */
 export const DEMO_SUGGESTIONS = [
   '我想要一个能写公众号文章的内容团队',
   '帮我建一个把业务数据变成分析报告的组织',
-  '需要一个前后端配合的软件研发组织，注重质量校验',
+  '需要一个用 GPU 训练模型的研发组织',
 ];

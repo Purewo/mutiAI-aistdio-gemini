@@ -12,16 +12,18 @@ import {
 import {
   confirmOrganizationVersion,
   createOrganizationProposal,
+  listVersionFeasibilityChecks,
   publishOrganizationVersion,
 } from '../api/endpoints';
 import { apiErrorFromThrown, type ApiError } from '../api/errors';
-import type { OrganizationVersion } from '../api/types';
+import type { FeasibilityCheck, OrganizationVersion } from '../api/types';
 import {
   DEMO_GREETING,
   DEMO_SUGGESTIONS,
   draftOrganization,
   type AssistantDraft,
 } from '../demo/assistantDemo';
+import FeasibilityPanel from '../components/FeasibilityPanel';
 import OrganizationGraph from '../components/OrganizationGraph';
 import PageHeader from '../components/PageHeader';
 import { InlineError } from '../components/states';
@@ -34,28 +36,33 @@ import { InlineError } from '../components/states';
  * data, and state-changing transitions require explicit confirmation as product actions — chat text
  * alone never publishes anything.
  *
- * The `/api/v1/assistant` conversation contracts are not implemented yet, so the assistant's
- * replies and drafting here come from the clearly-labeled demo engine in `src/demo/assistantDemo.ts`
- * (mock states the design doc explicitly authorizes). The confirm and publish buttons execute the
- * REAL contracted lifecycle — `POST /organizations/proposals`, then the confirm and publish
- * transitions — so a confirmed draft becomes a real published organization. When the conversation
- * API lands, the demo engine is replaced by the real transport and drafts arrive as product
- * records; the card lifecycle below maps onto AssistantAction states.
+ * The `/api/v1/assistant` conversation contracts are not implemented yet, so replies and spec
+ * drafting come from the clearly-labeled demo engine in `src/demo/assistantDemo.ts` (mock states
+ * the design doc explicitly authorizes). Everything downstream of drafting is REAL: each draft is
+ * persisted through `POST /organizations/proposals` (a proposal is a draft operation and needs no
+ * confirmation), the backend feasibility validator runs at proposal time and its persisted checks
+ * render on the card, and the explicit confirm and publish actions execute the contracted
+ * transitions. Only a `feasible` outcome offers confirmation; blocked and capability-unknown
+ * results stay preview-only and cannot be overridden, matching the product law. When the
+ * conversation API lands, the demo engine is replaced by the real transport and the card lifecycle
+ * maps onto AssistantAction states.
  */
 
-/** One proposal draft card inside the conversation, with its real-lifecycle progress. */
 interface ProposalCard {
   id: number;
   draft: AssistantDraft;
+  /** Persisted version; null only when creation itself failed. */
+  version: OrganizationVersion | null;
+  /** Persisted feasibility checks for the version, newest first. */
+  checks: FeasibilityCheck[];
   phase:
-    | 'draft'
+    | 'preview'
     | 'confirming'
     | 'confirmed'
     | 'publishing'
     | 'published'
-    | 'superseded';
-  /** Persisted version, present once the real proposal has been created. */
-  version: OrganizationVersion | null;
+    | 'superseded'
+    | 'create_failed';
   error: ApiError | null;
 }
 
@@ -67,8 +74,13 @@ type ChatMessage =
 let nextId = 1;
 const allocateId = () => nextId++;
 
-/** Demo-only latency so the running-turn state is visible, mirroring a real AssistantTurn. */
-const DEMO_TURN_DELAY_MS = 700;
+function latestCheck(checks: FeasibilityCheck[]): FeasibilityCheck | null {
+  let latest: FeasibilityCheck | null = null;
+  for (const check of checks) {
+    if (!latest || check.created_at > latest.created_at) latest = check;
+  }
+  return latest;
+}
 
 export default function Assistant() {
   const [messages, setMessages] = useState<ChatMessage[]>([
@@ -77,6 +89,14 @@ export default function Assistant() {
   const [cards, setCards] = useState<Map<number, ProposalCard>>(new Map());
   const [input, setInput] = useState('');
   const [turnRunning, setTurnRunning] = useState(false);
+  /**
+   * Organization this conversation is iterating on. A revision of the same demo template becomes a
+   * new proposal version of the same organization; switching templates starts a new organization.
+   */
+  const [conversationOrg, setConversationOrg] = useState<{
+    organizationId: string;
+    templateKey: string;
+  } | null>(null);
 
   const scrollRef = useRef<HTMLDivElement | null>(null);
   const composerRef = useRef<HTMLTextAreaElement | null>(null);
@@ -85,12 +105,17 @@ export default function Assistant() {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' });
   }, [messages, cards, turnRunning]);
 
-  const latestDraftCard = (): ProposalCard | null => {
-    let latest: ProposalCard | null = null;
+  const pendingPreviewCard = (): ProposalCard | null => {
+    let pending: ProposalCard | null = null;
     for (const card of cards.values()) {
-      if (card.phase === 'draft' && (!latest || card.id > latest.id)) latest = card;
+      if (
+        (card.phase === 'preview' || card.phase === 'create_failed') &&
+        (!pending || card.id > pending.id)
+      ) {
+        pending = card;
+      }
     }
-    return latest;
+    return pending;
   };
 
   const updateCard = (cardId: number, patch: Partial<ProposalCard>) => {
@@ -102,7 +127,7 @@ export default function Assistant() {
     });
   };
 
-  const sendMessage = (raw: string) => {
+  const sendMessage = async (raw: string) => {
     const text = raw.trim();
     if (text.length === 0 || turnRunning) return;
 
@@ -110,55 +135,106 @@ export default function Assistant() {
     setMessages((current) => [...current, { kind: 'user', id: allocateId(), text }]);
     setTurnRunning(true);
 
-    const pendingDraft = latestDraftCard();
+    const pending = pendingPreviewCard();
+    // Demo drafting; the persisted record and feasibility verdict below are real.
+    const draft = draftOrganization(text, pending?.draft ?? null);
+    const revisingSameOrganization =
+      conversationOrg !== null && conversationOrg.templateKey === draft.templateKey;
 
-    // Simulated AssistantTurn: the reply is demo drafting, not backend reasoning.
-    window.setTimeout(() => {
-      const draft = draftOrganization(text, pendingDraft?.draft ?? null);
-      const card: ProposalCard = {
-        id: allocateId(),
-        draft,
-        phase: 'draft',
-        version: null,
-        error: null,
-      };
+    const card: ProposalCard = {
+      id: allocateId(),
+      draft,
+      version: null,
+      checks: [],
+      phase: 'preview',
+      error: null,
+    };
+
+    try {
+      const version = await createOrganizationProposal({
+        organization_id: revisingSameOrganization ? conversationOrg.organizationId : null,
+        source_request: text,
+        spec: draft.spec,
+      });
+      // The proposal-phase check is persisted by the backend; fetch it for the preview. A failure
+      // here degrades to "no verdict shown yet", never to an invented outcome.
+      let checks: FeasibilityCheck[] = [];
+      try {
+        checks = await listVersionFeasibilityChecks(
+          version.organization_id,
+          version.spec_version_id,
+        );
+      } catch {
+        checks = [];
+      }
+
+      card.version = version;
+      card.checks = checks;
+      setConversationOrg({
+        organizationId: version.organization_id,
+        templateKey: draft.templateKey,
+      });
+
+      const verdict = latestCheck(checks);
+      const feasible = verdict === null || verdict.outcome === 'feasible';
+      const replyText = feasible
+        ? draft.replyText
+        : `${draft.replyText}\n\n注意：该方案未通过 Runtime 可行性校验，详见下方结论。您可以按建议调整需求后继续对话。`;
 
       setCards((current) => {
         const next = new Map(current);
-        // Revision replaces the pending draft; drafts that already hit the backend stay as history.
-        if (pendingDraft) {
-          const stale = next.get(pendingDraft.id);
-          if (stale && stale.phase === 'draft') next.set(stale.id, { ...stale, phase: 'superseded' });
+        if (pending) {
+          const stale = next.get(pending.id);
+          if (stale && (stale.phase === 'preview' || stale.phase === 'create_failed')) {
+            next.set(stale.id, { ...stale, phase: 'superseded' });
+          }
         }
         next.set(card.id, card);
         return next;
       });
       setMessages((current) => [
         ...current,
-        { kind: 'assistant', id: allocateId(), text: draft.replyText, cardId: card.id },
+        { kind: 'assistant', id: allocateId(), text: replyText, cardId: card.id },
       ]);
+    } catch (cause) {
+      card.phase = 'create_failed';
+      card.error = apiErrorFromThrown(cause);
+      setCards((current) => new Map(current).set(card.id, card));
+      setMessages((current) => [
+        ...current,
+        {
+          kind: 'assistant',
+          id: allocateId(),
+          text: '后端拒绝了这份方案，具体原因如下。您可以调整描述后重新发送。',
+          cardId: card.id,
+        },
+      ]);
+    } finally {
       setTurnRunning(false);
       composerRef.current?.focus();
-    }, DEMO_TURN_DELAY_MS);
+    }
   };
 
-  /**
-   * Execute the real preview-first lifecycle for a confirmed draft: create the proposal version,
-   * then confirm it. Publishing stays a separate explicit action, matching the product rule that a
-   * proposal is never presented as published before both transitions complete.
-   */
-  const confirmDraft = async (cardId: number) => {
+  const refreshChecks = async (cardId: number, version: OrganizationVersion) => {
+    try {
+      const checks = await listVersionFeasibilityChecks(
+        version.organization_id,
+        version.spec_version_id,
+      );
+      updateCard(cardId, { checks });
+    } catch {
+      // Keep the existing persisted checks; never substitute an invented verdict.
+    }
+  };
+
+  const confirmProposal = async (cardId: number) => {
     const card = cards.get(cardId);
-    if (!card || card.phase !== 'draft') return;
+    if (!card || card.phase !== 'preview' || !card.version) return;
     updateCard(cardId, { phase: 'confirming', error: null });
     try {
-      const proposal = await createOrganizationProposal({
-        source_request: null,
-        spec: card.draft.spec,
-      });
       const confirmed = await confirmOrganizationVersion(
-        proposal.organization_id,
-        proposal.spec_version_id,
+        card.version.organization_id,
+        card.version.spec_version_id,
       );
       updateCard(cardId, { phase: 'confirmed', version: confirmed });
       setMessages((current) => [
@@ -171,11 +247,13 @@ export default function Assistant() {
         },
       ]);
     } catch (cause) {
-      updateCard(cardId, { phase: 'draft', error: apiErrorFromThrown(cause) });
+      updateCard(cardId, { phase: 'preview', error: apiErrorFromThrown(cause) });
+      // A confirm-time gate rejection persists a new check; show the refreshed findings.
+      void refreshChecks(cardId, card.version);
     }
   };
 
-  const publishDraft = async (cardId: number) => {
+  const publishProposal = async (cardId: number) => {
     const card = cards.get(cardId);
     if (!card || card.phase !== 'confirmed' || !card.version) return;
     updateCard(cardId, { phase: 'publishing', error: null });
@@ -187,21 +265,18 @@ export default function Assistant() {
       updateCard(cardId, { phase: 'published', version: published });
       setMessages((current) => [
         ...current,
-        {
-          kind: 'event',
-          id: allocateId(),
-          text: `组织「${published.spec.name}」已发布`,
-        },
+        { kind: 'event', id: allocateId(), text: `组织「${published.spec.name}」已发布` },
       ]);
     } catch (cause) {
       updateCard(cardId, { phase: 'confirmed', error: apiErrorFromThrown(cause) });
+      void refreshChecks(cardId, card.version);
     }
   };
 
   const handleComposerKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (event.key === 'Enter' && !event.shiftKey && !event.nativeEvent.isComposing) {
       event.preventDefault();
-      sendMessage(input);
+      void sendMessage(input);
     }
   };
 
@@ -215,7 +290,7 @@ export default function Assistant() {
       <div className="border-b border-amber-200/60 bg-amber-50/80 px-6 py-2 sm:px-8">
         <p className="mx-auto flex max-w-3xl items-center gap-2 text-xs leading-relaxed text-amber-800">
           <FlaskConical className="h-3.5 w-3.5 flex-shrink-0" aria-hidden="true" />
-          小助理的回复与方案起草目前是前端演示逻辑（会话后端实现中）。「确认方案」与「发布」执行真实后端操作。
+          小助理的回复与方案起草目前是前端演示逻辑（会话后端实现中）。方案记录、可行性校验、确认与发布均为真实后端操作。
         </p>
       </div>
 
@@ -230,8 +305,8 @@ export default function Assistant() {
                   ? cards.get(message.cardId) ?? null
                   : null
               }
-              onConfirm={confirmDraft}
-              onPublish={publishDraft}
+              onConfirm={confirmProposal}
+              onPublish={publishProposal}
             />
           ))}
 
@@ -243,7 +318,7 @@ export default function Assistant() {
                 <button
                   key={suggestion}
                   type="button"
-                  onClick={() => sendMessage(suggestion)}
+                  onClick={() => void sendMessage(suggestion)}
                   className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm text-slate-600 shadow-sm transition-colors hover:border-indigo-200 hover:text-indigo-700 focus:outline-none focus-visible:ring-4 focus-visible:ring-indigo-500/15"
                 >
                   {suggestion}
@@ -260,7 +335,7 @@ export default function Assistant() {
           className="mx-auto flex max-w-3xl items-end gap-2 rounded-2xl border border-slate-300 bg-white p-2 shadow-sm transition-all duration-200 focus-within:border-indigo-500 focus-within:ring-4 focus-within:ring-indigo-500/10"
           onSubmit={(event) => {
             event.preventDefault();
-            sendMessage(input);
+            void sendMessage(input);
           }}
         >
           <label htmlFor="assistant-composer" className="sr-only">
@@ -348,15 +423,21 @@ function ProposalCardView({
   onPublish: (cardId: number) => void;
 }) {
   const phaseBadge: Record<ProposalCard['phase'], { label: string; tone: string }> = {
-    draft: { label: '待确认草稿', tone: 'border-blue-200 bg-blue-50 text-blue-700' },
+    preview: { label: '方案预览', tone: 'border-blue-200 bg-blue-50 text-blue-700' },
     confirming: { label: '确认中', tone: 'border-indigo-200 bg-indigo-50 text-indigo-700' },
     confirmed: { label: '已确认', tone: 'border-amber-200 bg-amber-50 text-amber-700' },
     publishing: { label: '发布中', tone: 'border-emerald-200 bg-emerald-50 text-emerald-700' },
     published: { label: '已发布', tone: 'border-emerald-200/50 bg-emerald-50 text-emerald-700' },
     superseded: { label: '已被新方案取代', tone: 'border-slate-200 bg-slate-50 text-slate-500' },
+    create_failed: { label: '创建失败', tone: 'border-red-200 bg-red-50 text-red-700' },
   };
   const badge = phaseBadge[card.phase];
   const busy = card.phase === 'confirming' || card.phase === 'publishing';
+
+  const verdict = latestCheck(card.checks);
+  // The backend enforces the gate regardless; hiding confirm for a non-feasible verdict keeps the
+  // UI from offering a transition the product law forbids.
+  const confirmable = verdict === null || verdict.outcome === 'feasible';
 
   const actionButton =
     'inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold text-white shadow-md transition-all focus:outline-none focus-visible:ring-4 disabled:cursor-not-allowed disabled:opacity-60';
@@ -377,7 +458,13 @@ function ProposalCardView({
         ) : null}
       </div>
 
-      <OrganizationGraph spec={card.draft.spec} />
+      <OrganizationGraph spec={card.version?.spec ?? card.draft.spec} />
+
+      {card.checks.length > 0 ? (
+        <div className="mt-3">
+          <FeasibilityPanel checks={card.checks} />
+        </div>
+      ) : null}
 
       {card.error ? (
         <div className="mt-3">
@@ -385,26 +472,32 @@ function ProposalCardView({
         </div>
       ) : null}
 
-      {card.phase !== 'superseded' ? (
+      {card.phase !== 'superseded' && card.phase !== 'create_failed' ? (
         <div className="mt-4 flex flex-wrap items-center justify-end gap-2 border-t border-slate-100 pt-3">
-          {card.phase === 'draft' || card.phase === 'confirming' ? (
+          {card.phase === 'preview' || card.phase === 'confirming' ? (
             <>
               <span className="mr-auto text-xs text-slate-400">
                 需要调整？直接在下方输入修改意见。
               </span>
-              <button
-                type="button"
-                onClick={() => onConfirm(card.id)}
-                disabled={busy}
-                className={`${actionButton} bg-gradient-to-r from-indigo-600 to-blue-600 shadow-indigo-200 hover:from-indigo-700 hover:to-blue-700 focus-visible:ring-indigo-500/20`}
-              >
-                {card.phase === 'confirming' ? (
-                  <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
-                ) : (
-                  <Check className="h-4 w-4" aria-hidden="true" />
-                )}
-                确认方案
-              </button>
+              {confirmable ? (
+                <button
+                  type="button"
+                  onClick={() => onConfirm(card.id)}
+                  disabled={busy}
+                  className={`${actionButton} bg-gradient-to-r from-indigo-600 to-blue-600 shadow-indigo-200 hover:from-indigo-700 hover:to-blue-700 focus-visible:ring-indigo-500/20`}
+                >
+                  {card.phase === 'confirming' ? (
+                    <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
+                  ) : (
+                    <Check className="h-4 w-4" aria-hidden="true" />
+                  )}
+                  确认方案
+                </button>
+              ) : (
+                <span className="text-xs font-medium text-slate-500">
+                  未通过可行性校验的方案仅供预览，无法确认。
+                </span>
+              )}
             </>
           ) : null}
 
@@ -449,7 +542,7 @@ function AssistantAvatar() {
 
 function TypingIndicator() {
   return (
-    <div className="flex gap-3" role="status" aria-label="小助理正在输入">
+    <div className="flex gap-3" role="status" aria-label="小助理正在处理">
       <AssistantAvatar />
       <div className="flex items-center gap-1 rounded-2xl rounded-tl-sm border border-slate-200/60 bg-white px-4 py-3.5 shadow-sm">
         <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-slate-400 [animation-delay:0ms]" />

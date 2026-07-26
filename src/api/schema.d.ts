@@ -75,6 +75,57 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/feasibility-checks/{feasibility_check_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Feasibility Check */
+        get: operations["get_feasibility_check_api_v1_feasibility_checks__feasibility_check_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/organizations/{organization_id}/versions/{spec_version_id}/feasibility-checks": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Organization Feasibility Checks */
+        get: operations["list_organization_feasibility_checks_api_v1_organizations__organization_id__versions__spec_version_id__feasibility_checks_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/tasks/{task_id}/feasibility-checks": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Task Feasibility Checks */
+        get: operations["list_task_feasibility_checks_api_v1_tasks__task_id__feasibility_checks_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/organizations/proposals": {
         parameters: {
             query?: never;
@@ -456,6 +507,7 @@ export interface components {
             reports_to?: string | null;
             /** Runtime Binding Key */
             runtime_binding_key: string;
+            capability_requirements?: components["schemas"]["WorkloadRequirements"];
         };
         /**
          * ApprovalDecision
@@ -672,6 +724,68 @@ export interface components {
             /** Details */
             details?: unknown | null;
         };
+        /** FeasibilityCheckResponse */
+        FeasibilityCheckResponse: {
+            /** Feasibility Check Id */
+            feasibility_check_id: string;
+            /** Target Type */
+            target_type: string;
+            /** Target Id */
+            target_id: string;
+            /** Phase */
+            phase: string;
+            /** Validator Version */
+            validator_version: string;
+            /** Input Hash */
+            input_hash: string;
+            /** Requirements */
+            requirements: {
+                [key: string]: unknown;
+            }[];
+            /** Profile Revisions */
+            profile_revisions: {
+                [key: string]: unknown;
+            }[];
+            outcome: components["schemas"]["FeasibilityOutcome"];
+            /** Findings */
+            findings: components["schemas"]["FeasibilityFindingResponse"][];
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+        };
+        /** FeasibilityFindingResponse */
+        FeasibilityFindingResponse: {
+            /** Reason Code */
+            reason_code: string;
+            /** Role Key */
+            role_key: string;
+            /** Binding Key */
+            binding_key: string;
+            /** Capability */
+            capability: string;
+            /** Required */
+            required: unknown | null;
+            /** Actual */
+            actual: unknown | null;
+            /** Alternative Codes */
+            alternative_codes: string[];
+            /** Message */
+            message: string;
+            /** Alternatives */
+            alternatives: string[];
+        };
+        /**
+         * FeasibilityOutcome
+         * @enum {string}
+         */
+        FeasibilityOutcome: "feasible" | "conditional" | "blocked" | "capability_unknown";
+        /** HTTPValidationError */
+        HTTPValidationError: {
+            /** Detail */
+            detail?: components["schemas"]["ValidationError"][];
+        };
         /** HealthResponse */
         HealthResponse: {
             /**
@@ -854,6 +968,7 @@ export interface components {
             /** Reasoning Effort */
             reasoning_effort: string | null;
             security_mode: components["schemas"]["RuntimeSecurityMode"];
+            capability_profile: components["schemas"]["RuntimeCapabilityProfileResponse"];
             /** Is Active */
             is_active: boolean;
             /**
@@ -876,6 +991,125 @@ export interface components {
             /** Reasoning Effort */
             reasoning_effort?: string | null;
             security_mode: components["schemas"]["RuntimeSecurityMode"];
+            capability_profile?: components["schemas"]["RuntimeCapabilityProfileSpec"] | null;
+        };
+        /** RuntimeCapabilityProfileResponse */
+        RuntimeCapabilityProfileResponse: {
+            /** Capability Profile Id */
+            capability_profile_id: string;
+            /** Revision */
+            revision: number;
+            profile: components["schemas"]["RuntimeCapabilityProfileSpec"];
+            /** Source */
+            source: string;
+            /** Trusted */
+            trusted: boolean;
+            /** Observed At */
+            observed_at: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+        };
+        /**
+         * RuntimeCapabilityProfileV1
+         * @description Versioned declaration of an effective Runtime environment.
+         */
+        RuntimeCapabilityProfileSpec: {
+            /**
+             * Schema Version
+             * @default 1.0
+             * @constant
+             */
+            schema_version: "1.0";
+            /**
+             * Os Family
+             * @default unknown
+             * @enum {string}
+             */
+            os_family: "linux" | "windows" | "macos" | "unknown";
+            /** Os Version */
+            os_version?: string | null;
+            /** Architecture */
+            architecture?: string | null;
+            /** Headless */
+            headless?: boolean | null;
+            /**
+             * Cpu Capacity Class
+             * @default unknown
+             * @enum {string}
+             */
+            cpu_capacity_class: "light" | "standard" | "heavy" | "unknown";
+            /** Memory Mb */
+            memory_mb?: number | null;
+            /** Gpu Available */
+            gpu_available?: boolean | null;
+            /** Gpu Kind */
+            gpu_kind?: string | null;
+            /** Gpu Memory Mb */
+            gpu_memory_mb?: number | null;
+            /**
+             * Installed Tools
+             * @default []
+             */
+            installed_tools: string[];
+            /**
+             * Tool Inventory Complete
+             * @default false
+             */
+            tool_inventory_complete: boolean;
+            /** Network Access */
+            network_access?: boolean | null;
+            /**
+             * External Services
+             * @default []
+             */
+            external_services: string[];
+            /**
+             * External Service Inventory Complete
+             * @default false
+             */
+            external_service_inventory_complete: boolean;
+            /**
+             * Attached Hardware
+             * @default []
+             */
+            attached_hardware: string[];
+            /**
+             * Hardware Inventory Complete
+             * @default false
+             */
+            hardware_inventory_complete: boolean;
+            /**
+             * Proprietary Software
+             * @default []
+             */
+            proprietary_software: string[];
+            /**
+             * Proprietary Software Inventory Complete
+             * @default false
+             */
+            proprietary_software_inventory_complete: boolean;
+            /**
+             * Supported Input Media Types
+             * @default []
+             */
+            supported_input_media_types: string[];
+            /**
+             * Supported Output Media Types
+             * @default []
+             */
+            supported_output_media_types: string[];
+            /**
+             * Media Inventory Complete
+             * @default false
+             */
+            media_inventory_complete: boolean;
+            /** Max Duration Seconds */
+            max_duration_seconds?: number | null;
+            /** Max Input Size Bytes */
+            max_input_size_bytes?: number | null;
         };
         /** RuntimeControlResponse */
         RuntimeControlResponse: {
@@ -979,6 +1213,7 @@ export interface components {
             request: string;
             /** @default legacy */
             orchestration_mode: components["schemas"]["TaskOrchestrationMode"];
+            capability_requirements?: components["schemas"]["WorkloadRequirements"];
         };
         /** TaskExecutionPlanResponse */
         TaskExecutionPlanResponse: {
@@ -1050,6 +1285,7 @@ export interface components {
             organization_spec_version_id: string;
             /** Request */
             request: string;
+            capability_requirements: components["schemas"]["WorkloadRequirements"];
             orchestration_mode: components["schemas"]["TaskOrchestrationMode"];
             status: components["schemas"]["TaskStatus"];
             /** Result Summary */
@@ -1114,6 +1350,100 @@ export interface components {
             username: string;
             /** Display Name */
             display_name: string;
+        };
+        /** ValidationError */
+        ValidationError: {
+            /** Location */
+            loc: (string | number)[];
+            /** Message */
+            msg: string;
+            /** Error Type */
+            type: string;
+            /** Input */
+            input?: unknown;
+            /** Context */
+            ctx?: Record<string, never>;
+        };
+        /**
+         * WorkloadRequirementsV1
+         * @description Capabilities required by one role or one submitted workload.
+         */
+        WorkloadRequirements: {
+            /**
+             * Schema Version
+             * @default 1.0
+             * @constant
+             */
+            schema_version: "1.0";
+            /**
+             * Os Families
+             * @default []
+             */
+            os_families: ("linux" | "windows" | "macos")[];
+            /**
+             * Requires Gui
+             * @default false
+             */
+            requires_gui: boolean;
+            /**
+             * Requires Gpu
+             * @default false
+             */
+            requires_gpu: boolean;
+            /** Min Gpu Memory Mb */
+            min_gpu_memory_mb?: number | null;
+            /**
+             * Min Cpu Capacity
+             * @default light
+             * @enum {string}
+             */
+            min_cpu_capacity: "light" | "standard" | "heavy";
+            /** Min Memory Mb */
+            min_memory_mb?: number | null;
+            /**
+             * Required Tools
+             * @default []
+             */
+            required_tools: string[];
+            /**
+             * Requires Network
+             * @default false
+             */
+            requires_network: boolean;
+            /**
+             * Required External Services
+             * @default []
+             */
+            required_external_services: string[];
+            /**
+             * Required Hardware
+             * @default []
+             */
+            required_hardware: string[];
+            /**
+             * Required Proprietary Software
+             * @default []
+             */
+            required_proprietary_software: string[];
+            /**
+             * Input Media Types
+             * @default []
+             */
+            input_media_types: string[];
+            /**
+             * Output Media Types
+             * @default []
+             */
+            output_media_types: string[];
+            /** Estimated Duration Seconds */
+            estimated_duration_seconds?: number | null;
+            /** Estimated Input Size Bytes */
+            estimated_input_size_bytes?: number | null;
+            /**
+             * Resource Intensive
+             * @default false
+             */
+            resource_intensive: boolean;
         };
     };
     responses: never;
@@ -1229,6 +1559,154 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    get_feasibility_check_api_v1_feasibility_checks__feasibility_check_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                feasibility_check_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FeasibilityCheckResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_organization_feasibility_checks_api_v1_organizations__organization_id__versions__spec_version_id__feasibility_checks_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                organization_id: string;
+                spec_version_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FeasibilityCheckResponse"][];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_task_feasibility_checks_api_v1_tasks__task_id__feasibility_checks_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                task_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FeasibilityCheckResponse"][];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };

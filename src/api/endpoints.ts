@@ -10,6 +10,7 @@ import type {
   Approval,
   ApprovalDecisionRequest,
   Artifact,
+  FeasibilityCheck,
   LoginRequest,
   LoginResponse,
   OrganizationDetail,
@@ -117,6 +118,42 @@ export function publishOrganizationVersion(
     `/organizations/${encode(organizationId)}/versions/${encode(specVersionId)}/publish`,
     { method: 'POST', signal },
   );
+}
+
+/* ----------------------------------------------------------- feasibility */
+
+/**
+ * Feasibility is a product law evaluated by the backend validator; the frontend renders the
+ * persisted outcome and findings and never infers feasibility from a model name or an earlier
+ * successful execution. Only a `feasible` outcome permits the guarded state transition, and a
+ * blocked or capability-unknown result cannot be overridden by user confirmation.
+ */
+export function getFeasibilityCheck(
+  feasibilityCheckId: string,
+  signal?: AbortSignal,
+): Promise<FeasibilityCheck> {
+  return requestJson<FeasibilityCheck>(
+    `/feasibility-checks/${encode(feasibilityCheckId)}`,
+    { signal },
+  );
+}
+
+export function listVersionFeasibilityChecks(
+  organizationId: string,
+  specVersionId: string,
+  signal?: AbortSignal,
+): Promise<FeasibilityCheck[]> {
+  return requestJson<FeasibilityCheck[]>(
+    `/organizations/${encode(organizationId)}/versions/${encode(specVersionId)}/feasibility-checks`,
+    { signal },
+  );
+}
+
+export function listTaskFeasibilityChecks(
+  taskId: string,
+  signal?: AbortSignal,
+): Promise<FeasibilityCheck[]> {
+  return requestJson<FeasibilityCheck[]>(`/tasks/${encode(taskId)}/feasibility-checks`, { signal });
 }
 
 /* ------------------------------------------------- runtime configuration */

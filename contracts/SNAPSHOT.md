@@ -1,10 +1,12 @@
 # Contract snapshot metadata
 
 - Source repository: `Purewo/mutiAI`
-- Source commit: `356ae35`
-- Sync date: `2026-07-25`
+- Source commit: `cd5d5ed`
+- Sync date: `2026-07-26`
 - Snapshot method: Mechanically copied from the authoritative core repository.
-- Review status: Reviewed against the M2.3 source files, OpenAPI routes, and M3 frontend task requirements.
+- Review status: Reviewed against the M2.3 source files, the localized error and Runtime
+  feasibility additions (`b585c93`, `5e88dd8`, `cd5d5ed`), OpenAPI routes, and the updated M3
+  frontend task packet.
 
 ## Included files
 

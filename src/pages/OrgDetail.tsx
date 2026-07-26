@@ -1,15 +1,17 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { ArrowLeft, Check, CheckCircle2, ChevronDown, ChevronRight, History, Loader2, Users } from 'lucide-react';
 import {
   confirmOrganizationVersion,
   getOrganization,
   listOrganizationVersions,
+  listVersionFeasibilityChecks,
   publishOrganizationVersion,
 } from '../api/endpoints';
 import { apiErrorFromThrown, type ApiError } from '../api/errors';
-import type { OrganizationVersion } from '../api/types';
+import type { FeasibilityCheck, OrganizationVersion } from '../api/types';
 import { useApiResource } from '../api/useApiResource';
+import FeasibilityPanel from '../components/FeasibilityPanel';
 import OrganizationGraph from '../components/OrganizationGraph';
 import PageHeader from '../components/PageHeader';
 import VersionStatusBadge from '../components/VersionStatusBadge';
@@ -156,6 +158,27 @@ function VersionRow({
   const [expanded, setExpanded] = useState(false);
   const [busy, setBusy] = useState<'confirm' | 'publish' | null>(null);
   const [error, setError] = useState<ApiError | null>(null);
+  /** Persisted feasibility checks, fetched lazily when the row is first expanded. */
+  const [checks, setChecks] = useState<FeasibilityCheck[] | null>(null);
+  const [checksError, setChecksError] = useState<ApiError | null>(null);
+
+  useEffect(() => {
+    if (!expanded || checks !== null) return;
+    const controller = new AbortController();
+    let active = true;
+    listVersionFeasibilityChecks(version.organization_id, version.spec_version_id, controller.signal)
+      .then((data) => {
+        if (active) setChecks(data);
+      })
+      .catch((cause: unknown) => {
+        const apiError = apiErrorFromThrown(cause);
+        if (active && apiError.kind !== 'aborted') setChecksError(apiError);
+      });
+    return () => {
+      active = false;
+      controller.abort();
+    };
+  }, [expanded, checks, version.organization_id, version.spec_version_id]);
 
   const runTransition = async (kind: 'confirm' | 'publish') => {
     setBusy(kind);
@@ -247,6 +270,11 @@ function VersionRow({
             </p>
           ) : null}
           <OrganizationGraph spec={version.spec} />
+          {checks === null && checksError === null ? (
+            <p className="text-xs text-slate-400">加载可行性结论中...</p>
+          ) : null}
+          {checksError ? <InlineError error={checksError} /> : null}
+          {checks !== null ? <FeasibilityPanel checks={checks} /> : null}
         </div>
       ) : null}
     </li>

@@ -1,20 +1,18 @@
 # M3 frontend task packet
 
-Status: In implementation. Owned locally by the frontend owner; see `CLAUDE.md`.
+Status: Ready for Gemini implementation.
 
 ## Contract source
 
 Use the backend repository commit `356ae35` as the contract baseline. The authoritative files are:
 
-- `contracts/openapi.v1.json`
-- `contracts/organization-spec.v1.json`
-- `contracts/task-event.v1.json`
-- `docs/backend-contract/architecture/API_EVENT_BOUNDARY.md`
-- `docs/backend-contract/architecture/TASK_PLAN_ARTIFACT_HANDOFF.md`
-- `docs/backend-contract/architecture/M2_3_PARALLEL_ARTIFACT_ACCESS_USAGE.md`
-- `docs/backend-contract/acceptance/M2_1_RUNTIME_POLICY.md`
-- `docs/LOCAL_INTEGRATION_REVIEW.md`
-- `fixtures/api/README.md`
+- `contracts/openapi/openapi.v1.json`
+- `contracts/schemas/organization-spec.v1.json`
+- `contracts/events/task-event.v1.json`
+- `docs/architecture/API_EVENT_BOUNDARY.md`
+- `docs/architecture/TASK_PLAN_ARTIFACT_HANDOFF.md`
+- `docs/architecture/M2_3_PARALLEL_ARTIFACT_ACCESS_USAGE.md`
+- `docs/acceptance/M2_1_RUNTIME_POLICY.md`
 
 Do not redefine backend resource shapes in the frontend repository. If a screen needs a field that is not in the OpenAPI snapshot, stop and report the missing contract instead of inventing one.
 
@@ -24,16 +22,14 @@ Build the authenticated single-user web shell and the preview-first organization
 
 1. Login with the development `admin` account.
 2. List the user's organizations.
-3. Submit one organization proposal request and show its structured preview.
-4. Confirm and publish the selected `OrganizationSpec` version.
-5. Show one organization's published `OrganizationSpec` as a read-only organization preview.
-6. Show Runtime bindings and allow editing model, reasoning effort, and security mode through the binding API.
-7. Submit a planned task for a published organization and show its generated execution plan before starting execution.
-8. Upload declared initial Task inputs, start the validated plan, and show exact step dependencies as either a strict-linear chain or a pure-parallel specialist fan-out followed by lead review.
-9. Show task status, per-role Assignment and plan-step status, Runtime IDs, requested/actual model, security snapshot, delivery summaries, and context-compaction count.
-10. Show released Artifact results through `content_url` and `download_url`. Never construct or display host paths from `storage_relative_path`.
-11. Show Task-level Token totals and the per-Assignment usage breakdown. Label Provider-observed counters separately from the conservative `charged_tokens` budget value.
-12. Reconnect task progress using the task event endpoint and then refresh the Task and usage resources.
+3. Show one organization's published `OrganizationSpec` as a read-only organization preview.
+4. Show Runtime bindings and allow editing model, reasoning effort, and security mode through the binding API.
+5. Submit a planned task for a published organization and show its generated execution plan before starting execution.
+6. Upload declared initial Task inputs, start the validated plan, and show exact step dependencies as either a strict-linear chain or a pure-parallel specialist fan-out followed by lead review.
+7. Show task status, per-role Assignment and plan-step status, Runtime IDs, requested/actual model, security snapshot, delivery summaries, and context-compaction count.
+8. Show released Artifact results through `content_url` and `download_url`. Never construct or display host paths from `storage_relative_path`.
+9. Show Task-level Token totals and the per-Assignment usage breakdown. Label Provider-observed counters separately from the conservative `charged_tokens` budget value.
+10. Reconnect task progress using the task event endpoint and then refresh the Task and usage resources.
 
 The UI can borrow Dify's visual clarity, but the first slice does not include a drag-and-drop editor. Organization changes remain structured preview data and backend-confirmed publication actions.
 
@@ -42,7 +38,6 @@ The UI can borrow Dify's visual clarity, but the first slice does not include a 
 - `POST /api/v1/auth/login`
 - `POST /api/v1/auth/logout`
 - `GET /api/v1/auth/me`
-- `POST /api/v1/organizations/proposals`
 - `GET /api/v1/organizations`
 - `GET /api/v1/organizations/{organization_id}`
 - `GET /api/v1/organizations/{organization_id}/versions`
@@ -68,11 +63,30 @@ Task submission must send a unique `Idempotency-Key` and set `orchestration_mode
 
 The Artifact content endpoint is owner-scoped and returns the declared media type. Use its default inline response for preview when the browser supports the media type, and add `download=true` for explicit download. Treat 409 integrity or release-state errors as unavailable results rather than attempting a direct filesystem fallback.
 
-Develop and verify against the real local backend. The checked-in API fixtures remain an offline reference for the empty, waiting, failed, completed, linear, parallel, Artifact, usage, approval, and event states, and are useful for states that are expensive to reproduce against a live Runtime. They are captured from the real FastAPI application at backend commit `356ae35`; do not edit or extend those captured responses.
+Send `Accept-Language: zh-CN` on API requests. For an `ErrorEnvelope`, keep the
+stable `code` for control flow and display the backend-provided localized
+`message`; do not replace business errors with frontend-authored translations.
+The response `Content-Language` identifies the selected locale. Network and
+timeout failures without an error envelope remain client-transport states.
 
-You may also create clearly labeled frontend-only mock data when additional records or content lengths are useful for inspecting layout and visual hierarchy. Keep this demo data separate from `contracts/` and `fixtures/api/`, use only fields and state values defined by the checked-in contracts, and never describe it as a real backend response. Mock mode must be explicit and must not activate as an automatic fallback when a real API request fails.
+Runtime binding responses now include the current versioned
+`capability_profile`. Organization role definitions may declare
+`capability_requirements`, and Task submission may declare the same structured
+workload requirements. The backend validates these requirements before
+confirmation, publication, Task submission, and Runtime start.
 
-Use relative `/api/v1` requests by default and include browser credentials for the HttpOnly session cookie. Keep the API base configurable for local integration. Do not require a remote deployment. A frontend change is complete only after the real API and browser acceptance review described in `docs/LOCAL_INTEGRATION_REVIEW.md`.
+Use the owner-scoped feasibility resources when rendering the preview and
+execution states:
+
+- `GET /api/v1/feasibility-checks/{feasibility_check_id}`
+- `GET /api/v1/organizations/{organization_id}/versions/{spec_version_id}/feasibility-checks`
+- `GET /api/v1/tasks/{task_id}/feasibility-checks`
+
+The current outcomes are `feasible`, `conditional`, `blocked`, and
+`capability_unknown`. Findings contain stable `reason_code`, affected role and
+binding, required and actual capability values, `alternative_codes`, and
+backend-localized `message` and `alternatives`. Do not infer feasibility from
+the model name or from a successful earlier Runtime execution.
 
 ## State mapping
 
@@ -123,4 +137,4 @@ Render plan topology from `execution_plan.steps[*].plan_step_id` and `dependency
 - Completed, failed, cancelled, and needs-revision task states are visibly distinct.
 - Browser console has no uncaught errors, and network requests match the OpenAPI contract.
 
-Every frontend change runs against the real local backend and passes browser verification before M3 is called complete. Contract defects are backend-owned and fixed in `Purewo/mutiAI` as their own commits before this repository's snapshots are refreshed.
+After Gemini submits the frontend change, Codex will run the frontend against the real local backend and perform browser verification before calling M3 complete.

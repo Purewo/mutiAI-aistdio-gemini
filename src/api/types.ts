@@ -33,6 +33,14 @@ export type RuntimeControl = Schemas['RuntimeControlResponse'];
 export type RuntimeExecution = Schemas['RuntimeExecutionResponse'];
 export type RuntimeExecutionStatus = Schemas['RuntimeExecutionStatus'];
 export type RuntimeSecurityMode = Schemas['RuntimeSecurityMode'];
+export type RuntimeCapabilityProfile = Schemas['RuntimeCapabilityProfileResponse'];
+export type RuntimeCapabilityProfileSpec = Schemas['RuntimeCapabilityProfileSpec'];
+
+/* Feasibility */
+export type FeasibilityCheck = Schemas['FeasibilityCheckResponse'];
+export type FeasibilityFinding = Schemas['FeasibilityFindingResponse'];
+export type FeasibilityOutcome = Schemas['FeasibilityOutcome'];
+export type WorkloadRequirements = Schemas['WorkloadRequirements'];
 
 /* Tasks, plans, and assignments */
 export type Task = Schemas['TaskResponse'];
