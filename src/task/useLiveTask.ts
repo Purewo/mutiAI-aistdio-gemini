@@ -13,7 +13,7 @@ import { getTask, getTaskUsage, listTaskApprovals } from '../api/endpoints';
 import { apiErrorFromThrown, type ApiError } from '../api/errors';
 import { TaskEventLog, streamTaskEvents, type TaskEvent } from '../api/events';
 import type { Approval, Task, TaskTokenUsage } from '../api/types';
-import { isTerminalTaskStatus } from '../api/types';
+import { isQuiescentTaskStatus } from '../api/types';
 import type { ConnectionStatus } from '../components/states';
 
 const RECONNECT_DELAY_MS = 1500;
@@ -129,9 +129,9 @@ export function useLiveTask(taskId: string): LiveTaskApi {
           if (!mounted.current) return;
 
           const task = stateRef.current.task;
-          const terminal = task !== null && isTerminalTaskStatus(task.status);
-          if (terminal) {
-            // The logical stream is over. The Task resource stays queryable.
+          // Stop polling once nothing further can arrive unprompted. The Task stays queryable and
+          // the banner keeps manual reconnect available for after a retry.
+          if (task !== null && isQuiescentTaskStatus(task.status)) {
             patch({ connection: 'closed' });
             return;
           }
@@ -144,7 +144,8 @@ export function useLiveTask(taskId: string): LiveTaskApi {
         if (error.kind === 'aborted') return;
         failureCount.current += 1;
         if (failureCount.current > MAX_CONSECUTIVE_FAILURES) {
-          patch({ connection: 'closed' });
+          // Distinct from a normal end of stream: the backend could not be reached.
+          patch({ connection: 'unreachable' });
           return;
         }
         patch({ connection: 'reconnecting' });

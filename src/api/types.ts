@@ -129,3 +129,14 @@ export const TERMINAL_TASK_STATUSES: readonly TaskStatus[] = [
 export function isTerminalTaskStatus(status: TaskStatus): boolean {
   return TERMINAL_TASK_STATUSES.includes(status);
 }
+
+/**
+ * Statuses where no further event can arrive until the user acts.
+ *
+ * Terminal statuses qualify, and so does `needs_revision`: the organization lead has returned a
+ * decision and the Task is parked awaiting user-directed follow-up, so polling the event stream
+ * would produce nothing but empty responses. It stays retryable, and it is not an error.
+ */
+export function isQuiescentTaskStatus(status: TaskStatus): boolean {
+  return isTerminalTaskStatus(status) || status === 'needs_revision';
+}

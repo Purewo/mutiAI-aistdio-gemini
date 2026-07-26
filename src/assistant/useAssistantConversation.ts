@@ -256,7 +256,8 @@ export function useAssistantConversation(): AssistantConversationApi {
           // Give up after repeated failures rather than hammering an unreachable backend. The
           // banner keeps a manual reconnect available, which resets the counter.
           if (failureCount.current > MAX_CONSECUTIVE_FAILURES) {
-            patch({ connection: 'closed' });
+            // Distinct from a normal end of stream: the backend could not be reached.
+            patch({ connection: 'unreachable' });
             return;
           }
           patch({ connection: 'reconnecting' });

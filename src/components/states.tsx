@@ -115,7 +115,11 @@ export function InlineError({ error }: { error: unknown }) {
   );
 }
 
-export type ConnectionStatus = 'connecting' | 'live' | 'reconnecting' | 'closed';
+/**
+ * `closed` is a normal end of stream. `unreachable` means repeated reconnects failed and automatic
+ * retrying stopped; the two must read differently so a lost backend is not mistaken for completion.
+ */
+export type ConnectionStatus = 'connecting' | 'live' | 'reconnecting' | 'closed' | 'unreachable';
 
 /**
  * Event-stream connection banner.
@@ -145,6 +149,10 @@ export function ReconnectBanner({
     closed: {
       text: closedText,
       tone: 'border-slate-200 bg-slate-50 text-slate-600',
+    },
+    unreachable: {
+      text: '无法连接到服务端，已停止自动重连。当前内容可能不是最新。',
+      tone: 'border-red-200 bg-red-50 text-red-800',
     },
   };
   const { text, tone } = copy[status];
