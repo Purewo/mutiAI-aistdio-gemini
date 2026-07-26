@@ -1,6 +1,8 @@
 # Local integration and review boundary
 
-Google AI Studio cannot access the project integrator's local filesystem or backend process. Gemini develops against the versioned contracts and real-response fixtures committed to this repository.
+Google AI Studio cannot access the project integrator's local filesystem or backend process. Gemini develops against the versioned contracts and real-response fixtures committed to this repository. It may use isolated, clearly labeled frontend-only mock data to inspect layout and visual states, but mock execution is not a real-backend acceptance result.
+
+Frontend-only mock data must remain outside `contracts/` and `fixtures/api/`, reuse contracted fields and state values, and stay explicitly separable from the real API transport. A failed real request must produce its contracted error state instead of silently switching the application into mock mode.
 
 ## Frontend transport requirements
 
@@ -12,7 +14,7 @@ Google AI Studio cannot access the project integrator's local filesystem or back
 
 ## Review ownership
 
-After Gemini commits a bounded implementation, the project integrator:
+After Gemini commits a bounded implementation, the Codex project integrator:
 
 1. Pulls the Gemini branch into the local frontend checkout.
 2. Installs dependencies and runs the repository's type, lint, test, and build commands.

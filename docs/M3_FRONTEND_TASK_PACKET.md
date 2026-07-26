@@ -6,9 +6,9 @@ Status: Ready for Gemini implementation.
 
 Use the backend repository commit `356ae35` as the contract baseline. The authoritative files are:
 
-- `contracts/openapi/openapi.v1.json`
-- `contracts/schemas/organization-spec.v1.json`
-- `contracts/events/task-event.v1.json`
+- `contracts/openapi.v1.json`
+- `contracts/organization-spec.v1.json`
+- `contracts/task-event.v1.json`
 - `docs/backend-contract/architecture/API_EVENT_BOUNDARY.md`
 - `docs/backend-contract/architecture/TASK_PLAN_ARTIFACT_HANDOFF.md`
 - `docs/backend-contract/architecture/M2_3_PARALLEL_ARTIFACT_ACCESS_USAGE.md`
@@ -24,14 +24,16 @@ Build the authenticated single-user web shell and the preview-first organization
 
 1. Login with the development `admin` account.
 2. List the user's organizations.
-3. Show one organization's published `OrganizationSpec` as a read-only organization preview.
-4. Show Runtime bindings and allow editing model, reasoning effort, and security mode through the binding API.
-5. Submit a planned task for a published organization and show its generated execution plan before starting execution.
-6. Upload declared initial Task inputs, start the validated plan, and show exact step dependencies as either a strict-linear chain or a pure-parallel specialist fan-out followed by lead review.
-7. Show task status, per-role Assignment and plan-step status, Runtime IDs, requested/actual model, security snapshot, delivery summaries, and context-compaction count.
-8. Show released Artifact results through `content_url` and `download_url`. Never construct or display host paths from `storage_relative_path`.
-9. Show Task-level Token totals and the per-Assignment usage breakdown. Label Provider-observed counters separately from the conservative `charged_tokens` budget value.
-10. Reconnect task progress using the task event endpoint and then refresh the Task and usage resources.
+3. Submit one organization proposal request and show its structured preview.
+4. Confirm and publish the selected `OrganizationSpec` version.
+5. Show one organization's published `OrganizationSpec` as a read-only organization preview.
+6. Show Runtime bindings and allow editing model, reasoning effort, and security mode through the binding API.
+7. Submit a planned task for a published organization and show its generated execution plan before starting execution.
+8. Upload declared initial Task inputs, start the validated plan, and show exact step dependencies as either a strict-linear chain or a pure-parallel specialist fan-out followed by lead review.
+9. Show task status, per-role Assignment and plan-step status, Runtime IDs, requested/actual model, security snapshot, delivery summaries, and context-compaction count.
+10. Show released Artifact results through `content_url` and `download_url`. Never construct or display host paths from `storage_relative_path`.
+11. Show Task-level Token totals and the per-Assignment usage breakdown. Label Provider-observed counters separately from the conservative `charged_tokens` budget value.
+12. Reconnect task progress using the task event endpoint and then refresh the Task and usage resources.
 
 The UI can borrow Dify's visual clarity, but the first slice does not include a drag-and-drop editor. Organization changes remain structured preview data and backend-confirmed publication actions.
 
@@ -40,6 +42,7 @@ The UI can borrow Dify's visual clarity, but the first slice does not include a 
 - `POST /api/v1/auth/login`
 - `POST /api/v1/auth/logout`
 - `GET /api/v1/auth/me`
+- `POST /api/v1/organizations/proposals`
 - `GET /api/v1/organizations`
 - `GET /api/v1/organizations/{organization_id}`
 - `GET /api/v1/organizations/{organization_id}/versions`
@@ -65,9 +68,11 @@ Task submission must send a unique `Idempotency-Key` and set `orchestration_mode
 
 The Artifact content endpoint is owner-scoped and returns the declared media type. Use its default inline response for preview when the browser supports the media type, and add `download=true` for explicit download. Treat 409 integrity or release-state errors as unavailable results rather than attempting a direct filesystem fallback.
 
-Google AI Studio cannot reach the local backend. Use the checked-in API fixtures for UI development and empty, waiting, failed, completed, linear, parallel, Artifact, usage, approval, and event states. The fixtures are captured from the real FastAPI application at backend commit `356ae35`; do not extend them with invented fields.
+Google AI Studio cannot reach the local backend. Use the checked-in API fixtures for contract-backed UI development and empty, waiting, failed, completed, linear, parallel, Artifact, usage, approval, and event states. The fixtures are captured from the real FastAPI application at backend commit `356ae35`; do not edit or extend those captured responses.
 
-Use relative `/api/v1` requests by default and include browser credentials for the HttpOnly session cookie. Keep the API base configurable for local integration. Do not require a remote deployment: the project integrator runs the backend and frontend locally.
+Gemini may also create clearly labeled frontend-only mock data when additional records or content lengths are useful for inspecting layout and visual hierarchy. Keep this demo data separate from `contracts/` and `fixtures/api/`, use only fields and state values defined by the checked-in contracts, and never describe it as a real backend response. Mock mode must be explicit and must not activate as an automatic fallback when a real API request fails.
+
+Use relative `/api/v1` requests by default and include browser credentials for the HttpOnly session cookie. Keep the API base configurable for local integration. Do not require a remote deployment. After Gemini submits the frontend implementation, the Codex project integrator pulls it, runs the backend and frontend locally, and performs the real API and browser acceptance review.
 
 ## State mapping
 
