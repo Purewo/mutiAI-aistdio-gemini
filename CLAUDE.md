@@ -50,6 +50,13 @@ Start the Codex sidecar only when a change needs real Runtime behavior.
   it as a captured backend response.
 - Mock mode must stay explicitly separable from the real API transport. A failed real request must
   render its contracted error state and must never silently fall back to mock data.
+- The platform-assistant conversation is chat-first by design
+  (`docs/backend-contract/architecture/PLATFORM_ASSISTANT_CONVERSATION.md`), but its
+  `/api/v1/assistant` contracts are not implemented yet. Until they land, the assistant page uses
+  the clearly-labeled demo engine in `src/demo/` for replies and drafting — visibly marked in the
+  UI — while confirm and publish execute the real contracted proposal lifecycle. Replace the demo
+  engine with the generated client when the conversation API enters OpenAPI; do not guess its
+  field names before then.
 
 ## Implementation rules
 
