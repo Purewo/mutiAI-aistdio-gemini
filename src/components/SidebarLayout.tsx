@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
-import { LogOut, MessageSquare, Smartphone, Sparkles, User, Users } from 'lucide-react';
+import { Cpu, LogOut, MessageSquare, Smartphone, Sparkles, User, Users } from 'lucide-react';
 import { useAuth } from '../auth/context';
 import { describeApiError } from '../api/errors';
 
@@ -44,6 +44,7 @@ export default function SidebarLayout() {
         <nav className="flex-1 space-y-1 overflow-y-auto p-2 lg:p-4">
           <NavItem to="/" icon={<MessageSquare className="h-5 w-5" />} label="平台小助理" />
           <NavItem to="/orgs" icon={<Users className="h-5 w-5" />} label="组织管理" />
+          <NavItem to="/runtime" icon={<Cpu className="h-5 w-5" />} label="Runtime 配置" />
           {/*
             Channel connections are a later milestone. The entry stays visible as a roadmap marker,
             but it links nowhere and shows no connection state, because no backend contract exists.

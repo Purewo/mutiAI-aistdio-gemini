@@ -8,6 +8,7 @@ import NotFound from './pages/NotFound';
 import OrgDetail from './pages/OrgDetail';
 import OrgsList from './pages/OrgsList';
 import Profile from './pages/Profile';
+import RuntimeConfig from './pages/RuntimeConfig';
 
 export default function App() {
   return (
@@ -22,6 +23,7 @@ export default function App() {
               <Route path="/" element={<Assistant />} />
               <Route path="/orgs" element={<OrgsList />} />
               <Route path="/orgs/:organizationId" element={<OrgDetail />} />
+              <Route path="/runtime" element={<RuntimeConfig />} />
               <Route path="/profile" element={<Profile />} />
               {/*
                 The single catch-all sits inside the guard on purpose. An unknown path for a signed-out
