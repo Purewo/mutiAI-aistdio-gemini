@@ -7,7 +7,7 @@
  * parallel fan-out becomes one wide layer of specialists joined by the lead-review layer. The
  * component draws whatever the persisted edges describe and offers no editing.
  */
-import { Crown, User2 } from 'lucide-react';
+import { ChevronRight, Crown, User2, Workflow } from 'lucide-react';
 import type { PlanStep } from '../api/types';
 import { PlanStepStatusBadge } from './taskBadges';
 
@@ -52,7 +52,7 @@ function StepCard({ step, dependencyNames }: { step: PlanStep; dependencyNames: 
   const isLeadReview = step.step_kind === 'lead_review';
   return (
     <div
-      className={`w-72 rounded-2xl border p-4 text-left shadow-sm ${
+      className={`flex h-full w-60 flex-col rounded-2xl border p-3.5 text-left shadow-sm ${
         isLeadReview ? 'border-indigo-200 bg-indigo-50/50' : 'border-slate-200 bg-white'
       }`}
     >
@@ -77,12 +77,22 @@ function StepCard({ step, dependencyNames }: { step: PlanStep; dependencyNames: 
         <PlanStepStatusBadge status={step.status} />
       </div>
 
-      <p className="mb-1 line-clamp-2 text-xs leading-relaxed text-slate-600">{step.objective}</p>
-      <p className="mb-2 line-clamp-2 text-[11px] leading-relaxed text-slate-400">
-        验收：{step.acceptance_criteria}
-      </p>
+      {/* Wrappers keep line-clamp working: it needs display:-webkit-box, which a flex child loses. */}
+      <div className="mb-1">
+        <p className="line-clamp-2 text-xs leading-relaxed text-slate-600" title={step.objective}>
+          {step.objective}
+        </p>
+      </div>
+      <div className="mb-2">
+        <p
+          className="line-clamp-2 text-[11px] leading-relaxed text-slate-400"
+          title={step.acceptance_criteria}
+        >
+          验收：{step.acceptance_criteria}
+        </p>
+      </div>
 
-      <div className="flex flex-wrap gap-1">
+      <div className="mt-auto flex flex-wrap gap-1">
         {isLeadReview ? (
           <span className="rounded-full border border-indigo-200 bg-white px-2 py-0.5 text-[10px] font-semibold text-indigo-700">
             负责人评审
@@ -126,17 +136,58 @@ function StepCard({ step, dependencyNames }: { step: PlanStep; dependencyNames: 
   );
 }
 
+/**
+ * Describe the shape the persisted dependencies actually form, so a reader does not have to infer
+ * concurrency from the layout. Only the two contracted M2.3 shapes are named; anything else is
+ * reported neutrally rather than guessed at.
+ */
+function describeTopology(layers: LayeredStep[][]): string {
+  const widths = layers.map((layer) => layer.length);
+  if (widths.length === 0) return '';
+  if (widths.every((w) => w === 1)) {
+    return `严格线性：${widths.length} 个步骤依次执行，每一步都要等上一步完成。`;
+  }
+  const widest = Math.max(...widths);
+  return `并行分支：最宽一层有 ${widest} 个步骤可同时执行，其余按依赖先后进行。`;
+}
+
 export default function PlanGraph({ steps }: { steps: readonly PlanStep[] }) {
   const layers = layerSteps(steps);
   const nameById = new Map(steps.map((step) => [step.plan_step_id, step.step_key]));
+  const topology = describeTopology(layers);
 
   return (
     <div className="overflow-x-auto rounded-2xl border border-slate-200/60 bg-white/80 p-6 shadow-sm">
-      <div className="flex min-w-max flex-col items-center">
+      {topology ? (
+        <p className="mb-5 flex items-start gap-1.5 text-xs leading-relaxed text-slate-500">
+          <Workflow className="mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-slate-400" aria-hidden="true" />
+          <span>
+            <strong className="font-semibold">执行顺序</strong>（由持久化的步骤依赖决定）：
+            {topology}
+          </span>
+        </p>
+      ) : null}
+
+      {/*
+        Layers flow left to right, which matches how a pipeline reads and uses the width a desktop
+        actually has instead of turning a four-step chain into a long vertical scroll. Steps that
+        share a layer stack vertically inside their column, so a parallel fan-out still reads as one
+        stage. The container scrolls horizontally when a plan outgrows the viewport.
+      */}
+      <div className="flex min-w-max items-stretch">
         {layers.map((layer, index) => (
-          <div key={index} className="flex flex-col items-center">
-            {index > 0 ? <span aria-hidden="true" className="h-6 w-px bg-slate-300" /> : null}
-            <ul className="flex flex-wrap items-stretch justify-center gap-4">
+          <div key={index} className="flex items-stretch">
+            {/* A directed connector: these stages run in sequence, they are not alternatives. */}
+            {index > 0 ? (
+              <span
+                aria-hidden="true"
+                className="flex w-10 flex-shrink-0 items-center justify-center self-center text-slate-300"
+              >
+                <span className="h-px w-5 bg-current" />
+                <ChevronRight className="-ml-1.5 h-4 w-4" />
+              </span>
+            ) : null}
+            <ul className="flex flex-col justify-center gap-4">
               {layer.map(({ step }) => (
                 <li key={step.plan_step_id}>
                   <StepCard

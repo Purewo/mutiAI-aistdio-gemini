@@ -6,7 +6,7 @@
  * instead of assuming a fixed set of specialists. This is a preview: there is no drag-and-drop
  * editing in V1.
  */
-import { Crown, User2 } from 'lucide-react';
+import { Crown, Info, User2 } from 'lucide-react';
 import type { AgentRoleSpec, OrganizationSpec } from '../api/types';
 
 interface RoleNode {
@@ -137,6 +137,9 @@ function RoleBranch({ node }: { node: RoleNode }) {
 
 export default function OrganizationGraph({ spec }: { spec: OrganizationSpec }) {
   const { roots, orphans } = buildTree(spec.roles);
+  // Siblings sit side by side because they report to the same lead. That reads like concurrency,
+  // which it is not: this diagram carries no execution order at all.
+  const hasSiblings = roots.some((node) => node.children.length > 1);
 
   return (
     <div className="relative overflow-x-auto rounded-2xl border border-slate-200/60 bg-white/80 p-8 shadow-sm">
@@ -144,6 +147,16 @@ export default function OrganizationGraph({ spec }: { spec: OrganizationSpec }) 
         aria-hidden="true"
         className="pointer-events-none absolute inset-0 bg-[radial-gradient(#e2e8f0_1px,transparent_1px)] opacity-30 [background-size:16px_16px]"
       />
+
+      <p className="relative z-10 mb-6 flex items-start gap-1.5 text-xs leading-relaxed text-slate-400">
+        <Info className="mt-0.5 h-3.5 w-3.5 flex-shrink-0" aria-hidden="true" />
+        <span>
+          此图表示<strong className="font-semibold text-slate-500">汇报关系</strong>
+          （岗位向谁汇报），不代表执行顺序。
+          {hasSiblings ? '并排显示的岗位只是同级汇报，不意味着它们并行执行。' : null}
+          实际执行顺序由每个任务的执行计划决定，见任务详情页。
+        </span>
+      </p>
 
       <ul className="relative z-10 flex min-w-max flex-wrap items-start justify-center gap-10">
         {roots.map((node) => (
