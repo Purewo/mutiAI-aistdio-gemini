@@ -857,6 +857,15 @@ export interface components {
             /** Result Summary */
             result_summary: string | null;
             runtime_execution: components["schemas"]["RuntimeExecutionResponse"] | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Completed At */
+            completed_at: string | null;
+            /** Wall Duration Seconds */
+            wall_duration_seconds: number | null;
         };
         /**
          * AssignmentStatus
@@ -1360,6 +1369,10 @@ export interface components {
             ready_at: string | null;
             /** Completed At */
             completed_at: string | null;
+            /** Dependency Wait Seconds */
+            dependency_wait_seconds: number | null;
+            /** Active Duration Seconds */
+            active_duration_seconds: number | null;
         };
         /**
          * PlanStepStatus
@@ -1606,6 +1619,21 @@ export interface components {
             total_tokens: number | null;
             /** Context Compactions */
             context_compactions: number;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Started At */
+            started_at: string | null;
+            /** Completed At */
+            completed_at: string | null;
+            /** Queue Duration Seconds */
+            queue_duration_seconds: number | null;
+            /** Run Duration Seconds */
+            run_duration_seconds: number | null;
+            /** Wall Duration Seconds */
+            wall_duration_seconds: number | null;
         };
         /**
          * RuntimeExecutionStatus
@@ -1718,6 +1746,8 @@ export interface components {
             updated_at: string;
             /** Completed At */
             completed_at: string | null;
+            /** Wall Duration Seconds */
+            wall_duration_seconds: number | null;
         };
         /**
          * TaskStatus

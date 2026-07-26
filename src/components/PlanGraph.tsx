@@ -9,6 +9,7 @@
  */
 import { ChevronRight, Crown, User2, Workflow } from 'lucide-react';
 import type { PlanStep } from '../api/types';
+import { formatDuration } from '../lib/format';
 import { PlanStepStatusBadge } from './taskBadges';
 
 interface LayeredStep {
@@ -91,6 +92,27 @@ function StepCard({ step, dependencyNames }: { step: PlanStep; dependencyNames: 
           验收：{step.acceptance_criteria}
         </p>
       </div>
+
+      {/*
+        Separates waiting for upstream deliveries from the step's own active time, which is what
+        distinguishes a slow dependency chain from a slow step.
+      */}
+      {step.dependency_wait_seconds !== null || step.active_duration_seconds !== null ? (
+        <dl className="mb-2 flex flex-wrap gap-x-3 gap-y-0.5 text-[10px] text-slate-400">
+          {step.dependency_wait_seconds !== null ? (
+            <div className="flex gap-1" title="等待上游交付的时间">
+              <dt>等待依赖</dt>
+              <dd className="tabular-nums">{formatDuration(step.dependency_wait_seconds)}</dd>
+            </div>
+          ) : null}
+          {step.active_duration_seconds !== null ? (
+            <div className="flex gap-1" title="步骤就绪后到完成的时间">
+              <dt>执行</dt>
+              <dd className="tabular-nums">{formatDuration(step.active_duration_seconds)}</dd>
+            </div>
+          ) : null}
+        </dl>
+      ) : null}
 
       <div className="mt-auto flex flex-wrap gap-1">
         {isLeadReview ? (

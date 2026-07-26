@@ -5,6 +5,7 @@ import {
   ArrowLeft,
   BadgeCheck,
   CheckCircle2,
+  Clock,
   FileUp,
   Gauge,
   ListChecks,
@@ -35,6 +36,7 @@ import FeasibilityPanel from '../components/FeasibilityPanel';
 import PageHeader from '../components/PageHeader';
 import PlanGraph from '../components/PlanGraph';
 import TaskEventLogView from '../components/TaskEventLogView';
+import TaskTimingPanel from '../components/TaskTimingPanel';
 import TaskUsagePanel from '../components/TaskUsagePanel';
 import {
   AssignmentStatusBadge,
@@ -43,7 +45,7 @@ import {
   TaskStatusBadge,
 } from '../components/taskBadges';
 import { ErrorState, InlineError, LoadingState, ReconnectBanner } from '../components/states';
-import { formatDateTime } from '../lib/format';
+import { formatDateTime, formatDuration } from '../lib/format';
 
 /**
  * Planned-Task preparation, execution, and results.
@@ -136,6 +138,12 @@ export default function TaskDetail() {
         ) : null}
 
         {task.assignments.length > 0 ? <AssignmentsSection task={task} /> : null}
+
+        {task.assignments.length > 0 ? (
+          <Section icon={<Clock className="h-5 w-5 text-indigo-600" />} title="耗时分布">
+            <TaskTimingPanel task={task} />
+          </Section>
+        ) : null}
 
         {live.usage ? (
           <Section icon={<Gauge className="h-5 w-5 text-indigo-600" />} title="Token 用量">
@@ -236,6 +244,14 @@ function TaskMetaCard({ task }: { task: Task }) {
           <div className="flex gap-1.5">
             <dt>完成于</dt>
             <dd>{formatDateTime(task.completed_at)}</dd>
+          </div>
+        ) : null}
+        {task.wall_duration_seconds !== null ? (
+          <div className="flex gap-1.5">
+            <dt>总耗时</dt>
+            <dd className="font-semibold text-slate-700">
+              {formatDuration(task.wall_duration_seconds)}
+            </dd>
           </div>
         ) : null}
       </dl>
@@ -695,6 +711,54 @@ function InputsSection({ task, onUploaded }: { task: Task; onUploaded: () => Pro
   );
 }
 
+/**
+ * Where one Assignment's wall time went.
+ *
+ * The backend reports three Runtime phases plus the Assignment total. The gap between them is the
+ * product's own work — output validation, Artifact publication, state settlement — which is exactly
+ * the case that is otherwise invisible when a role looks slow but Codex was not the cause. These
+ * are wall-clock observations and can include waiting, so they are labeled as such rather than
+ * presented as model compute time.
+ */
+function TimingBreakdown({
+  assignmentSeconds,
+  execution,
+}: {
+  assignmentSeconds: number | null;
+  execution: NonNullable<Task['assignments'][number]['runtime_execution']>;
+}) {
+  const phases: Array<{ label: string; seconds: number | null; hint: string }> = [
+    { label: '排队', seconds: execution.queue_duration_seconds, hint: 'Runtime 调度等待' },
+    { label: 'Codex 运行', seconds: execution.run_duration_seconds, hint: 'Codex 实际执行阶段' },
+    { label: 'Runtime 总计', seconds: execution.wall_duration_seconds, hint: '从创建到结束' },
+  ];
+
+  // Only meaningful when both totals are known; a partial phase would produce a misleading number.
+  const productOverhead =
+    assignmentSeconds !== null && execution.wall_duration_seconds !== null
+      ? assignmentSeconds - execution.wall_duration_seconds
+      : null;
+
+  if (phases.every((p) => p.seconds === null) && productOverhead === null) return null;
+
+  return (
+    <dl className="mt-2 flex flex-wrap gap-x-6 gap-y-0.5 text-[11px] text-slate-400">
+      {phases.map((phase) => (
+        <div key={phase.label} className="flex gap-1" title={phase.hint}>
+          <dt>{phase.label}</dt>
+          <dd className="tabular-nums">{formatDuration(phase.seconds)}</dd>
+        </div>
+      ))}
+      {productOverhead !== null ? (
+        <div className="flex gap-1" title="Assignment 总耗时减去 Runtime 耗时：产出校验、Artifact 发布与状态收敛">
+          <dt>产品处理</dt>
+          <dd className="tabular-nums">{formatDuration(Math.max(0, productOverhead))}</dd>
+        </div>
+      ) : null}
+    </dl>
+  );
+}
+
 function AssignmentsSection({ task }: { task: Task }) {
   return (
     <Section icon={<ListChecks className="h-5 w-5 text-blue-600" />} title="岗位任务">
@@ -712,7 +776,17 @@ function AssignmentsSection({ task }: { task: Task }) {
                 </span>
                 <span className="text-xs text-slate-400">{assignment.assignment_kind}</span>
                 <AssignmentStatusBadge status={assignment.status} />
+                {assignment.wall_duration_seconds !== null ? (
+                  <span className="ml-auto inline-flex items-center gap-1 text-xs font-medium text-slate-500">
+                    <Clock className="h-3.5 w-3.5 text-slate-400" aria-hidden="true" />
+                    {formatDuration(assignment.wall_duration_seconds)}
+                  </span>
+                ) : null}
               </div>
+
+              {execution ? (
+                <TimingBreakdown assignmentSeconds={assignment.wall_duration_seconds} execution={execution} />
+              ) : null}
 
               {/*
                 Product Runtime facts only: identities, policy snapshot, and compaction count. No
