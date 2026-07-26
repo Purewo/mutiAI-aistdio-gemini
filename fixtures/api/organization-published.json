@@ -1,6 +1,6 @@
 {
-  "spec_version_id": "82d3ba7f-dc4c-4be1-b638-6c2dbc7107c0",
-  "organization_id": "e107ec24-426c-41b2-8d45-625a8ad47983",
+  "spec_version_id": "e465bc90-a871-47ba-908c-380b5b61d374",
+  "organization_id": "1bbd7eef-eeb3-4b7a-a58e-c1b2b6d23554",
   "version_number": 1,
   "status": "published",
   "spec": {
@@ -14,7 +14,26 @@
         "responsibility": "Plan and review bounded work.",
         "is_lead": true,
         "reports_to": null,
-        "runtime_binding_key": "codex-local-default"
+        "runtime_binding_key": "codex-local-default",
+        "capability_requirements": {
+          "schema_version": "1.0",
+          "os_families": [],
+          "requires_gui": false,
+          "requires_gpu": false,
+          "min_gpu_memory_mb": null,
+          "min_cpu_capacity": "light",
+          "min_memory_mb": null,
+          "required_tools": [],
+          "requires_network": false,
+          "required_external_services": [],
+          "required_hardware": [],
+          "required_proprietary_software": [],
+          "input_media_types": [],
+          "output_media_types": [],
+          "estimated_duration_seconds": null,
+          "estimated_input_size_bytes": null,
+          "resource_intensive": false
+        }
       },
       {
         "role_key": "linear_a",
@@ -22,7 +41,26 @@
         "responsibility": "Produce the first linear Artifact.",
         "is_lead": false,
         "reports_to": "lead",
-        "runtime_binding_key": "codex-local-default"
+        "runtime_binding_key": "codex-local-default",
+        "capability_requirements": {
+          "schema_version": "1.0",
+          "os_families": [],
+          "requires_gui": false,
+          "requires_gpu": false,
+          "min_gpu_memory_mb": null,
+          "min_cpu_capacity": "light",
+          "min_memory_mb": null,
+          "required_tools": [],
+          "requires_network": false,
+          "required_external_services": [],
+          "required_hardware": [],
+          "required_proprietary_software": [],
+          "input_media_types": [],
+          "output_media_types": [],
+          "estimated_duration_seconds": null,
+          "estimated_input_size_bytes": null,
+          "resource_intensive": false
+        }
       },
       {
         "role_key": "linear_b",
@@ -30,7 +68,26 @@
         "responsibility": "Consume A and produce B.",
         "is_lead": false,
         "reports_to": "lead",
-        "runtime_binding_key": "codex-local-default"
+        "runtime_binding_key": "codex-local-default",
+        "capability_requirements": {
+          "schema_version": "1.0",
+          "os_families": [],
+          "requires_gui": false,
+          "requires_gpu": false,
+          "min_gpu_memory_mb": null,
+          "min_cpu_capacity": "light",
+          "min_memory_mb": null,
+          "required_tools": [],
+          "requires_network": false,
+          "required_external_services": [],
+          "required_hardware": [],
+          "required_proprietary_software": [],
+          "input_media_types": [],
+          "output_media_types": [],
+          "estimated_duration_seconds": null,
+          "estimated_input_size_bytes": null,
+          "resource_intensive": false
+        }
       },
       {
         "role_key": "parallel_a",
@@ -38,7 +95,26 @@
         "responsibility": "Produce parallel Artifact A.",
         "is_lead": false,
         "reports_to": "lead",
-        "runtime_binding_key": "codex-local-default"
+        "runtime_binding_key": "codex-local-default",
+        "capability_requirements": {
+          "schema_version": "1.0",
+          "os_families": [],
+          "requires_gui": false,
+          "requires_gpu": false,
+          "min_gpu_memory_mb": null,
+          "min_cpu_capacity": "light",
+          "min_memory_mb": null,
+          "required_tools": [],
+          "requires_network": false,
+          "required_external_services": [],
+          "required_hardware": [],
+          "required_proprietary_software": [],
+          "input_media_types": [],
+          "output_media_types": [],
+          "estimated_duration_seconds": null,
+          "estimated_input_size_bytes": null,
+          "resource_intensive": false
+        }
       },
       {
         "role_key": "parallel_b",
@@ -46,7 +122,26 @@
         "responsibility": "Produce parallel Artifact B.",
         "is_lead": false,
         "reports_to": "lead",
-        "runtime_binding_key": "codex-local-default"
+        "runtime_binding_key": "codex-local-default",
+        "capability_requirements": {
+          "schema_version": "1.0",
+          "os_families": [],
+          "requires_gui": false,
+          "requires_gpu": false,
+          "min_gpu_memory_mb": null,
+          "min_cpu_capacity": "light",
+          "min_memory_mb": null,
+          "required_tools": [],
+          "requires_network": false,
+          "required_external_services": [],
+          "required_hardware": [],
+          "required_proprietary_software": [],
+          "input_media_types": [],
+          "output_media_types": [],
+          "estimated_duration_seconds": null,
+          "estimated_input_size_bytes": null,
+          "resource_intensive": false
+        }
       },
       {
         "role_key": "waiting_worker",
@@ -54,7 +149,26 @@
         "responsibility": "Expose a waiting Runtime state.",
         "is_lead": false,
         "reports_to": "lead",
-        "runtime_binding_key": "codex-local-default"
+        "runtime_binding_key": "codex-local-default",
+        "capability_requirements": {
+          "schema_version": "1.0",
+          "os_families": [],
+          "requires_gui": false,
+          "requires_gpu": false,
+          "min_gpu_memory_mb": null,
+          "min_cpu_capacity": "light",
+          "min_memory_mb": null,
+          "required_tools": [],
+          "requires_network": false,
+          "required_external_services": [],
+          "required_hardware": [],
+          "required_proprietary_software": [],
+          "input_media_types": [],
+          "output_media_types": [],
+          "estimated_duration_seconds": null,
+          "estimated_input_size_bytes": null,
+          "resource_intensive": false
+        }
       },
       {
         "role_key": "failing_worker",
@@ -62,12 +176,31 @@
         "responsibility": "Expose a failed Runtime state.",
         "is_lead": false,
         "reports_to": "lead",
-        "runtime_binding_key": "codex-local-default"
+        "runtime_binding_key": "codex-local-default",
+        "capability_requirements": {
+          "schema_version": "1.0",
+          "os_families": [],
+          "requires_gui": false,
+          "requires_gpu": false,
+          "min_gpu_memory_mb": null,
+          "min_cpu_capacity": "light",
+          "min_memory_mb": null,
+          "required_tools": [],
+          "requires_network": false,
+          "required_external_services": [],
+          "required_hardware": [],
+          "required_proprietary_software": [],
+          "input_media_types": [],
+          "output_media_types": [],
+          "estimated_duration_seconds": null,
+          "estimated_input_size_bytes": null,
+          "resource_intensive": false
+        }
       }
     ]
   },
   "source_request": null,
-  "created_at": "2026-07-25T12:54:43.908577Z",
-  "confirmed_at": "2026-07-25T12:54:43.923576Z",
-  "published_at": "2026-07-25T12:54:43.939594Z"
+  "created_at": "2026-07-26T13:19:25.072746Z",
+  "confirmed_at": "2026-07-26T13:19:25.124026Z",
+  "published_at": "2026-07-26T13:19:25.154666Z"
 }

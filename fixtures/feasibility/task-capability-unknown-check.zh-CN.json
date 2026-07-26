@@ -1,10 +1,10 @@
 {
-  "feasibility_check_id": "184570ad-1e19-43f0-a25c-d2ff441735ba",
+  "feasibility_check_id": "7854238e-a008-4c52-bc46-87d1feef6532",
   "target_type": "task",
-  "target_id": "781e7df0-9186-4238-86ea-9787b365030a",
+  "target_id": "2a2ae778-eaa6-4d96-a824-cd70221fddff",
   "phase": "task_submission",
   "validator_version": "1.0",
-  "input_hash": "27dc6b2a237449f68965dbe5e72776402370e5de838124dc89ffd1552673fc9c",
+  "input_hash": "6ab0b8f1d5ad75b0b16d3ca9b4d15f4475e323854dc054aa2cd754767c1cdef0",
   "requirements": [
     {
       "role_key": "lead",
@@ -57,15 +57,15 @@
     {
       "role_key": "lead",
       "binding_key": "linux-unknown-gpu",
-      "runtime_binding_id": "4e723e0f-d4da-4110-8821-f024bb546178",
-      "capability_profile_id": "fa0b9619-8997-4815-a34d-ab11e5804819",
+      "runtime_binding_id": "082fc6e0-0ada-400c-97a7-24307ee43461",
+      "capability_profile_id": "65ef9aea-4efa-4fd4-bc23-ab64c212858d",
       "revision": 1
     },
     {
       "role_key": "specialist",
       "binding_key": "linux-unknown-gpu",
-      "runtime_binding_id": "4e723e0f-d4da-4110-8821-f024bb546178",
-      "capability_profile_id": "fa0b9619-8997-4815-a34d-ab11e5804819",
+      "runtime_binding_id": "082fc6e0-0ada-400c-97a7-24307ee43461",
+      "capability_profile_id": "65ef9aea-4efa-4fd4-bc23-ab64c212858d",
       "revision": 1
     }
   ],
@@ -106,5 +106,5 @@
       ]
     }
   ],
-  "created_at": "2026-07-26T10:11:56.428876Z"
+  "created_at": "2026-07-26T13:22:12.256039Z"
 }

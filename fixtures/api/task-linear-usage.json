@@ -1,5 +1,5 @@
 {
-  "task_id": "1bf56bf4-c18c-4a79-b350-7fb725c81d70",
+  "task_id": "ccc16ced-7bf7-4230-ac87-753ed4bb8386",
   "execution_count": 4,
   "reported_execution_count": 4,
   "unavailable_execution_count": 0,
@@ -13,12 +13,12 @@
   "observed_total_tokens": 246,
   "assignments": [
     {
-      "assignment_id": "7541311c-f4f0-53b5-9bed-c7e96b2cbcab",
+      "assignment_id": "1a25b6b9-fe24-53a9-bd3c-ad286d46e41b",
       "assignment_key": "lead.plan",
       "assignment_kind": "lead_plan",
       "agent_role_key": "lead",
-      "runtime_execution_id": "f5100e5d-233a-4cfc-8281-d59e427fb5b6",
-      "execution_id": "4648adbc-c363-5033-97d6-1c0939cec23d",
+      "runtime_execution_id": "df0c4508-4727-4c56-b62c-54c33a2f3d4c",
+      "execution_id": "513d75d9-c82c-5e4b-a303-a7296611b89f",
       "provider": "fake",
       "requested_model": null,
       "actual_model": "fixture-model",
@@ -33,12 +33,12 @@
       "total_tokens": 60
     },
     {
-      "assignment_id": "257ce49d-7d4c-534c-8d36-28d09547b2a0",
+      "assignment_id": "2b4801ad-257b-55ca-9caf-3e28a8a17d97",
       "assignment_key": "plan_step:linear_a",
       "assignment_kind": "plan_step",
       "agent_role_key": "linear_a",
-      "runtime_execution_id": "54c24158-e686-4984-b7a0-0c0bb6ae4f9c",
-      "execution_id": "5b19b95c-ae35-581a-919e-f0f65ae4287b",
+      "runtime_execution_id": "4372cc97-7ba4-4a65-af0f-31ea2b123ace",
+      "execution_id": "022093b9-c039-52e9-898e-66fc8d095218",
       "provider": "fake",
       "requested_model": null,
       "actual_model": "fixture-model",
@@ -53,12 +53,12 @@
       "total_tokens": 63
     },
     {
-      "assignment_id": "fc018df9-5e55-5241-b3d5-21d07019a6f6",
+      "assignment_id": "e279fb1c-2eda-5f39-a6e4-db22ed8b7d29",
       "assignment_key": "plan_step:linear_b",
       "assignment_kind": "plan_step",
       "agent_role_key": "linear_b",
-      "runtime_execution_id": "9f641cb7-633e-430d-99b0-a85abbf126dc",
-      "execution_id": "ef7dc192-93dd-5113-b750-38a7c3aec9aa",
+      "runtime_execution_id": "93d01282-da21-48c7-8107-ec5bfb488fe8",
+      "execution_id": "7cb95549-bdf7-58e1-846d-3decece68b5d",
       "provider": "fake",
       "requested_model": null,
       "actual_model": "fixture-model",
@@ -73,12 +73,12 @@
       "total_tokens": 63
     },
     {
-      "assignment_id": "38eac3b1-76a3-5643-9a7b-e4af6d6c3dc7",
+      "assignment_id": "9d7fa36f-1dd6-5b95-9607-5be13174f9db",
       "assignment_key": "plan_step:linear_review",
       "assignment_kind": "plan_step",
       "agent_role_key": "lead",
-      "runtime_execution_id": "0553dee3-9700-45c1-bc0e-e68a01bb6600",
-      "execution_id": "234ca824-aced-5b34-8971-ef67f2a5e83f",
+      "runtime_execution_id": "fa8dbfd0-7e1b-42d1-8a5e-3590f5293605",
+      "execution_id": "ce846f97-6ecf-5863-b47e-71e6b9969b02",
       "provider": "fake",
       "requested_model": null,
       "actual_model": "fixture-model",

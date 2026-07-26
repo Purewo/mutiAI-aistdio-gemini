@@ -1,15 +1,13 @@
 # Backend documentation snapshot metadata
 
 - Source repository: `Purewo/mutiAI`
-- Source commit: `356ae35`
-- Sync date: `2026-07-25`
+- Source commit: `a4bced0`
+- Sync date: `2026-07-26`
 - Snapshot method: Mechanically copied read-only backend boundary and acceptance documents.
 
-Additional documents synced after the base snapshot:
-
-- `architecture/PLATFORM_ASSISTANT_CONVERSATION.md`: copied from backend commit `1b78db4`
-  (2026-07-26). Design baseline only — its `/api/v1/assistant` payloads are not yet part of the
-  OpenAPI contract snapshot, so the frontend consumes it for interaction shape and mock-state
-  guidance, not for field names.
+The snapshot includes the implemented platform-assistant conversation contract,
+Runtime feasibility policy, and planned Task Artifact handoff. The
+`/api/v1/assistant` payloads are part of the OpenAPI snapshot and the event
+schema under `contracts/events/`.
 
 The backend repository remains authoritative. Update these files from the core repository when the frontend contract baseline changes.

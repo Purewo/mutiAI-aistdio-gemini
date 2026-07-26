@@ -1,11 +1,11 @@
 [
   {
-    "feasibility_check_id": "fac55657-cdc3-4494-8c1e-dd55ed74a521",
+    "feasibility_check_id": "854d81e3-3654-4153-b498-48dba783b61d",
     "target_type": "task",
-    "target_id": "7aba8088-c479-4363-8f05-b1411abe21e2",
+    "target_id": "c123d1b7-3c19-4412-9f89-941ea8d60603",
     "phase": "task_submission",
     "validator_version": "1.0",
-    "input_hash": "cd61543d73f551099b1f23991621a7b14bb513909278c94e3afebcb46f27dfa3",
+    "input_hash": "ac36c355d5f4cba6063ee0dee2877b6ea098d45ba66c22168fd85989cdd0b141",
     "requirements": [
       {
         "role_key": "lead",
@@ -58,29 +58,29 @@
       {
         "role_key": "lead",
         "binding_key": "linux-standard",
-        "runtime_binding_id": "e97c237c-31cb-48dc-ae44-33260ff71e3a",
-        "capability_profile_id": "994e210b-dfb4-4e37-a211-2ea71a44abdf",
+        "runtime_binding_id": "2b1351f2-f2c7-4551-b939-5678799185f3",
+        "capability_profile_id": "a6f05fa7-3668-42fd-8f88-880797c9e987",
         "revision": 1
       },
       {
         "role_key": "specialist",
         "binding_key": "linux-standard",
-        "runtime_binding_id": "e97c237c-31cb-48dc-ae44-33260ff71e3a",
-        "capability_profile_id": "994e210b-dfb4-4e37-a211-2ea71a44abdf",
+        "runtime_binding_id": "2b1351f2-f2c7-4551-b939-5678799185f3",
+        "capability_profile_id": "a6f05fa7-3668-42fd-8f88-880797c9e987",
         "revision": 1
       }
     ],
     "outcome": "feasible",
     "findings": [],
-    "created_at": "2026-07-26T10:11:56.534900Z"
+    "created_at": "2026-07-26T13:22:12.356694Z"
   },
   {
-    "feasibility_check_id": "5680683b-3e45-40b8-ab02-1bbb516e1b17",
+    "feasibility_check_id": "3ab20173-3c21-4a41-9ca3-a7c60daff0bb",
     "target_type": "task",
-    "target_id": "7aba8088-c479-4363-8f05-b1411abe21e2",
+    "target_id": "c123d1b7-3c19-4412-9f89-941ea8d60603",
     "phase": "runtime_start",
     "validator_version": "1.0",
-    "input_hash": "c6e6ab3b245f553638f7537672b03ad11ef57efc628e0294edb360b89035104f",
+    "input_hash": "dc61b96ec14dfa18608e1ba0dc8bc74dd47677ed4516b4ff3d9fc8b0def09270",
     "requirements": [
       {
         "role_key": "specialist",
@@ -110,22 +110,22 @@
       {
         "role_key": "specialist",
         "binding_key": "linux-standard",
-        "runtime_binding_id": "e97c237c-31cb-48dc-ae44-33260ff71e3a",
-        "capability_profile_id": "994e210b-dfb4-4e37-a211-2ea71a44abdf",
+        "runtime_binding_id": "2b1351f2-f2c7-4551-b939-5678799185f3",
+        "capability_profile_id": "a6f05fa7-3668-42fd-8f88-880797c9e987",
         "revision": 1
       }
     ],
     "outcome": "feasible",
     "findings": [],
-    "created_at": "2026-07-26T10:11:56.623018Z"
+    "created_at": "2026-07-26T13:22:12.443314Z"
   },
   {
-    "feasibility_check_id": "96cfc39f-035c-47ad-9e59-848d9659ccf9",
+    "feasibility_check_id": "583b4e3b-9493-44b8-99f7-864b84b373b9",
     "target_type": "task",
-    "target_id": "7aba8088-c479-4363-8f05-b1411abe21e2",
+    "target_id": "c123d1b7-3c19-4412-9f89-941ea8d60603",
     "phase": "runtime_start",
     "validator_version": "1.0",
-    "input_hash": "18978e3eeae0a195a32e5d8fddf4e69f9dfaae37439ad0de9fdb120645b36e69",
+    "input_hash": "19986f8dadce0b6c6b24610168fdeac12848a9d3407276c6729809bcd660db02",
     "requirements": [
       {
         "role_key": "lead",
@@ -155,13 +155,13 @@
       {
         "role_key": "lead",
         "binding_key": "linux-standard",
-        "runtime_binding_id": "e97c237c-31cb-48dc-ae44-33260ff71e3a",
-        "capability_profile_id": "994e210b-dfb4-4e37-a211-2ea71a44abdf",
+        "runtime_binding_id": "2b1351f2-f2c7-4551-b939-5678799185f3",
+        "capability_profile_id": "a6f05fa7-3668-42fd-8f88-880797c9e987",
         "revision": 1
       }
     ],
     "outcome": "feasible",
     "findings": [],
-    "created_at": "2026-07-26T10:11:56.692192Z"
+    "created_at": "2026-07-26T13:22:12.506996Z"
   }
 ]

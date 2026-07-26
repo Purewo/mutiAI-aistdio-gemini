@@ -1,10 +1,10 @@
 # API response fixtures
 
-These files are captured from the real FastAPI application at backend contract commit `356ae35`. Generation used FastAPI `TestClient`, the product database, LangGraph checkpoints, the real plan and Artifact services, and a deterministic fake external Runtime. No remote server was required.
+These files are captured from the real FastAPI application at backend contract commit `a4bced0`. Generation used FastAPI `TestClient`, the product database, LangGraph checkpoints, the real plan and Artifact services, and a deterministic fake external Runtime. No remote server was required.
 
 Use these fixtures only when Google AI Studio cannot reach the local backend. OpenAPI and the JSON Schemas under `contracts/` remain authoritative. IDs, timestamps, summaries, model labels, and token counts are fixture values, not product defaults.
 
-The responses were captured in isolated execution sessions. Random organization, organization-version, and owner path IDs were mechanically normalized afterward so every scenario can be mounted under the same published organization in one frontend Mock. No fields, statuses, dependencies, event positions, usage values, or response shapes were added or changed.
+The responses were captured in one isolated execution session so every scenario uses the same published organization. No fields, statuses, dependencies, event positions, usage values, or response shapes were added or changed. Every JSON response was validated against the current backend Pydantic response model after capture.
 
 ## Organization and authentication
 
