@@ -1,31 +1,37 @@
-import React from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { AuthProvider } from './auth/AuthProvider';
+import RequireAuth from './components/RequireAuth';
 import SidebarLayout from './components/SidebarLayout';
-import Login from './pages/Login';
 import Assistant from './pages/Assistant';
-import OrgsList from './pages/OrgsList';
+import Login from './pages/Login';
+import NotFound from './pages/NotFound';
 import OrgDetail from './pages/OrgDetail';
-import WeChatConnect from './pages/WeChatConnect';
+import OrgsList from './pages/OrgsList';
 import Profile from './pages/Profile';
 
 export default function App() {
   return (
     <BrowserRouter>
-      <Routes>
-        <Route path="/login" element={<Login />} />
-        
-        {/* Main Application Routes inside Sidebar Layout */}
-        <Route element={<SidebarLayout />}>
-          <Route path="/" element={<Assistant />} />
-          <Route path="/orgs" element={<OrgsList />} />
-          <Route path="/orgs/:id" element={<OrgDetail />} />
-          <Route path="/wechat" element={<WeChatConnect />} />
-          <Route path="/profile" element={<Profile />} />
-        </Route>
-        
-        {/* Fallback */}
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
+      <AuthProvider>
+        <Routes>
+          <Route path="/login" element={<Login />} />
+
+          {/* Everything below requires a backend-confirmed session. */}
+          <Route element={<RequireAuth />}>
+            <Route element={<SidebarLayout />}>
+              <Route path="/" element={<Assistant />} />
+              <Route path="/orgs" element={<OrgsList />} />
+              <Route path="/orgs/:organizationId" element={<OrgDetail />} />
+              <Route path="/profile" element={<Profile />} />
+              {/*
+                The single catch-all sits inside the guard on purpose. An unknown path for a signed-out
+                visitor redirects to login rather than revealing that the route does not exist.
+              */}
+              <Route path="*" element={<NotFound />} />
+            </Route>
+          </Route>
+        </Routes>
+      </AuthProvider>
     </BrowserRouter>
   );
 }
