@@ -1,8 +1,9 @@
-import { useEffect, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
-import { ArrowLeft, Check, CheckCircle2, ChevronDown, ChevronRight, History, Loader2, Users } from 'lucide-react';
+import React, { useEffect, useRef, useState } from 'react';
+import { Link, useNavigate, useParams } from 'react-router-dom';
+import { ArrowLeft, ArrowRight, Check, CheckCircle2, ChevronDown, ChevronRight, ClipboardList, History, Loader2, Users } from 'lucide-react';
 import {
   confirmOrganizationVersion,
+  createTask,
   getOrganization,
   listOrganizationVersions,
   listVersionFeasibilityChecks,
@@ -17,6 +18,7 @@ import PageHeader from '../components/PageHeader';
 import VersionStatusBadge from '../components/VersionStatusBadge';
 import { EmptyState, ErrorState, InlineError, LoadingState } from '../components/states';
 import { formatDateTime } from '../lib/format';
+import { listRecentTasks, rememberTask } from '../lib/recentTasks';
 
 export default function OrgDetail() {
   const { organizationId } = useParams<{ organizationId: string }>();
@@ -111,6 +113,11 @@ export default function OrgDetail() {
             )}
           </section>
 
+          <TasksSection
+            organizationId={detail.organization_id}
+            published={detail.current_published_version_id !== null}
+          />
+
           <section>
             <div className="mb-4 flex items-center gap-2">
               <History className="h-5 w-5 text-blue-600" aria-hidden="true" />
@@ -145,6 +152,130 @@ export default function OrgDetail() {
         </div>
       </div>
     </div>
+  );
+}
+
+function TasksSection({
+  organizationId,
+  published,
+}: {
+  organizationId: string;
+  published: boolean;
+}) {
+  const navigate = useNavigate();
+  const [request, setRequest] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<ApiError | null>(null);
+  /**
+   * One idempotency key per logical submission: it survives retries of a failed request so the
+   * backend can return the original Task, and is regenerated only after a success.
+   */
+  const idempotencyKey = useRef<string>(crypto.randomUUID());
+  const recent = listRecentTasks(organizationId);
+
+  const submit = async (event: React.FormEvent) => {
+    event.preventDefault();
+    const text = request.trim();
+    if (text.length === 0 || submitting) return;
+    setSubmitting(true);
+    setError(null);
+    try {
+      const task = await createTask(
+        organizationId,
+        { request: text, orchestration_mode: 'planned' },
+        idempotencyKey.current,
+      );
+      idempotencyKey.current = crypto.randomUUID();
+      rememberTask({
+        task_id: task.task_id,
+        organization_id: organizationId,
+        request_preview: text.slice(0, 200),
+        submitted_at: task.created_at,
+      });
+      navigate(`/tasks/${task.task_id}`);
+    } catch (cause) {
+      setError(apiErrorFromThrown(cause));
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  return (
+    <section>
+      <div className="mb-4 flex items-center gap-2">
+        <ClipboardList className="h-5 w-5 text-indigo-600" aria-hidden="true" />
+        <h2 className="text-lg font-semibold text-slate-800">任务</h2>
+      </div>
+
+      {published ? (
+        <form
+          onSubmit={submit}
+          className="rounded-2xl border border-slate-200/60 bg-white p-4 shadow-sm"
+          noValidate
+        >
+          <label htmlFor="task-request" className="mb-1.5 block text-sm font-medium text-slate-700">
+            向组织负责人提交任务
+          </label>
+          <textarea
+            id="task-request"
+            name="task-request"
+            value={request}
+            disabled={submitting}
+            onChange={(event) => setRequest(event.target.value)}
+            rows={3}
+            placeholder="描述要完成的工作。提交后由组织负责人生成执行计划，确认计划并补齐输入后才会开始执行。"
+            className="w-full resize-y rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm transition-all duration-200 focus:border-indigo-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 disabled:cursor-not-allowed disabled:opacity-60"
+          />
+          {error ? (
+            <div className="mt-3">
+              <InlineError error={error} />
+            </div>
+          ) : null}
+          <div className="mt-3 flex justify-end">
+            <button
+              type="submit"
+              disabled={submitting || request.trim().length === 0}
+              className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-indigo-600 to-blue-600 px-5 py-2.5 text-sm font-semibold text-white shadow-md shadow-indigo-200 transition-all hover:from-indigo-700 hover:to-blue-700 focus:outline-none focus-visible:ring-4 focus-visible:ring-indigo-500/20 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              {submitting ? (
+                <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
+              ) : (
+                <ArrowRight className="h-4 w-4" aria-hidden="true" />
+              )}
+              提交任务
+            </button>
+          </div>
+        </form>
+      ) : (
+        <EmptyState title="发布组织后即可提交任务" />
+      )}
+
+      {recent.length > 0 ? (
+        <div className="mt-3 rounded-2xl border border-slate-200/60 bg-white p-4 shadow-sm">
+          {/*
+            The contract has no Task-list route yet, so this is a browser-local record of recently
+            submitted Tasks, kept only for navigation convenience. The gap is reported backend-side.
+          */}
+          <p className="mb-2 text-xs font-medium text-slate-400">最近提交（本地记录）</p>
+          <ul className="space-y-1.5">
+            {recent.map((record) => (
+              <li key={record.task_id}>
+                <Link
+                  to={`/tasks/${record.task_id}`}
+                  className="flex items-center gap-3 rounded-xl px-3 py-2 text-sm text-slate-600 transition-colors hover:bg-slate-50 hover:text-slate-900 focus:outline-none focus-visible:ring-4 focus-visible:ring-indigo-500/15"
+                >
+                  <span className="min-w-0 flex-1 truncate">{record.request_preview}</span>
+                  <span className="flex-shrink-0 text-xs text-slate-400">
+                    {formatDateTime(record.submitted_at)}
+                  </span>
+                  <ArrowRight className="h-3.5 w-3.5 flex-shrink-0 text-slate-400" aria-hidden="true" />
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ) : null}
+    </section>
   );
 }
 
