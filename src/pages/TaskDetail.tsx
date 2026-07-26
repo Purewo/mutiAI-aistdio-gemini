@@ -1,52 +1,60 @@
 import React, { useRef, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import {
+  Activity,
   ArrowLeft,
+  BadgeCheck,
   CheckCircle2,
   FileUp,
+  Gauge,
   ListChecks,
   Loader2,
+  Package,
   Play,
+  RefreshCw,
+  ShieldQuestion,
   Wand2,
   Workflow,
+  XCircle,
 } from 'lucide-react';
 import {
-  getTask,
+  cancelTask,
+  decideTaskApproval,
   listTaskFeasibilityChecks,
   planTask,
+  retryTask,
   startTask,
   uploadTaskInput,
 } from '../api/endpoints';
 import { apiErrorFromThrown, type ApiError } from '../api/errors';
-import type { Task } from '../api/types';
+import type { Approval, Task } from '../api/types';
 import { useApiResource } from '../api/useApiResource';
+import { useLiveTask } from '../task/useLiveTask';
+import ArtifactList from '../components/ArtifactList';
 import FeasibilityPanel from '../components/FeasibilityPanel';
 import PageHeader from '../components/PageHeader';
 import PlanGraph from '../components/PlanGraph';
+import TaskEventLogView from '../components/TaskEventLogView';
+import TaskUsagePanel from '../components/TaskUsagePanel';
 import {
   AssignmentStatusBadge,
   DeliverySummary,
   PlanStatusBadge,
   TaskStatusBadge,
 } from '../components/taskBadges';
-import { ErrorState, InlineError, LoadingState } from '../components/states';
+import { ErrorState, InlineError, LoadingState, ReconnectBanner } from '../components/states';
 import { formatDateTime } from '../lib/format';
 
 /**
- * Planned-Task preparation and inspection.
+ * Planned-Task preparation, execution, and results.
  *
- * The pre-execution flow follows the contracted lifecycle: the submitted Task carries
- * `orchestration_mode: planned`; `POST /plan` runs the organization lead's recoverable planning
- * boundary and persists an immutable plan; every contract key in
- * `execution_plan.initial_input_contracts` must be fulfilled by an uploaded initial Artifact; and
- * start stays disabled until the backend has returned a validated plan and no declared input is
- * missing. Plan topology renders exclusively from persisted step IDs and dependencies.
+ * The Task resource is authoritative; the event stream only tells the page when to refetch. Plan
+ * topology renders from persisted step IDs and dependencies, Artifact access uses only
+ * backend-issued URLs, and approval controls appear only for approval records the backend returned.
  */
 
-/** Read a File into the contracted base64 transport. */
 async function fileToBase64(file: File): Promise<string> {
-  const buffer = await file.arrayBuffer();
-  const bytes = new Uint8Array(buffer);
+  const bytes = new Uint8Array(await file.arrayBuffer());
   let binary = '';
   const CHUNK = 0x8000;
   for (let i = 0; i < bytes.length; i += CHUNK) {
@@ -57,13 +65,13 @@ async function fileToBase64(file: File): Promise<string> {
 
 export default function TaskDetail() {
   const { taskId } = useParams<{ taskId: string }>();
-  const task = useApiResource((signal) => getTask(taskId ?? '', signal), [taskId]);
+  const live = useLiveTask(taskId ?? '');
   const checks = useApiResource(
     (signal) => listTaskFeasibilityChecks(taskId ?? '', signal),
     [taskId],
   );
 
-  if (task.state.status === 'loading') {
+  if (live.status === 'loading') {
     return (
       <Shell>
         <LoadingState label="加载任务中..." />
@@ -71,44 +79,77 @@ export default function TaskDetail() {
     );
   }
 
-  if (task.state.status === 'error') {
-    const { error } = task.state;
+  if (live.status === 'error' || !live.task) {
+    const error = live.error;
     return (
       <Shell>
         <div className="mx-auto max-w-2xl">
           <ErrorState
             error={error}
-            title={error.isNotFound ? '找不到该任务' : '加载任务失败'}
-            onRetry={error.isNotFound ? undefined : task.reload}
+            title={error?.isNotFound ? '找不到该任务' : '加载任务失败'}
+            onRetry={error?.isNotFound ? undefined : live.retry}
           />
         </div>
       </Shell>
     );
   }
 
-  const data = task.state.data;
+  const task = live.task;
 
   return (
-    <Shell
-      title={<TaskStatusBadge status={data.status} />}
-      organizationId={data.organization_id}
-    >
+    <Shell status={<TaskStatusBadge status={task.status} />} organizationId={task.organization_id}>
       <div className="mx-auto max-w-6xl space-y-8">
-        <TaskMetaCard task={data} />
+        {live.connection !== 'live' ? (
+          <ReconnectBanner
+            status={live.connection}
+            onReconnect={live.reconnect}
+            closedText="事件流已结束。任务详情仍可查询。"
+          />
+        ) : null}
+
+        <TaskMetaCard task={task} />
 
         {checks.state.status === 'ready' && checks.state.data.length > 0 ? (
           <FeasibilityPanel checks={checks.state.data} />
         ) : null}
 
-        <PlanSection task={data} onTaskUpdated={task.set} onReload={task.reload} />
+        <ControlsSection task={task} onTaskUpdated={live.setTask} onReload={live.refresh} />
 
-        {data.execution_plan && data.execution_plan.initial_input_contracts.length > 0 ? (
-          <InputsSection task={data} onUploaded={task.reload} />
+        {live.approvals.length > 0 ? (
+          <ApprovalsSection
+            taskId={task.task_id}
+            approvals={live.approvals}
+            onDecided={live.refresh}
+          />
         ) : null}
 
-        <StartSection task={data} onTaskUpdated={task.set} onReload={task.reload} />
+        <PlanSection task={task} onTaskUpdated={live.setTask} onReload={live.refresh} />
 
-        {data.assignments.length > 0 ? <AssignmentsSection task={data} /> : null}
+        {task.execution_plan && task.execution_plan.initial_input_contracts.length > 0 ? (
+          <InputsSection task={task} onUploaded={live.refresh} />
+        ) : null}
+
+        {task.artifacts.length > 0 ? (
+          <Section icon={<Package className="h-5 w-5 text-emerald-600" />} title="交付结果">
+            <ArtifactList artifacts={task.artifacts} />
+          </Section>
+        ) : null}
+
+        {task.assignments.length > 0 ? <AssignmentsSection task={task} /> : null}
+
+        {live.usage ? (
+          <Section icon={<Gauge className="h-5 w-5 text-indigo-600" />} title="Token 用量">
+            <TaskUsagePanel usage={live.usage} />
+          </Section>
+        ) : null}
+
+        {live.events.length > 0 ? (
+          <Section icon={<Activity className="h-5 w-5 text-blue-600" />} title="事件">
+            <div className="rounded-2xl border border-slate-200/60 bg-white p-4 shadow-sm">
+              <TaskEventLogView events={live.events} />
+            </div>
+          </Section>
+        ) : null}
       </div>
     </Shell>
   );
@@ -116,11 +157,11 @@ export default function TaskDetail() {
 
 function Shell({
   children,
-  title,
+  status,
   organizationId,
 }: {
   children: React.ReactNode;
-  title?: React.ReactNode;
+  status?: React.ReactNode;
   organizationId?: string;
 }) {
   return (
@@ -129,7 +170,7 @@ function Shell({
         title="任务详情"
         actions={
           <div className="flex items-center gap-3">
-            {title}
+            {status}
             {organizationId ? (
               <Link
                 to={`/orgs/${organizationId}`}
@@ -144,6 +185,29 @@ function Shell({
       />
       <div className="flex-1 overflow-y-auto p-6 sm:p-8">{children}</div>
     </div>
+  );
+}
+
+function Section({
+  icon,
+  title,
+  extra,
+  children,
+}: {
+  icon: React.ReactNode;
+  title: string;
+  extra?: React.ReactNode;
+  children: React.ReactNode;
+}) {
+  return (
+    <section>
+      <div className="mb-4 flex items-center gap-2">
+        <span aria-hidden="true">{icon}</span>
+        <h2 className="text-lg font-semibold text-slate-800">{title}</h2>
+        {extra}
+      </div>
+      {children}
+    </section>
   );
 }
 
@@ -176,11 +240,187 @@ function TaskMetaCard({ task }: { task: Task }) {
         ) : null}
       </dl>
       {task.result_summary ? (
-        <p className="mt-3 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm leading-relaxed text-slate-700">
-          {task.result_summary}
-        </p>
+        <div className="mt-3 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
+          <DeliverySummary summary={task.result_summary} />
+        </div>
       ) : null}
     </section>
+  );
+}
+
+/** Retry and cancel, offered only for states where the backend accepts them. */
+function ControlsSection({
+  task,
+  onTaskUpdated,
+  onReload,
+}: {
+  task: Task;
+  onTaskUpdated: (task: Task) => void;
+  onReload: () => Promise<void>;
+}) {
+  const [busy, setBusy] = useState<'retry' | 'cancel' | null>(null);
+  const [error, setError] = useState<ApiError | null>(null);
+
+  const retryable = task.status === 'failed' || task.status === 'needs_revision';
+  const cancellable =
+    task.status === 'running' || task.status === 'waiting' || task.status === 'planning';
+  if (!retryable && !cancellable) return null;
+
+  const run = async (kind: 'retry' | 'cancel') => {
+    setBusy(kind);
+    setError(null);
+    try {
+      onTaskUpdated(kind === 'retry' ? await retryTask(task.task_id) : await cancelTask(task.task_id));
+    } catch (cause) {
+      setError(apiErrorFromThrown(cause));
+      // TASK_CANCELLATION_INCOMPLETE still cancels the Task; read the persisted state.
+      await onReload().catch(() => undefined);
+    } finally {
+      setBusy(null);
+    }
+  };
+
+  const button =
+    'inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold transition-all focus:outline-none focus-visible:ring-4 disabled:cursor-not-allowed disabled:opacity-60';
+
+  return (
+    <section className="rounded-2xl border border-slate-200/60 bg-white p-4 shadow-sm">
+      <div className="flex flex-wrap items-center gap-2">
+        <span className="mr-auto text-sm text-slate-600">
+          {retryable
+            ? '可以重试失败的岗位任务，已完成的兄弟任务不会重跑。'
+            : '任务正在执行，可以请求取消。'}
+        </span>
+        {retryable ? (
+          <button
+            type="button"
+            onClick={() => run('retry')}
+            disabled={busy !== null}
+            className={`${button} bg-gradient-to-r from-indigo-600 to-blue-600 text-white shadow-md shadow-indigo-200 hover:from-indigo-700 hover:to-blue-700 focus-visible:ring-indigo-500/20`}
+          >
+            {busy === 'retry' ? (
+              <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
+            ) : (
+              <RefreshCw className="h-4 w-4" aria-hidden="true" />
+            )}
+            重试
+          </button>
+        ) : null}
+        {cancellable ? (
+          <button
+            type="button"
+            onClick={() => run('cancel')}
+            disabled={busy !== null}
+            className={`${button} border border-slate-200 text-slate-600 hover:bg-slate-50 focus-visible:ring-slate-400/20`}
+          >
+            {busy === 'cancel' ? (
+              <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
+            ) : (
+              <XCircle className="h-4 w-4" aria-hidden="true" />
+            )}
+            取消任务
+          </button>
+        ) : null}
+      </div>
+      {error ? (
+        <div className="mt-3">
+          <InlineError error={error} />
+        </div>
+      ) : null}
+    </section>
+  );
+}
+
+/** Runtime approval requests. Controls appear only for records the backend returned. */
+function ApprovalsSection({
+  taskId,
+  approvals,
+  onDecided,
+}: {
+  taskId: string;
+  approvals: Approval[];
+  onDecided: () => Promise<void>;
+}) {
+  const [busy, setBusy] = useState<string | null>(null);
+  const [error, setError] = useState<ApiError | null>(null);
+
+  const decide = async (approvalId: string, decision: 'accept' | 'decline' | 'cancel') => {
+    setBusy(approvalId);
+    setError(null);
+    try {
+      await decideTaskApproval(taskId, approvalId, { decision });
+      await onDecided();
+    } catch (cause) {
+      setError(apiErrorFromThrown(cause));
+    } finally {
+      setBusy(null);
+    }
+  };
+
+  const button =
+    'inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition-all focus:outline-none focus-visible:ring-4 disabled:cursor-not-allowed disabled:opacity-60';
+
+  return (
+    <Section icon={<ShieldQuestion className="h-5 w-5 text-amber-600" />} title="Runtime 审批">
+      <ul className="space-y-2">
+        {approvals.map((approval) => (
+          <li
+            key={approval.approval_id}
+            className="rounded-2xl border border-slate-200/60 bg-white p-4 shadow-sm"
+          >
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="text-sm font-semibold text-slate-800">{approval.kind}</span>
+              <span className="rounded-full border border-slate-200 bg-slate-50 px-2 py-0.5 text-[11px] font-semibold text-slate-600">
+                {approval.status}
+              </span>
+              {approval.status === 'pending' ? (
+                <div className="ml-auto flex items-center gap-1.5">
+                  <button
+                    type="button"
+                    onClick={() => decide(approval.approval_id, 'decline')}
+                    disabled={busy !== null}
+                    className={`${button} border border-slate-200 text-slate-600 hover:bg-slate-50 focus-visible:ring-slate-400/20`}
+                  >
+                    拒绝
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => decide(approval.approval_id, 'accept')}
+                    disabled={busy !== null}
+                    className={`${button} bg-gradient-to-r from-indigo-600 to-blue-600 text-white shadow-sm hover:from-indigo-700 hover:to-blue-700 focus-visible:ring-indigo-500/20`}
+                  >
+                    {busy === approval.approval_id ? (
+                      <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden="true" />
+                    ) : (
+                      <BadgeCheck className="h-3.5 w-3.5" aria-hidden="true" />
+                    )}
+                    同意
+                  </button>
+                </div>
+              ) : null}
+            </div>
+            {approval.reason ? (
+              <p className="mt-2 text-sm leading-relaxed text-slate-600">{approval.reason}</p>
+            ) : null}
+            {/*
+              The command is what the user is being asked to approve, so it must be visible to make
+              an informed decision. `cwd` is deliberately omitted: host filesystem paths are not
+              product history.
+            */}
+            {approval.command ? (
+              <pre className="mt-2 overflow-x-auto rounded-xl border border-slate-200 bg-slate-50 p-3 text-xs leading-relaxed text-slate-700">
+                {approval.command}
+              </pre>
+            ) : null}
+          </li>
+        ))}
+      </ul>
+      {error ? (
+        <div className="mt-3">
+          <InlineError error={error} />
+        </div>
+      ) : null}
+    </Section>
   );
 }
 
@@ -191,7 +431,7 @@ function PlanSection({
 }: {
   task: Task;
   onTaskUpdated: (task: Task) => void;
-  onReload: () => void;
+  onReload: () => Promise<void>;
 }) {
   const [generating, setGenerating] = useState(false);
   const [error, setError] = useState<ApiError | null>(null);
@@ -204,21 +444,18 @@ function PlanSection({
       onTaskUpdated(await planTask(task.task_id));
     } catch (cause) {
       setError(apiErrorFromThrown(cause));
-      // Planning runs a recoverable lead boundary; the persisted Task may have moved anyway.
-      onReload();
+      await onReload().catch(() => undefined);
     } finally {
       setGenerating(false);
     }
   };
 
   return (
-    <section>
-      <div className="mb-4 flex items-center gap-2">
-        <Workflow className="h-5 w-5 text-indigo-600" aria-hidden="true" />
-        <h2 className="text-lg font-semibold text-slate-800">执行计划</h2>
-        {plan ? <PlanStatusBadge status={plan.status} /> : null}
-      </div>
-
+    <Section
+      icon={<Workflow className="h-5 w-5 text-indigo-600" />}
+      title="执行计划"
+      extra={plan ? <PlanStatusBadge status={plan.status} /> : undefined}
+    >
       {!plan ? (
         <div className="flex flex-col items-start gap-3 rounded-2xl border border-dashed border-slate-300 bg-white/60 p-6">
           <p className="text-sm text-slate-600">
@@ -249,35 +486,102 @@ function PlanSection({
               </p>
             ) : null}
             <p className="mt-2 text-[11px] text-slate-400">
-              第 {plan.plan_version} 版 · 来源 {plan.source} · 创建于 {formatDateTime(plan.created_at)}
+              第 {plan.plan_version} 版 · 来源 {plan.source} · 创建于{' '}
+              {formatDateTime(plan.created_at)}
             </p>
           </div>
           <PlanGraph steps={plan.steps} />
+          <StartRow task={task} onTaskUpdated={onTaskUpdated} onReload={onReload} />
         </div>
       )}
-    </section>
+    </Section>
+  );
+}
+
+function StartRow({
+  task,
+  onTaskUpdated,
+  onReload,
+}: {
+  task: Task;
+  onTaskUpdated: (task: Task) => void;
+  onReload: () => Promise<void>;
+}) {
+  const [starting, setStarting] = useState(false);
+  const [error, setError] = useState<ApiError | null>(null);
+
+  const plan = task.execution_plan;
+  if (!plan || task.status !== 'created') return null;
+
+  const missingInputs = plan.initial_input_contracts.filter(
+    (contractKey) =>
+      !task.artifacts.some(
+        (artifact) => artifact.origin === 'task_input' && artifact.contract_key === contractKey,
+      ),
+  );
+  const planValidated = plan.status === 'validated';
+  const startable = planValidated && missingInputs.length === 0;
+
+  const start = async () => {
+    setStarting(true);
+    setError(null);
+    try {
+      onTaskUpdated(await startTask(task.task_id));
+    } catch (cause) {
+      setError(apiErrorFromThrown(cause));
+      // A Runtime failure reported by /start is persisted; render that, not the transient error.
+      await onReload().catch(() => undefined);
+    } finally {
+      setStarting(false);
+    }
+  };
+
+  return (
+    <div className="rounded-2xl border border-slate-200/60 bg-white p-4 shadow-sm">
+      <div className="flex flex-wrap items-center gap-3">
+        <div className="mr-auto text-sm text-slate-600">
+          {startable
+            ? '计划已校验，所需输入齐备，可以开始执行。'
+            : !planValidated
+              ? `计划当前状态为「${plan.status}」，尚不能开始执行。`
+              : `还有 ${missingInputs.length} 项声明的初始输入未上传：${missingInputs.join('、')}`}
+        </div>
+        <button
+          type="button"
+          onClick={start}
+          disabled={!startable || starting}
+          className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 px-5 py-2.5 text-sm font-semibold text-white shadow-md shadow-emerald-200 transition-all hover:from-emerald-700 hover:to-teal-700 focus:outline-none focus-visible:ring-4 focus-visible:ring-emerald-500/20 disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          {starting ? (
+            <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
+          ) : (
+            <Play className="h-4 w-4" aria-hidden="true" />
+          )}
+          开始执行
+        </button>
+      </div>
+      {error ? (
+        <div className="mt-3">
+          <InlineError error={error} />
+        </div>
+      ) : null}
+    </div>
   );
 }
 
 interface PendingUpload {
   file: File;
-  /** Stable per-selection delivery identity, reused if the same upload is retried. */
   deliveryId: string;
   uploading: boolean;
   error: ApiError | null;
 }
 
-function InputsSection({ task, onUploaded }: { task: Task; onUploaded: () => void }) {
+function InputsSection({ task, onUploaded }: { task: Task; onUploaded: () => Promise<void> }) {
   const plan = task.execution_plan;
   const [pending, setPending] = useState<Map<string, PendingUpload>>(new Map());
   const fileInputs = useRef(new Map<string, HTMLInputElement | null>());
 
   if (!plan) return null;
-
-  const fulfilledBy = (contractKey: string) =>
-    task.artifacts.find(
-      (artifact) => artifact.origin === 'task_input' && artifact.contract_key === contractKey,
-    );
 
   const setPendingFor = (key: string, value: PendingUpload | null) => {
     setPending((current) => {
@@ -315,29 +619,27 @@ function InputsSection({ task, onUploaded }: { task: Task; onUploaded: () => voi
         source_delivery_id: entry.deliveryId,
       });
       setPendingFor(contractKey, null);
-      onUploaded();
+      await onUploaded();
     } catch (cause) {
-      setPendingFor(contractKey, {
-        ...entry,
-        uploading: false,
-        error: apiErrorFromThrown(cause),
-      });
+      setPendingFor(contractKey, { ...entry, uploading: false, error: apiErrorFromThrown(cause) });
     }
   };
 
   return (
-    <section>
-      <div className="mb-4 flex items-center gap-2">
-        <FileUp className="h-5 w-5 text-blue-600" aria-hidden="true" />
-        <h2 className="text-lg font-semibold text-slate-800">初始输入</h2>
+    <Section
+      icon={<FileUp className="h-5 w-5 text-blue-600" />}
+      title="初始输入"
+      extra={
         <span className="text-sm text-slate-400">
           计划声明了 {plan.initial_input_contracts.length} 项输入契约
         </span>
-      </div>
-
+      }
+    >
       <ul className="space-y-3">
         {plan.initial_input_contracts.map((contractKey) => {
-          const artifact = fulfilledBy(contractKey);
+          const artifact = task.artifacts.find(
+            (item) => item.origin === 'task_input' && item.contract_key === contractKey,
+          );
           const entry = pending.get(contractKey);
           return (
             <li
@@ -389,106 +691,93 @@ function InputsSection({ task, onUploaded }: { task: Task; onUploaded: () => voi
           );
         })}
       </ul>
-    </section>
-  );
-}
-
-function StartSection({
-  task,
-  onTaskUpdated,
-  onReload,
-}: {
-  task: Task;
-  onTaskUpdated: (task: Task) => void;
-  onReload: () => void;
-}) {
-  const [starting, setStarting] = useState(false);
-  const [error, setError] = useState<ApiError | null>(null);
-
-  const plan = task.execution_plan;
-  // Start is only offered before execution begins; afterwards progress speaks for itself.
-  if (!plan || task.status !== 'created') return null;
-
-  const missingInputs = plan.initial_input_contracts.filter(
-    (contractKey) =>
-      !task.artifacts.some(
-        (artifact) => artifact.origin === 'task_input' && artifact.contract_key === contractKey,
-      ),
-  );
-  const planValidated = plan.status === 'validated';
-  const startable = planValidated && missingInputs.length === 0;
-
-  const start = async () => {
-    setStarting(true);
-    setError(null);
-    try {
-      onTaskUpdated(await startTask(task.task_id));
-    } catch (cause) {
-      setError(apiErrorFromThrown(cause));
-      // If /start reported a Runtime failure, the persisted Task holds the authoritative state.
-      onReload();
-    } finally {
-      setStarting(false);
-    }
-  };
-
-  return (
-    <section className="rounded-2xl border border-slate-200/60 bg-white p-5 shadow-sm">
-      <div className="flex flex-wrap items-center gap-3">
-        <div className="mr-auto text-sm text-slate-600">
-          {startable
-            ? '计划已校验，所需输入齐备，可以开始执行。'
-            : !planValidated
-              ? `计划当前状态为「${plan.status}」，尚不能开始执行。`
-              : `还有 ${missingInputs.length} 项声明的初始输入未上传：${missingInputs.join('、')}`}
-        </div>
-        <button
-          type="button"
-          onClick={start}
-          disabled={!startable || starting}
-          className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 px-5 py-2.5 text-sm font-semibold text-white shadow-md shadow-emerald-200 transition-all hover:from-emerald-700 hover:to-teal-700 focus:outline-none focus-visible:ring-4 focus-visible:ring-emerald-500/20 disabled:cursor-not-allowed disabled:opacity-50"
-        >
-          {starting ? (
-            <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
-          ) : (
-            <Play className="h-4 w-4" aria-hidden="true" />
-          )}
-          开始执行
-        </button>
-      </div>
-      {error ? (
-        <div className="mt-3">
-          <InlineError error={error} />
-        </div>
-      ) : null}
-    </section>
+    </Section>
   );
 }
 
 function AssignmentsSection({ task }: { task: Task }) {
   return (
-    <section>
-      <div className="mb-4 flex items-center gap-2">
-        <ListChecks className="h-5 w-5 text-blue-600" aria-hidden="true" />
-        <h2 className="text-lg font-semibold text-slate-800">岗位任务</h2>
-      </div>
+    <Section icon={<ListChecks className="h-5 w-5 text-blue-600" />} title="岗位任务">
       <ul className="space-y-2">
-        {task.assignments.map((assignment) => (
-          <li
-            key={assignment.assignment_id}
-            className="flex flex-wrap items-center gap-3 rounded-2xl border border-slate-200/60 bg-white p-4 shadow-sm"
-          >
-            <span className="font-mono text-sm font-semibold text-slate-800">
-              {assignment.agent_role_key}
-            </span>
-            <span className="text-xs text-slate-400">{assignment.assignment_kind}</span>
-            <AssignmentStatusBadge status={assignment.status} />
-            {assignment.result_summary ? (
-              <DeliverySummary summary={assignment.result_summary} />
-            ) : null}
-          </li>
-        ))}
+        {task.assignments.map((assignment) => {
+          const execution = assignment.runtime_execution;
+          return (
+            <li
+              key={assignment.assignment_id}
+              className="rounded-2xl border border-slate-200/60 bg-white p-4 shadow-sm"
+            >
+              <div className="flex flex-wrap items-center gap-3">
+                <span className="font-mono text-sm font-semibold text-slate-800">
+                  {assignment.agent_role_key}
+                </span>
+                <span className="text-xs text-slate-400">{assignment.assignment_kind}</span>
+                <AssignmentStatusBadge status={assignment.status} />
+              </div>
+
+              {/*
+                Product Runtime facts only: identities, policy snapshot, and compaction count. No
+                Codex transcript, tool events, or host paths.
+              */}
+              {execution ? (
+                <dl className="mt-2 flex flex-wrap gap-x-6 gap-y-0.5 text-[11px] text-slate-400">
+                  <div className="flex gap-1">
+                    <dt>Runtime 状态</dt>
+                    <dd>{execution.status}</dd>
+                  </div>
+                  <div className="flex gap-1">
+                    <dt>模型</dt>
+                    <dd>
+                      {execution.actual_model ?? '—'}
+                      {execution.requested_model && execution.requested_model !== execution.actual_model
+                        ? `（请求 ${execution.requested_model}）`
+                        : null}
+                    </dd>
+                  </div>
+                  <div className="flex gap-1">
+                    <dt>安全模式</dt>
+                    <dd>{execution.security_mode ?? '—'}</dd>
+                  </div>
+                  <div className="flex gap-1">
+                    <dt>沙箱</dt>
+                    <dd>{execution.sandbox_mode ?? '—'}</dd>
+                  </div>
+                  <div className="flex gap-1">
+                    <dt>网络</dt>
+                    <dd>
+                      {execution.network_access === null
+                        ? '—'
+                        : execution.network_access
+                          ? '允许'
+                          : '禁止'}
+                    </dd>
+                  </div>
+                  <div className="flex gap-1">
+                    <dt>上下文压缩</dt>
+                    <dd>{execution.context_compactions}</dd>
+                  </div>
+                  <div className="flex gap-1">
+                    <dt>执行 ID</dt>
+                    <dd className="font-mono">{execution.execution_id}</dd>
+                  </div>
+                  {execution.wait_reason ? (
+                    <div className="flex gap-1">
+                      <dt>等待原因</dt>
+                      <dd>{execution.wait_reason}</dd>
+                    </div>
+                  ) : null}
+                </dl>
+              ) : null}
+
+              {assignment.result_summary ? (
+                <div className="mt-2">
+                  <DeliverySummary summary={assignment.result_summary} />
+                </div>
+              ) : null}
+            </li>
+          );
+        })}
       </ul>
-    </section>
+    </Section>
   );
 }
+
