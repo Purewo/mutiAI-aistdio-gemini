@@ -1,13 +1,60 @@
-import React from 'react';
-import { Send, Users, Activity, Bot } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
+import { Send, Users, Activity, Bot, Loader2, AlertCircle } from 'lucide-react';
+import { getOrganization } from '../lib/api';
 
 export default function OrgDetail() {
+  const { id } = useParams<{ id: string }>();
+  const [org, setOrg] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    async function load() {
+      if (!id) return;
+      try {
+        const data = await getOrganization(id);
+        setOrg(data);
+      } catch (err: any) {
+        setError(err.message || '加载组织详情失败');
+      } finally {
+        setLoading(false);
+      }
+    }
+    load();
+  }, [id]);
+
+  if (loading) {
+    return (
+      <div className="flex h-full w-full items-center justify-center bg-slate-50/50">
+        <div className="flex flex-col items-center space-y-4">
+          <Loader2 className="w-8 h-8 text-indigo-600 animate-spin" />
+          <p className="text-slate-500 font-medium">加载组织详情中...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error || !org) {
+    return (
+      <div className="flex h-full w-full items-center justify-center bg-slate-50/50 p-8">
+        <div className="bg-white p-8 rounded-2xl shadow-sm border border-red-100 flex flex-col items-center space-y-4 max-w-md w-full text-center">
+          <AlertCircle className="w-12 h-12 text-red-500" />
+          <h2 className="text-xl font-bold text-slate-800">加载失败</h2>
+          <p className="text-slate-600">{error || '找不到该组织'}</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col h-full bg-slate-50/50">
       <header className="px-8 py-5 bg-white/80 backdrop-blur-md border-b border-slate-200/60 sticky top-0 z-10 flex items-center justify-between">
         <div className="flex items-center space-x-4">
-          <h1 className="text-xl font-bold text-slate-800">演示研发组织</h1>
-          <span className="px-2.5 py-1 text-xs font-semibold rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200/50">活跃</span>
+          <h1 className="text-xl font-bold text-slate-800">{org.name}</h1>
+          <span className="px-2.5 py-1 text-xs font-semibold rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200/50">
+            {org.current_published_version_id ? '已发布' : '草稿'}
+          </span>
         </div>
       </header>
       
@@ -22,7 +69,7 @@ export default function OrgDetail() {
             </div>
             <div className="bg-white/80 backdrop-blur border border-slate-200/60 rounded-2xl h-[400px] flex items-center justify-center shadow-sm relative overflow-hidden">
               <div className="absolute inset-0 bg-[radial-gradient(#e2e8f0_1px,transparent_1px)] [background-size:16px_16px] opacity-30"></div>
-              <p className="text-slate-400 font-medium relative z-10">组织架构图画布 (占位)</p>
+              <p className="text-slate-400 font-medium relative z-10">组织架构图画布 (即将实现)</p>
             </div>
           </section>
           
@@ -45,8 +92,8 @@ export default function OrgDetail() {
               <Bot className="w-5 h-5 text-indigo-600" />
             </div>
             <div>
-              <h3 className="font-semibold text-slate-900 leading-tight">Alice</h3>
-              <p className="text-xs text-slate-500 font-medium">组织负责人</p>
+              <h3 className="font-semibold text-slate-900 leading-tight">组织负责人</h3>
+              <p className="text-xs text-slate-500 font-medium">协调中心</p>
             </div>
           </div>
           
@@ -57,7 +104,7 @@ export default function OrgDetail() {
                     <Bot className="w-4 h-4 text-indigo-600" />
                   </div>
                   <div className="bg-white px-4 py-3 rounded-2xl rounded-tl-sm text-sm text-slate-700 shadow-sm border border-slate-200/60 leading-relaxed">
-                    您好，我是 Alice，本组织的负责人。今天我能帮您协调哪些代理？
+                    您好，我是本组织的负责人。今天我能帮您协调哪些代理？
                   </div>
                 </div>
              </div>
@@ -66,7 +113,7 @@ export default function OrgDetail() {
           <div className="p-4 border-t border-slate-100 bg-white">
             <div className="relative shadow-sm rounded-xl bg-slate-50 border border-slate-200 focus-within:border-indigo-500 focus-within:bg-white focus-within:ring-4 focus-within:ring-indigo-500/10 transition-all duration-200 p-1.5 flex items-end">
               <textarea 
-                placeholder="给 Alice 发送消息..." 
+                placeholder="给负责人发送消息..." 
                 className="flex-1 px-3 py-1.5 bg-transparent resize-none max-h-32 min-h-[36px] focus:outline-none text-slate-700 placeholder-slate-400 text-sm"
                 rows={1}
               />

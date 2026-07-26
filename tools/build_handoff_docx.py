@@ -106,7 +106,7 @@ def add_title_page(document: Document) -> None:
     meta_run = meta.add_run(
         f"文档版本：V1 bootstrap\n生成日期：{date.today().isoformat()}\n"
         "核心仓库：https://github.com/Purewo/mutiAI\n"
-        "前端仓库：https://github.com/Purewo/mutiAI-aistdio-gemini"
+        "前端仓库：https://github.com/Purewo/mutiAI-Gemini"
     )
     set_run_font(meta_run, "Microsoft YaHei", 10.5)
     meta_run.font.color.rgb = RGBColor(89, 89, 89)
