@@ -1,12 +1,15 @@
 # Contract snapshot metadata
 
 - Source repository: `Purewo/mutiAI`
-- Source commit: `a4bced0`
-- Sync date: `2026-07-26`
+- Source commit: `5f365d3`
+- Sync date: `2026-07-27`
 - Snapshot method: Mechanically copied from the authoritative core repository.
 - Review status: Reviewed against the M2.3 source files, the localized error, Runtime feasibility,
-  and platform-assistant additions (`b585c93`, `5e88dd8`, `99724d0`, `a4bced0`), OpenAPI routes, and the updated M3
-  frontend task packet.
+  platform-assistant, and account self-service additions (`b585c93`, `5e88dd8`, `99724d0`,
+  `a4bced0`, `1e2f969`, `94edeeb`), OpenAPI routes, and the updated M3 frontend task packet.
+
+`ApprovalResponse.cwd` was removed upstream and host paths are sanitized. The generated types no
+longer expose it and no view reads it.
 
 ## Included files
 

@@ -737,8 +737,6 @@ export interface components {
             reason: string | null;
             /** Command */
             command: string | null;
-            /** Cwd */
-            cwd: string | null;
             /** Details */
             details: {
                 [key: string]: unknown;
