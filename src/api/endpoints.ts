@@ -10,6 +10,8 @@ import type {
   Approval,
   ApprovalDecisionRequest,
   Artifact,
+  ChangePasswordRequest,
+  UpdateUserRequest,
   AssistantAction,
   AssistantActionDecisionRequest,
   AssistantConversation,
@@ -61,6 +63,35 @@ export function logout(signal?: AbortSignal): Promise<void> {
 /** Resolve the current session. A 401 here means unauthenticated, not a failure to report. */
 export function getCurrentUser(signal?: AbortSignal): Promise<User> {
   return requestJson<User>('/auth/me', { signal });
+}
+
+/** Update the current user's profile. Only `display_name` is mutable; `username` is immutable. */
+export function updateCurrentUser(
+  body: UpdateUserRequest,
+  signal?: AbortSignal,
+): Promise<User> {
+  return requestJson<User>('/auth/me', { method: 'PATCH', body, signal });
+}
+
+/**
+ * Change the current user's password.
+ *
+ * The backend keeps this browser's session alive and revokes the user's other active sessions, so
+ * the caller must not treat success as a sign-out. A wrong current password returns
+ * `AUTH_CURRENT_PASSWORD_INVALID`; reusing the current password returns
+ * `AUTH_NEW_PASSWORD_MUST_DIFFER`. Both arrive as localized envelopes and are displayed as-is.
+ */
+export function changePassword(
+  body: ChangePasswordRequest,
+  signal?: AbortSignal,
+): Promise<void> {
+  return requestVoid('/auth/password', {
+    method: 'POST',
+    body,
+    // A 401 here would mean the session lapsed, not a bad current password, so leave the global
+    // unauthenticated handling in place.
+    signal,
+  });
 }
 
 /* ------------------------------------------------------- organization design */

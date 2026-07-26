@@ -16,6 +16,8 @@ type Schemas = components['schemas'];
 export type User = Schemas['UserResponse'];
 export type LoginRequest = Schemas['LoginRequest'];
 export type LoginResponse = Schemas['LoginResponse'];
+export type UpdateUserRequest = Schemas['UpdateUserRequest'];
+export type ChangePasswordRequest = Schemas['ChangePasswordRequest'];
 
 /* Organization design */
 export type OrganizationSummary = Schemas['OrganizationSummaryResponse'];

@@ -38,6 +38,8 @@ export interface AuthContextValue {
   signOut: () => Promise<void>;
   /** Re-resolve the session against the backend, for retry after an error state. */
   refresh: () => Promise<void>;
+  /** Replace the held user with one the backend just returned, e.g. after a profile update. */
+  setUser: (user: User) => void;
 }
 
 export const AuthContext = createContext<AuthContextValue | null>(null);

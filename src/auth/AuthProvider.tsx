@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { getCurrentUser, login as loginRequest, logout as logoutRequest } from '../api/endpoints';
 import { ApiError, apiErrorFromThrown } from '../api/errors';
 import { setUnauthorizedListener } from '../api/http';
+import type { User } from '../api/types';
 import { AuthContext, type AuthContextValue, type AuthState } from './context';
 
 /**
@@ -71,9 +72,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const refresh = useCallback(() => resolveSession(), [resolveSession]);
 
+  const setUser = useCallback((user: User) => {
+    // Only meaningful for an established session; never use this to fabricate one.
+    setState((current) =>
+      current.status === 'authenticated' ? { status: 'authenticated', user } : current,
+    );
+  }, []);
+
   const value = useMemo<AuthContextValue>(
-    () => ({ state, signIn, signOut, refresh }),
-    [state, signIn, signOut, refresh],
+    () => ({ state, signIn, signOut, refresh, setUser }),
+    [state, signIn, signOut, refresh, setUser],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
