@@ -222,7 +222,9 @@ function Section({
 function TaskMetaCard({ task }: { task: Task }) {
   return (
     <section className="rounded-2xl border border-slate-200/60 bg-white p-5 shadow-sm">
-      <p className="whitespace-pre-wrap text-sm leading-relaxed text-slate-700">{task.request}</p>
+      <p className="whitespace-pre-wrap break-words text-sm leading-relaxed text-slate-700">
+        {task.request}
+      </p>
       <dl className="mt-4 flex flex-wrap gap-x-8 gap-y-1 border-t border-slate-100 pt-3 text-xs text-slate-500">
         <div className="flex gap-1.5">
           <dt>编排模式</dt>

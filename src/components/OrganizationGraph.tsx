@@ -6,6 +6,7 @@
  * instead of assuming a fixed set of specialists. This is a preview: there is no drag-and-drop
  * editing in V1.
  */
+import { useEffect, useRef } from 'react';
 import { Crown, Info, User2 } from 'lucide-react';
 import type { AgentRoleSpec, OrganizationSpec } from '../api/types';
 
@@ -141,13 +142,26 @@ export default function OrganizationGraph({ spec }: { spec: OrganizationSpec }) 
   // which it is not: this diagram carries no execution order at all.
   const hasSiblings = roots.some((node) => node.children.length > 1);
 
+  /*
+    The tree is centered on its root. On a viewport narrower than the tree, opening at scroll
+    position zero shows empty canvas beside the leftmost branch and cuts the lead off, so the graph
+    starts centered instead. On a wide screen there is nothing to scroll and this is a no-op.
+  */
+  const viewport = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const element = viewport.current;
+    if (!element) return;
+    element.scrollLeft = Math.max(0, (element.scrollWidth - element.clientWidth) / 2);
+  }, [spec]);
+
   return (
-    <div className="relative overflow-x-auto rounded-2xl border border-slate-200/60 bg-white/80 p-8 shadow-sm">
+    <div className="relative rounded-2xl border border-slate-200/60 bg-white/80 p-8 shadow-sm">
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(#e2e8f0_1px,transparent_1px)] opacity-30 [background-size:16px_16px]"
+        className="pointer-events-none absolute inset-0 rounded-2xl bg-[radial-gradient(#e2e8f0_1px,transparent_1px)] opacity-30 [background-size:16px_16px]"
       />
 
+      {/* Outside the scroller: this explains the diagram and must stay readable while it is panned. */}
       <p className="relative z-10 mb-6 flex items-start gap-1.5 text-xs leading-relaxed text-slate-400">
         <Info className="mt-0.5 h-3.5 w-3.5 flex-shrink-0" aria-hidden="true" />
         <span>
@@ -158,13 +172,16 @@ export default function OrganizationGraph({ spec }: { spec: OrganizationSpec }) 
         </span>
       </p>
 
-      <ul className="relative z-10 flex min-w-max flex-wrap items-start justify-center gap-10">
-        {roots.map((node) => (
-          <li key={node.role.role_key}>
-            <RoleBranch node={node} />
-          </li>
-        ))}
-      </ul>
+      {/* Bleeds into the card padding so a wide tree can pan across the full card width. */}
+      <div ref={viewport} className="relative z-10 -mx-8 overflow-x-auto px-8">
+        <ul className="flex min-w-max flex-wrap items-start justify-center gap-10">
+          {roots.map((node) => (
+            <li key={node.role.role_key}>
+              <RoleBranch node={node} />
+            </li>
+          ))}
+        </ul>
+      </div>
 
       {orphans.length > 0 ? (
         <div className="relative z-10 mt-8 rounded-xl border border-amber-200 bg-amber-50 p-4">

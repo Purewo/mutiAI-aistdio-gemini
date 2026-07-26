@@ -103,10 +103,13 @@ export default function AssistantActionCard({
       {action.status === 'failed' && action.error_message ? (
         <p className="mb-2 flex items-start gap-1.5 rounded-xl border border-red-100 bg-red-50 px-3 py-2 text-sm leading-relaxed text-red-700">
           <AlertCircle className="mt-0.5 h-4 w-4 flex-shrink-0" aria-hidden="true" />
-          <span>
+          {/* `min-w-0` lets this shrink below its content; error codes are long unbreakable tokens. */}
+          <span className="min-w-0 flex-1 break-words">
             {action.error_message}
             {action.error_code ? (
-              <span className="ml-1.5 font-mono text-xs text-red-500">{action.error_code}</span>
+              <span className="ml-1.5 break-all font-mono text-xs text-red-500">
+                {action.error_code}
+              </span>
             ) : null}
           </span>
         </p>

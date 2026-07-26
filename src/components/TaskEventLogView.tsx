@@ -54,19 +54,28 @@ export default function TaskEventLogView({ events }: { events: readonly TaskEven
             aria-hidden="true"
             className={`mt-1.5 h-1.5 w-1.5 flex-shrink-0 rounded-full ${toneFor(event.event_type)}`}
           />
-          <span className="w-12 flex-shrink-0 tabular-nums text-slate-400">#{event.sequence}</span>
-          <span className="w-32 flex-shrink-0 text-slate-400">
-            {formatDateTime(event.occurred_at)}
-          </span>
-          <span className="min-w-0 flex-1">
-            <span className="font-mono font-medium text-slate-700">{event.event_type}</span>
-            {(() => {
-              const summary = summarize(event.payload);
-              return summary ? (
-                <span className="ml-2 break-all text-slate-400">{summary}</span>
-              ) : null;
-            })()}
-          </span>
+          {/*
+            Event types are long unbreakable identifiers. On a narrow column the sequence and
+            timestamp would leave them too little room to fit, so below `sm` they move onto their own
+            line instead of pushing the row into a horizontal scroll.
+          */}
+          <div className="min-w-0 flex-1 sm:flex sm:items-start sm:gap-2.5">
+            <div className="flex gap-2.5 text-slate-400">
+              <span className="w-12 flex-shrink-0 tabular-nums">#{event.sequence}</span>
+              <span className="flex-shrink-0 sm:w-32">{formatDateTime(event.occurred_at)}</span>
+            </div>
+            <div className="min-w-0 flex-1">
+              <span className="break-all font-mono font-medium text-slate-700">
+                {event.event_type}
+              </span>
+              {(() => {
+                const summary = summarize(event.payload);
+                return summary ? (
+                  <span className="ml-2 break-all text-slate-400">{summary}</span>
+                ) : null;
+              })()}
+            </div>
+          </div>
         </li>
       ))}
     </ol>

@@ -7,7 +7,7 @@
  * parallel fan-out becomes one wide layer of specialists joined by the lead-review layer. The
  * component draws whatever the persisted edges describe and offers no editing.
  */
-import { ChevronRight, Crown, User2, Workflow } from 'lucide-react';
+import { ChevronDown, ChevronRight, Crown, User2, Workflow } from 'lucide-react';
 import type { PlanStep } from '../api/types';
 import { formatDuration } from '../lib/format';
 import { PlanStepStatusBadge } from './taskBadges';
@@ -53,7 +53,7 @@ function StepCard({ step, dependencyNames }: { step: PlanStep; dependencyNames: 
   const isLeadReview = step.step_kind === 'lead_review';
   return (
     <div
-      className={`flex h-full w-60 flex-col rounded-2xl border p-3.5 text-left shadow-sm ${
+      className={`flex h-full w-full flex-col rounded-2xl border p-3.5 text-left shadow-sm lg:w-60 ${
         isLeadReview ? 'border-indigo-200 bg-indigo-50/50' : 'border-slate-200 bg-white'
       }`}
     >
@@ -191,36 +191,53 @@ export default function PlanGraph({ steps }: { steps: readonly PlanStep[] }) {
       ) : null}
 
       {/*
-        Layers flow left to right, which matches how a pipeline reads and uses the width a desktop
-        actually has instead of turning a four-step chain into a long vertical scroll. Steps that
-        share a layer stack vertically inside their column, so a parallel fan-out still reads as one
-        stage. The container scrolls horizontally when a plan outgrows the viewport.
+        On a wide screen layers flow left to right, which matches how a pipeline reads and uses the
+        width a desktop actually has instead of turning a four-step chain into a long vertical
+        scroll. Below `lg` that would force the reader to scroll sideways to find the next stage, so
+        the same graph stacks top to bottom instead. Steps sharing a layer always stack vertically;
+        in the stacked layout that is ambiguous, so a wide layer states its concurrency in words.
       */}
-      <div className="flex min-w-max items-stretch">
+      <div className="flex flex-col items-stretch lg:min-w-max lg:flex-row">
         {layers.map((layer, index) => (
-          <div key={index} className="flex items-stretch">
+          <div key={index} className="flex flex-col items-stretch lg:flex-row">
             {/* A directed connector: these stages run in sequence, they are not alternatives. */}
             {index > 0 ? (
-              <span
-                aria-hidden="true"
-                className="flex w-10 flex-shrink-0 items-center justify-center self-center text-slate-300"
-              >
-                <span className="h-px w-5 bg-current" />
-                <ChevronRight className="-ml-1.5 h-4 w-4" />
-              </span>
+              <>
+                <span
+                  aria-hidden="true"
+                  className="flex flex-col items-center py-2 text-slate-300 lg:hidden"
+                >
+                  <span className="h-4 w-px bg-current" />
+                  <ChevronDown className="-mt-1.5 h-4 w-4" />
+                </span>
+                <span
+                  aria-hidden="true"
+                  className="hidden w-10 flex-shrink-0 items-center justify-center self-center text-slate-300 lg:flex"
+                >
+                  <span className="h-px w-5 bg-current" />
+                  <ChevronRight className="-ml-1.5 h-4 w-4" />
+                </span>
+              </>
             ) : null}
-            <ul className="flex flex-col justify-center gap-4">
-              {layer.map(({ step }) => (
-                <li key={step.plan_step_id}>
-                  <StepCard
-                    step={step}
-                    dependencyNames={step.dependency_step_ids.map(
-                      (id) => nameById.get(id) ?? id.slice(0, 8),
-                    )}
-                  />
-                </li>
-              ))}
-            </ul>
+            <div className="flex flex-col justify-center">
+              {layer.length > 1 ? (
+                <p className="mb-2 text-[11px] font-medium text-slate-400 lg:hidden">
+                  以下 {layer.length} 个步骤属于同一阶段，可同时执行
+                </p>
+              ) : null}
+              <ul className="flex flex-col justify-center gap-4">
+                {layer.map(({ step }) => (
+                  <li key={step.plan_step_id}>
+                    <StepCard
+                      step={step}
+                      dependencyNames={step.dependency_step_ids.map(
+                        (id) => nameById.get(id) ?? id.slice(0, 8),
+                      )}
+                    />
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
         ))}
       </div>

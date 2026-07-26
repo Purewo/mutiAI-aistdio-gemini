@@ -203,9 +203,7 @@ export default function Assistant() {
               onChange={(event) => setInput(event.target.value)}
               onKeyDown={handleKeyDown}
               placeholder={
-                turnRunning
-                  ? '小助理正在处理上一条消息...'
-                  : '描述您想创建或调整的组织...（Enter 发送，Shift+Enter 换行）'
+                turnRunning ? '小助理正在处理上一条消息...' : '描述您想创建或调整的组织...'
               }
               rows={1}
               disabled={turnRunning}
@@ -224,6 +222,13 @@ export default function Assistant() {
               )}
             </button>
           </form>
+          {/*
+            The keyboard hint lives outside the placeholder because a one-line composer clips it on a
+            narrow screen, and it is hidden there anyway: a phone keyboard has no Shift+Enter.
+          */}
+          <p className="mt-1.5 hidden text-[11px] text-slate-400 sm:block">
+            Enter 发送，Shift+Enter 换行
+          </p>
         </div>
       </div>
     </div>
@@ -257,7 +262,8 @@ function MessageRow({
   if (message.role === 'user') {
     return (
       <div className="flex justify-end">
-        <div className="max-w-[85%] whitespace-pre-wrap rounded-2xl rounded-br-sm bg-gradient-to-r from-indigo-600 to-blue-600 px-4 py-3 text-sm leading-relaxed text-white shadow-md shadow-indigo-200/60">
+        {/* `break-words` only kicks in for tokens that cannot fit at all, such as a long MIME type. */}
+        <div className="max-w-[85%] whitespace-pre-wrap break-words rounded-2xl rounded-br-sm bg-gradient-to-r from-indigo-600 to-blue-600 px-4 py-3 text-sm leading-relaxed text-white shadow-md shadow-indigo-200/60">
           {message.text}
           {message.status === 'failed' ? (
             <span className="mt-1 block text-xs text-indigo-100">这条消息未能送达</span>
@@ -294,14 +300,14 @@ function AssistantText({ text }: { text: string }) {
   const trimmed = text.trim();
   const structured = trimmed.startsWith('{') && trimmed.endsWith('}');
 
-  if (!structured) return <span className="whitespace-pre-wrap">{trimmed}</span>;
+  if (!structured) return <span className="whitespace-pre-wrap break-words">{trimmed}</span>;
 
   let pretty = trimmed;
   try {
     pretty = JSON.stringify(JSON.parse(trimmed), null, 2);
   } catch {
     // Not valid JSON after all; fall through and show it as text.
-    return <span className="whitespace-pre-wrap">{trimmed}</span>;
+    return <span className="whitespace-pre-wrap break-words">{trimmed}</span>;
   }
 
   return (
