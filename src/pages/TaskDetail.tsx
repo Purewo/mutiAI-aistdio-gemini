@@ -23,7 +23,12 @@ import { useApiResource } from '../api/useApiResource';
 import FeasibilityPanel from '../components/FeasibilityPanel';
 import PageHeader from '../components/PageHeader';
 import PlanGraph from '../components/PlanGraph';
-import { AssignmentStatusBadge, PlanStatusBadge, TaskStatusBadge } from '../components/taskBadges';
+import {
+  AssignmentStatusBadge,
+  DeliverySummary,
+  PlanStatusBadge,
+  TaskStatusBadge,
+} from '../components/taskBadges';
 import { ErrorState, InlineError, LoadingState } from '../components/states';
 import { formatDateTime } from '../lib/format';
 
@@ -479,9 +484,7 @@ function AssignmentsSection({ task }: { task: Task }) {
             <span className="text-xs text-slate-400">{assignment.assignment_kind}</span>
             <AssignmentStatusBadge status={assignment.status} />
             {assignment.result_summary ? (
-              <p className="w-full text-sm leading-relaxed text-slate-600">
-                {assignment.result_summary}
-              </p>
+              <DeliverySummary summary={assignment.result_summary} />
             ) : null}
           </li>
         ))}

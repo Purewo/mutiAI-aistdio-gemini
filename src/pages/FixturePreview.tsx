@@ -15,7 +15,12 @@ import { FlaskConical } from 'lucide-react';
 import type { Task } from '../api/types';
 import PageHeader from '../components/PageHeader';
 import PlanGraph from '../components/PlanGraph';
-import { AssignmentStatusBadge, PlanStatusBadge, TaskStatusBadge } from '../components/taskBadges';
+import {
+  AssignmentStatusBadge,
+  DeliverySummary,
+  PlanStatusBadge,
+  TaskStatusBadge,
+} from '../components/taskBadges';
 import linearPlanned from '../../fixtures/api/task-linear-planned.json';
 import linearCompleted from '../../fixtures/api/task-linear-completed.json';
 import parallelPlanned from '../../fixtures/api/task-parallel-planned.json';
@@ -112,9 +117,7 @@ export default function FixturePreview() {
                   <span className="text-xs text-slate-400">{assignment.assignment_kind}</span>
                   <AssignmentStatusBadge status={assignment.status} />
                   {assignment.result_summary ? (
-                    <p className="w-full text-sm leading-relaxed text-slate-600">
-                      {assignment.result_summary}
-                    </p>
+                    <DeliverySummary summary={assignment.result_summary} />
                   ) : null}
                 </li>
               ))}

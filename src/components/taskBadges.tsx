@@ -86,3 +86,42 @@ const ASSIGNMENT: Record<AssignmentStatus, Presentation> = {
 export function AssignmentStatusBadge({ status }: { status: AssignmentStatus }) {
   return <Badge presentation={ASSIGNMENT[status]} raw={status} />;
 }
+
+/**
+ * Render a backend-provided delivery summary.
+ *
+ * Some summaries (notably the lead's planning delivery) are a serialized structured envelope rather
+ * than prose. Dumping that inline overwhelms the page, so long or JSON-shaped content collapses
+ * behind a disclosure and scrolls inside its own container. The text is never truncated or
+ * rewritten — it is backend product data.
+ */
+export function DeliverySummary({ summary }: { summary: string }) {
+  const trimmed = summary.trim();
+  const structured =
+    (trimmed.startsWith('{') && trimmed.endsWith('}')) ||
+    (trimmed.startsWith('[') && trimmed.endsWith(']'));
+
+  if (!structured && trimmed.length <= 400) {
+    return <p className="w-full text-sm leading-relaxed text-slate-600">{trimmed}</p>;
+  }
+
+  let pretty = trimmed;
+  if (structured) {
+    try {
+      pretty = JSON.stringify(JSON.parse(trimmed), null, 2);
+    } catch {
+      // Not valid JSON after all; show the original text.
+    }
+  }
+
+  return (
+    <details className="w-full">
+      <summary className="cursor-pointer text-sm font-medium text-slate-500 hover:text-slate-700">
+        {structured ? '结构化交付内容' : '完整交付摘要'}（展开）
+      </summary>
+      <pre className="mt-2 max-h-80 overflow-auto rounded-xl border border-slate-200 bg-slate-50 p-3 text-xs leading-relaxed text-slate-600">
+        {pretty}
+      </pre>
+    </details>
+  );
+}
