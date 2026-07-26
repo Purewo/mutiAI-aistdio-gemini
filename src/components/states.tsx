@@ -127,20 +127,23 @@ export type ConnectionStatus = 'connecting' | 'live' | 'reconnecting' | 'closed'
 export function ReconnectBanner({
   status,
   onReconnect,
+  closedText = '事件流已结束，当前内容已是最新。',
 }: {
   status: ConnectionStatus;
   onReconnect?: () => void;
+  /** Overrides the end-of-stream copy, which differs between the task and conversation views. */
+  closedText?: string;
 }) {
   if (status === 'live') return null;
 
   const copy: Record<Exclude<ConnectionStatus, 'live'>, { text: string; tone: string }> = {
     connecting: { text: '正在连接事件流...', tone: 'border-slate-200 bg-slate-50 text-slate-600' },
     reconnecting: {
-      text: '事件流已断开，正在重连。任务进度可能暂时滞后。',
+      text: '事件流已断开，正在重连。进度可能暂时滞后。',
       tone: 'border-amber-200 bg-amber-50 text-amber-800',
     },
     closed: {
-      text: '事件流已结束。任务详情仍可查询。',
+      text: closedText,
       tone: 'border-slate-200 bg-slate-50 text-slate-600',
     },
   };

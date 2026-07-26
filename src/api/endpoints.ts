@@ -10,6 +10,13 @@ import type {
   Approval,
   ApprovalDecisionRequest,
   Artifact,
+  AssistantAction,
+  AssistantActionDecisionRequest,
+  AssistantConversation,
+  AssistantMessagePage,
+  AssistantSubmission,
+  AssistantTurn,
+  AssistantUserMessageRequest,
   FeasibilityCheck,
   LoginRequest,
   LoginResponse,
@@ -118,6 +125,120 @@ export function publishOrganizationVersion(
     `/organizations/${encode(organizationId)}/versions/${encode(specVersionId)}/publish`,
     { method: 'POST', signal },
   );
+}
+
+/* ------------------------------------------- platform assistant conversation */
+
+/**
+ * The platform assistant is a product-owned conversation backed by a persistent Codex Thread.
+ * Product-tool results are not a second API: they stay visible through the persisted Organization,
+ * Task, Artifact, usage, and feasibility resources, and Codex private history is never exposed.
+ */
+export function listAssistantConversations(signal?: AbortSignal): Promise<AssistantConversation[]> {
+  return requestJson<AssistantConversation[]>('/assistant/conversations', { signal });
+}
+
+export function createAssistantConversation(signal?: AbortSignal): Promise<AssistantConversation> {
+  return requestJson<AssistantConversation>('/assistant/conversations', {
+    method: 'POST',
+    signal,
+  });
+}
+
+export function getAssistantConversation(
+  conversationId: string,
+  signal?: AbortSignal,
+): Promise<AssistantConversation> {
+  return requestJson<AssistantConversation>(
+    `/assistant/conversations/${encode(conversationId)}`,
+    { signal },
+  );
+}
+
+export function archiveAssistantConversation(
+  conversationId: string,
+  signal?: AbortSignal,
+): Promise<AssistantConversation> {
+  return requestJson<AssistantConversation>(
+    `/assistant/conversations/${encode(conversationId)}/archive`,
+    { method: 'POST', signal },
+  );
+}
+
+/** One cursor page of conversation history, oldest-first within the page. */
+export function listAssistantMessages(
+  conversationId: string,
+  options: { cursor?: string; limit?: number } = {},
+  signal?: AbortSignal,
+): Promise<AssistantMessagePage> {
+  return requestJson<AssistantMessagePage>(
+    `/assistant/conversations/${encode(conversationId)}/messages`,
+    { query: { cursor: options.cursor, limit: options.limit }, signal },
+  );
+}
+
+/**
+ * Submit a user message. The backend accepts it (202) and returns the persisted message together
+ * with the queued Turn; the assistant's reply arrives later through the event stream. The
+ * idempotency key must be stable across retries of the same submission.
+ */
+export function submitAssistantMessage(
+  conversationId: string,
+  body: AssistantUserMessageRequest,
+  idempotencyKey: string,
+  signal?: AbortSignal,
+): Promise<AssistantSubmission> {
+  return requestJson<AssistantSubmission>(
+    `/assistant/conversations/${encode(conversationId)}/messages`,
+    { method: 'POST', body, idempotencyKey, signal },
+  );
+}
+
+export function getAssistantTurn(turnId: string, signal?: AbortSignal): Promise<AssistantTurn> {
+  return requestJson<AssistantTurn>(`/assistant/turns/${encode(turnId)}`, { signal });
+}
+
+export function cancelAssistantTurn(turnId: string, signal?: AbortSignal): Promise<AssistantTurn> {
+  return requestJson<AssistantTurn>(`/assistant/turns/${encode(turnId)}/cancel`, {
+    method: 'POST',
+    signal,
+  });
+}
+
+export function listAssistantActions(
+  conversationId: string,
+  signal?: AbortSignal,
+): Promise<AssistantAction[]> {
+  return requestJson<AssistantAction[]>(
+    `/assistant/conversations/${encode(conversationId)}/actions`,
+    { signal },
+  );
+}
+
+export function getAssistantAction(
+  actionId: string,
+  signal?: AbortSignal,
+): Promise<AssistantAction> {
+  return requestJson<AssistantAction>(`/assistant/actions/${encode(actionId)}`, { signal });
+}
+
+/**
+ * Confirm or decline one proposed action.
+ *
+ * Confirmation is asynchronous: a successful response means the decision was recorded, not that the
+ * product operation finished. Treat `confirmed` and `executing` as pending and refresh the action
+ * and its referenced resource after `assistant.action.completed` or `assistant.action.failed`.
+ */
+export function decideAssistantAction(
+  actionId: string,
+  body: AssistantActionDecisionRequest,
+  signal?: AbortSignal,
+): Promise<AssistantAction> {
+  return requestJson<AssistantAction>(`/assistant/actions/${encode(actionId)}/decision`, {
+    method: 'POST',
+    body,
+    signal,
+  });
 }
 
 /* ----------------------------------------------------------- feasibility */

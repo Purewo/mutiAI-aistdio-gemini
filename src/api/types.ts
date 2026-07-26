@@ -71,6 +71,45 @@ export type ApprovalDecisionRequest = Schemas['ApprovalDecisionRequest'];
 export type TaskTokenUsage = Schemas['TaskTokenUsageResponse'];
 export type AssignmentTokenUsage = Schemas['AssignmentTokenUsageResponse'];
 
+/* Platform assistant conversation */
+export type AssistantConversation = Schemas['AssistantConversationResponse'];
+export type AssistantConversationStatus = Schemas['AssistantConversationStatus'];
+export type AssistantMessage = Schemas['AssistantMessageResponse'];
+export type AssistantMessagePage = Schemas['AssistantMessagePage'];
+export type AssistantMessageRole = Schemas['AssistantMessageRole'];
+export type AssistantMessageStatus = Schemas['AssistantMessageStatus'];
+export type AssistantUserMessageRequest = Schemas['AssistantUserMessageRequest'];
+export type AssistantSubmission = Schemas['AssistantSubmissionResponse'];
+export type AssistantTurn = Schemas['AssistantTurnResponse'];
+export type AssistantTurnStatus = Schemas['AssistantTurnStatus'];
+export type AssistantAction = Schemas['AssistantActionResponse'];
+export type AssistantActionStatus = Schemas['AssistantActionStatus'];
+export type AssistantActionDecisionRequest = Schemas['AssistantActionDecisionRequest'];
+
+/**
+ * Turn states that admit no further transition. `waiting` is excluded: it is a resumable Runtime or
+ * capacity boundary, not an end state.
+ */
+export const TERMINAL_TURN_STATUSES: readonly AssistantTurnStatus[] = [
+  'completed',
+  'failed',
+  'cancelled',
+];
+
+export function isTerminalTurnStatus(status: AssistantTurnStatus): boolean {
+  return TERMINAL_TURN_STATUSES.includes(status);
+}
+
+/**
+ * Action states still awaiting a product outcome. Confirmation is asynchronous, so `confirmed` and
+ * `executing` are pending — never success — until the backend reports completion or failure.
+ */
+export const PENDING_ACTION_STATUSES: readonly AssistantActionStatus[] = [
+  'proposed',
+  'confirmed',
+  'executing',
+];
+
 /* Errors */
 export type ErrorEnvelope = Schemas['ErrorEnvelope'];
 
