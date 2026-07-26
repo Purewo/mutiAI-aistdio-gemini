@@ -1,11 +1,12 @@
 # M3 frontend implementation plan
 
-Status: Ready for implementation.
+Status: In implementation. Owned locally by the frontend owner; see `CLAUDE.md`.
 
 This plan turns the M3 product scope into bounded, reviewable frontend stages. It defines implementation order and acceptance gates, not calendar estimates.
 
 Read these files before implementation:
 
+- `CLAUDE.md`
 - `GEMINI.md`
 - `docs/M3_FRONTEND_TASK_PACKET.md`
 - `docs/LOCAL_INTEGRATION_REVIEW.md`
@@ -16,18 +17,18 @@ Read these files before implementation:
 
 The contract baseline is backend commit `356ae35`. Use only repository-visible files and repository-relative paths. Do not invent backend fields, endpoints, or states.
 
-## AI Studio mock and real-integration boundary
+## Real-integration and mock boundary
 
-Gemini cannot access the real local backend from Google AI Studio. This changes how the frontend is developed, but it does not require a remote deployment.
+The frontend is developed locally against the running backend. No remote deployment is required.
 
-- Use the captured responses under `fixtures/api/` first for contract-backed states and flows.
+- Develop and verify against the real local backend. It is the acceptance target for every stage.
+- The captured responses under `fixtures/api/` are an offline regression and visual reference, and are useful for states that are expensive to reproduce against a live Runtime.
 - You may create clearly labeled frontend-only mock data when extra records, text lengths, or state combinations are useful for inspecting page composition, spacing, overflow, and responsive behavior.
 - Keep UI-only mock data outside `contracts/` and `fixtures/api/`. Do not edit captured fixtures or describe synthetic UI data as a real backend response.
 - Reuse only fields, enum values, and resource relationships that exist in the checked-in contracts. Mock data may vary content and quantity for visual review, but it must not expand the backend contract.
 - Keep mock/demo mode explicitly separable from the real API client. A real request failure must render an error state and must never trigger a silent fallback to mock data.
-- Gemini is responsible for the implementation, fixture/mock visual checks, and the available repository lint and build checks.
-- After Gemini submits the candidate code, the Codex project integrator pulls it, starts the real backend and frontend, and verifies real authentication, network requests, SSE reconnect behavior, Artifact access, Task usage, browser console output, interactions, and responsive layout.
-- The Codex project integrator reports reproducible defects but does not modify Gemini's frontend implementation. Gemini owns the corrective commits.
+- The frontend owner is responsible for the implementation, the repository lint, typecheck, and build checks, and the real-backend browser verification: authentication, network requests, SSE reconnect behavior, Artifact access, Task usage, browser console output, interactions, and responsive layout.
+- Contract defects are backend-owned. Fix them in `Purewo/mutiAI` as their own commits, then refresh this repository's snapshots.
 
 ## Product flow for M3
 
@@ -229,9 +230,8 @@ Acceptance gate:
 - Keep each stage in a bounded commit or pull request checkpoint.
 - State which contract snapshot and fixtures the implementation used.
 - List known limitations or missing backend fields instead of filling them with invented data.
-- Do not mark M3 complete when code has only passed AI Studio fixture or mock checks.
-- After Gemini submits the candidate implementation, the Codex project integrator runs it against the real backend and performs browser, console, network, SSE, Artifact, and responsive-layout verification.
-- The Codex project integrator reports reproducible issues without editing Gemini's implementation. Gemini owns the corrective commits.
+- Do not mark a stage complete when code has only passed fixture or mock checks.
+- Each stage is verified against the real backend with browser, console, network, SSE, Artifact, and responsive-layout checks before it is called done.
 
 ## Explicit non-goals
 

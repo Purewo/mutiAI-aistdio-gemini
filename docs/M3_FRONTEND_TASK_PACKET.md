@@ -1,6 +1,6 @@
 # M3 frontend task packet
 
-Status: Ready for Gemini implementation.
+Status: In implementation. Owned locally by the frontend owner; see `CLAUDE.md`.
 
 ## Contract source
 
@@ -68,11 +68,11 @@ Task submission must send a unique `Idempotency-Key` and set `orchestration_mode
 
 The Artifact content endpoint is owner-scoped and returns the declared media type. Use its default inline response for preview when the browser supports the media type, and add `download=true` for explicit download. Treat 409 integrity or release-state errors as unavailable results rather than attempting a direct filesystem fallback.
 
-Google AI Studio cannot reach the local backend. Use the checked-in API fixtures for contract-backed UI development and empty, waiting, failed, completed, linear, parallel, Artifact, usage, approval, and event states. The fixtures are captured from the real FastAPI application at backend commit `356ae35`; do not edit or extend those captured responses.
+Develop and verify against the real local backend. The checked-in API fixtures remain an offline reference for the empty, waiting, failed, completed, linear, parallel, Artifact, usage, approval, and event states, and are useful for states that are expensive to reproduce against a live Runtime. They are captured from the real FastAPI application at backend commit `356ae35`; do not edit or extend those captured responses.
 
-Gemini may also create clearly labeled frontend-only mock data when additional records or content lengths are useful for inspecting layout and visual hierarchy. Keep this demo data separate from `contracts/` and `fixtures/api/`, use only fields and state values defined by the checked-in contracts, and never describe it as a real backend response. Mock mode must be explicit and must not activate as an automatic fallback when a real API request fails.
+You may also create clearly labeled frontend-only mock data when additional records or content lengths are useful for inspecting layout and visual hierarchy. Keep this demo data separate from `contracts/` and `fixtures/api/`, use only fields and state values defined by the checked-in contracts, and never describe it as a real backend response. Mock mode must be explicit and must not activate as an automatic fallback when a real API request fails.
 
-Use relative `/api/v1` requests by default and include browser credentials for the HttpOnly session cookie. Keep the API base configurable for local integration. Do not require a remote deployment. After Gemini submits the frontend implementation, the Codex project integrator pulls it, runs the backend and frontend locally, and performs the real API and browser acceptance review.
+Use relative `/api/v1` requests by default and include browser credentials for the HttpOnly session cookie. Keep the API base configurable for local integration. Do not require a remote deployment. A frontend change is complete only after the real API and browser acceptance review described in `docs/LOCAL_INTEGRATION_REVIEW.md`.
 
 ## State mapping
 
@@ -123,4 +123,4 @@ Render plan topology from `execution_plan.steps[*].plan_step_id` and `dependency
 - Completed, failed, cancelled, and needs-revision task states are visibly distinct.
 - Browser console has no uncaught errors, and network requests match the OpenAPI contract.
 
-After Gemini submits the frontend change, Codex pulls the branch, runs the frontend against the real local backend, and performs browser verification before calling M3 complete. Codex does not modify Gemini's implementation during this review. Reproducible issues are reported to the project owner, and Gemini submits the fixes.
+Every frontend change runs against the real local backend and passes browser verification before M3 is called complete. Contract defects are backend-owned and fixed in `Purewo/mutiAI` as their own commits before this repository's snapshots are refreshed.

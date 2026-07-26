@@ -1,25 +1,52 @@
 # Local integration and review boundary
 
-Google AI Studio cannot access the project integrator's local filesystem or backend process. Gemini develops against the versioned contracts and real-response fixtures committed to this repository. It may use isolated, clearly labeled frontend-only mock data to inspect layout and visual states, but mock execution is not a real-backend acceptance result.
+The frontend is developed locally against the running backend. The frontend owner can start the API,
+issue real requests, and drive a real browser, so contract-backed behavior is verified directly
+instead of being inferred from captured responses.
 
-Frontend-only mock data must remain outside `contracts/` and `fixtures/api/`, reuse contracted fields and state values, and stay explicitly separable from the real API transport. A failed real request must produce its contracted error state instead of silently switching the application into mock mode.
+This replaces the earlier arrangement in which a Google AI Studio collaborator wrote candidate code
+against fixtures and a separate integrator performed acceptance without modifying the
+implementation. The frontend owner now writes the implementation, verifies it, and owns the
+corrective commits.
+
+The captured responses under `fixtures/api/` remain useful as an offline regression and visual
+reference, and for exercising states that are expensive to reproduce against a live Runtime. They
+are no longer the primary development input.
+
+Frontend-only mock data must remain outside `contracts/` and `fixtures/api/`, reuse contracted fields
+and state values, and stay explicitly separable from the real API transport. A failed real request
+must produce its contracted error state instead of silently switching the application into mock
+mode.
 
 ## Frontend transport requirements
 
 - Use relative `/api/v1` requests by default.
 - Include browser credentials so the HttpOnly session cookie is sent.
-- Keep the API base configurable without embedding the integrator's Windows paths.
+- Keep the API base configurable without embedding local absolute paths.
 - Support a local development proxy from `/api` to `http://127.0.0.1:8000`.
 - Do not require a remote server or public deployment for M3 validation.
 
-## Review ownership
+## Local verification
 
-After Gemini commits a bounded implementation, the Codex project integrator:
+```powershell
+# backend, in the mutiAI repository
+uv run uvicorn mutiai.main:app --reload            # http://127.0.0.1:8000
 
-1. Pulls the Gemini branch into the local frontend checkout.
-2. Installs dependencies and runs the repository's type, lint, test, and build commands.
-3. Starts the real backend locally and connects the frontend through the development proxy.
-4. Verifies authentication, requests, SSE reconnect behavior, Artifact access, browser console output, responsive layout, and core interactions.
-5. Reports reproducible defects with request, response, console, screenshot, or interaction evidence.
+# frontend, in this repository
+npm install
+npm run dev                                        # http://localhost:3000
+```
 
-The project integrator does not modify Gemini's frontend implementation during review. The project owner sends the report to Gemini, and Gemini owns all corrective code changes and commits. Contract defects remain backend-owned and are fixed in the core repository before refreshing this repository's snapshots.
+`RUNTIME_PROVIDER` defaults to `fake`, which keeps the backend self-contained for frontend work.
+Start the Codex sidecar only when a change needs real Runtime behavior.
+
+Before a frontend change is called complete:
+
+1. Run the repository's type, lint, and build commands.
+2. Run the frontend against the real backend through the development proxy.
+3. Verify authentication, request and response shapes, SSE reconnect behavior, and Artifact access.
+4. Check the browser console for uncaught errors and the network panel for contract conformance.
+5. Verify core interactions and responsive layout.
+
+Contract defects are backend-owned. Fix them in `Purewo/mutiAI` as their own commits, then refresh
+this repository's snapshots and record the source commit in `contracts/SNAPSHOT.md`.

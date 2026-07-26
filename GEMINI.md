@@ -1,6 +1,12 @@
-# Gemini frontend instructions
+# Frontend instructions
 
-Read `docs/GEMINI_HANDOFF.md`, `docs/M3_FRONTEND_TASK_PACKET.md`, `docs/M3_FRONTEND_IMPLEMENTATION_PLAN.md`, and `docs/LOCAL_INTEGRATION_REVIEW.md` before changing the frontend.
+Ownership note: since 2026-07-26 this frontend is developed locally by the project's frontend owner,
+who can run and debug the real backend directly. `CLAUDE.md` holds the current working rules and
+takes precedence wherever this file or `docs/GEMINI_HANDOFF.md` describes the earlier Google AI
+Studio collaborator workflow. The product background, page scope, and contract rules below remain
+accurate.
+
+Read `CLAUDE.md`, `docs/GEMINI_HANDOFF.md`, `docs/M3_FRONTEND_TASK_PACKET.md`, `docs/M3_FRONTEND_IMPLEMENTATION_PLAN.md`, and `docs/LOCAL_INTEGRATION_REVIEW.md` before changing the frontend.
 
 ## Rules
 
@@ -14,10 +20,10 @@ Read `docs/GEMINI_HANDOFF.md`, `docs/M3_FRONTEND_TASK_PACKET.md`, `docs/M3_FRONT
 - V1 has no drag-and-drop organization editor, autonomous role creation, organization invitations, or member management.
 - Always implement loading, empty, error, and reconnect states when their contract is available.
 - Keep visual components independent from transport details by using a small typed client layer.
-- Use repository fixtures first when AI Studio cannot reach the local backend.
+- Develop against the real local backend. The checked-in fixtures under `fixtures/api/` are an offline regression and visual reference, not the primary development input.
 - You may create clearly labeled frontend-only mock data to inspect layout and visual states when the checked-in fixtures do not provide enough visual variety. Keep it outside `contracts/` and `fixtures/api/`, reuse only contracted fields and state values, and never present it as a captured backend response.
 - Mock mode must never silently replace a failed real API request. Keep the real API transport and mock/demo data source explicitly separable.
 
 ## Handoff expectation
 
-A frontend commit is a candidate implementation. AI Studio mock and fixture checks are for frontend construction and visual review, not proof of real integration. After Gemini submits the code, the Codex project integrator pulls it, connects it to the real backend, performs browser verification, and reports reproducible defects. The integrator does not modify Gemini's implementation during review. Gemini owns the corrective code changes and commits.
+A frontend commit is complete only after it has been verified in a real browser against the running backend. Lint, typecheck, build, fixture, and mock checks support construction and visual review; they are not proof of real integration. The frontend owner writes the implementation, performs that browser verification, and owns the corrective commits. Contract defects remain backend-owned and are fixed in `Purewo/mutiAI` before this repository's snapshots are refreshed.
