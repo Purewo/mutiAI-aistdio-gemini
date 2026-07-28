@@ -36,7 +36,13 @@ function isTextPreviewable(mediaType: string): boolean {
   );
 }
 
-function ArtifactRow({ artifact }: { artifact: Artifact }) {
+function ArtifactRow({
+  artifact,
+  replayNumberById,
+}: {
+  artifact: Artifact;
+  replayNumberById?: ReadonlyMap<string, number>;
+}) {
   const [preview, setPreview] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -131,6 +137,12 @@ function ArtifactRow({ artifact }: { artifact: Artifact }) {
           <dt>来源</dt>
           <dd>{artifact.origin}</dd>
         </div>
+        {artifact.replay_run_id && replayNumberById?.has(artifact.replay_run_id) ? (
+          <div className="flex gap-1">
+            <dt>重放血缘</dt>
+            <dd>第 {replayNumberById.get(artifact.replay_run_id)} 次</dd>
+          </div>
+        ) : null}
         {artifact.released_at ? (
           <div className="flex gap-1">
             <dt>发布于</dt>
@@ -160,11 +172,17 @@ function ArtifactRow({ artifact }: { artifact: Artifact }) {
   );
 }
 
-export default function ArtifactList({ artifacts }: { artifacts: readonly Artifact[] }) {
+export default function ArtifactList({
+  artifacts,
+  replayNumberById,
+}: {
+  artifacts: readonly Artifact[];
+  replayNumberById?: ReadonlyMap<string, number>;
+}) {
   return (
     <ul className="space-y-3">
       {artifacts.map((artifact) => (
-        <ArtifactRow key={artifact.artifact_id} artifact={artifact} />
+        <ArtifactRow key={artifact.artifact_id} artifact={artifact} replayNumberById={replayNumberById} />
       ))}
     </ul>
   );

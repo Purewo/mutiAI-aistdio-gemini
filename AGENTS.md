@@ -37,6 +37,16 @@ file is the current repository instruction and ownership boundary.
 - Do not expose host paths, Codex transcripts, raw tool events, LangGraph
   checkpoints, or Runtime workspace internals as product history.
 
+## Target platform
+
+- V1 targets desktop web browsers. Desktop interaction, layout, and browser
+  acceptance are the current frontend delivery gate.
+- Mobile and narrow-screen UX are explicitly out of scope for V1. Do not spend
+  current feature time on mobile adaptation or treat mobile screenshots,
+  responsive polish, or mobile-specific defects as release blockers.
+- Mobile support will be designed as a separate product pass later instead of
+  being inferred from the current desktop information architecture.
+
 ## Verification and delivery
 
 Run the relevant checks before delivery:
@@ -49,9 +59,9 @@ npm run build
 
 Frontend work is not complete from fixture or static checks alone. Run the
 frontend through the local backend proxy and verify the changed flow in a real
-browser, including Console, Network, responsive layout, and reconnect behavior
-when applicable. Record the verified URL, state, and any remaining risk in
-`docs/CURRENT_STATUS.md` or the relevant task document.
+desktop browser, including Console, Network, desktop layout, and reconnect
+behavior when applicable. Record the verified URL, state, and any remaining
+risk in `docs/CURRENT_STATUS.md` or the relevant task document.
 
 The active branch at takeover is `feat/m3-frontend-foundation`, with frontend
 baseline `ad9d659` and contract snapshot source `b409e9b`. Compare current

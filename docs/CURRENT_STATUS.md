@@ -1,6 +1,6 @@
 # Nexwork frontend current status
 
-Status date: 2026-07-28
+Status date: 2026-07-29
 
 This is the frontend-side handoff for Codex. `AGENTS.md` is the repository
 instruction file; `Purewo/mutiAI/docs/CURRENT_STATUS.md` remains authoritative
@@ -207,11 +207,49 @@ The live local-stack acceptance used conversation
 - Final `npm run lint` and `npm run build` passed. Vite retains its existing
   non-fatal main-chunk size warning.
 
+## Bounded Task replay acceptance
+
+The frontend contract snapshot, generated TypeScript, and bounded replay
+architecture document were refreshed from backend commit `868139c`. The Task
+detail now consumes the persisted replay policy and immutable ReplayRun
+records, supports `full`, strict-linear `from_step`, and candidate `step_only`
+requests, and distinguishes business replay from technical retry. Task creation
+also sends the initial `manual` or `auto_within_limit` policy and the contracted
+0-10 replay limit. Assistant `task.replay` Actions display their requested
+scope, reason, feedback, and Task destination before confirmation.
+
+The live desktop acceptance used Task
+`d608a67b-0542-4004-bd4f-588b4d4b7f50` and created ReplayRun
+`4db6ad7b-c3cf-42d1-b150-2ab81eb8fda5` through the real UI:
+
+- A `step_only` replay targeted
+  `currency_translator.convert_cny_to_usd_workbook`; the create request returned
+  HTTP `201` and the ReplayRun completed as replay number 1.
+- The Task correctly remained `needs_revision` with `candidate_only=true`. The
+  replay produced plan version 2 and USD Artifact version 2 while retaining the
+  queryable original Plan, Assignments, and Artifacts.
+- The persisted history showed the replay reason and feedback, executed and
+  reused steps, pinned input Artifacts, effective Artifact bindings, lead
+  decision, and immutable parent lineage. The plan graph marked replayed steps
+  and fixed reused steps separately, and its expandable baseline view rendered
+  all four original steps.
+- The event history included `task.replay_created`, `task.replay_started`,
+  `plan.step_reused`, and `task.replay_completed`. The replayed Artifact and
+  Assignments displayed replay number 1.
+- A desktop `1440x900` recheck confirmed the replay form, policy value 3,
+  history card, and expanded baseline lineage. The document had no horizontal
+  overflow. Current Console output contains only the two known React Router v7
+  future-flag warnings; the earlier form-field issue is absent after the
+  `id`/`name` corrections. Authenticated API requests returned `200`, with only
+  the expected StrictMode aborts immediately replaced by successful requests.
+- `npm run typecheck`, `npm run lint`, and `npm run build` passed on
+  2026-07-29. Vite retains its existing non-fatal main-chunk size warning.
+
 ## Known follow-up risks
 
-- At a 390x844 mobile viewport, the Runtime capacity card visibly overlaps the
-  capacity timestamp/value. This is a real frontend layout defect to fix in a
-  subsequent Codex UI change.
+- V1 currently targets desktop web browsers. Mobile and narrow-screen UX,
+  including the previously observed 390x844 Runtime capacity-card overlap, is
+  deferred to a separate product redesign and is not a current delivery gate.
 - Existing assistant history contains older malformed/placeholder-looking
   text in some records. The transport renders the persisted backend response;
   investigate the data/encoding layer before changing the renderer.
@@ -226,8 +264,7 @@ The live local-stack acceptance used conversation
 ## Next acceptance gate
 
 Continue from the backend M3 gate: run the deterministic wait/cancel,
-needs-revision, and approval scenarios through the real browser; then resolve
-the mobile Runtime layout defect and React Router warnings as scoped frontend
-work. Keep SSE reconnect/deduplication, Artifact access, usage semantics,
-authentication, console, network, and responsive checks in the acceptance
-record.
+needs-revision, and approval scenarios through a desktop browser. Keep SSE
+reconnect/deduplication, Artifact access, usage semantics, authentication,
+console, network, and desktop layout checks in the acceptance record. Mobile
+adaptation remains outside the V1 frontend scope until a separate design pass.

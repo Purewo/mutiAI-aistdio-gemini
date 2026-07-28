@@ -10,7 +10,7 @@ import {
   publishOrganizationVersion,
 } from '../api/endpoints';
 import { apiErrorFromThrown, type ApiError } from '../api/errors';
-import type { FeasibilityCheck, OrganizationVersion } from '../api/types';
+import type { FeasibilityCheck, OrganizationVersion, TaskReplayPolicy } from '../api/types';
 import { useApiResource } from '../api/useApiResource';
 import FeasibilityPanel from '../components/FeasibilityPanel';
 import OrganizationGraph from '../components/OrganizationGraph';
@@ -164,6 +164,8 @@ function TasksSection({
 }) {
   const navigate = useNavigate();
   const [request, setRequest] = useState('');
+  const [replayPolicy, setReplayPolicy] = useState<TaskReplayPolicy>('manual');
+  const [maxReplayCount, setMaxReplayCount] = useState(3);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<ApiError | null>(null);
   /**
@@ -182,7 +184,12 @@ function TasksSection({
     try {
       const task = await createTask(
         organizationId,
-        { request: text, orchestration_mode: 'planned' },
+        {
+          request: text,
+          orchestration_mode: 'planned',
+          replay_policy: replayPolicy,
+          max_replay_count: maxReplayCount,
+        },
         idempotencyKey.current,
       );
       idempotencyKey.current = crypto.randomUUID();
@@ -226,6 +233,47 @@ function TasksSection({
             placeholder="描述要完成的工作。提交后由组织负责人生成执行计划，确认计划并补齐输入后才会开始执行。"
             className="w-full resize-y rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm transition-all duration-200 focus:border-indigo-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 disabled:cursor-not-allowed disabled:opacity-60"
           />
+          <details className="mt-3 rounded-xl border border-slate-200 bg-slate-50/60 px-3.5 py-2.5">
+            <summary className="cursor-pointer text-xs font-semibold text-slate-600">
+              业务重放策略 · {replayPolicy === 'manual' ? '仅手动确认' : '额度内自动重放'} · 最多 {maxReplayCount} 次
+            </summary>
+            <p className="mt-2 text-xs leading-relaxed text-slate-500">
+              负责人验收后若要求修订，可创建保留完整血缘的新执行尝试。Runtime 技术重试不占用这个额度。
+            </p>
+            <div className="mt-3 grid gap-3 sm:grid-cols-2">
+              <label className="text-xs font-semibold text-slate-700">
+                触发方式
+                <select
+                  id="new-task-replay-policy"
+                  name="new-task-replay-policy"
+                  value={replayPolicy}
+                  onChange={(event) => setReplayPolicy(event.target.value as TaskReplayPolicy)}
+                  disabled={submitting}
+                  className="mt-1.5 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-normal text-slate-700 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 disabled:opacity-60"
+                >
+                  <option value="manual">仅手动确认</option>
+                  <option value="auto_within_limit">负责人建议通过校验后自动重放</option>
+                </select>
+              </label>
+              <label className="text-xs font-semibold text-slate-700">
+                最大重放次数（0–10）
+                <input
+                  id="new-task-replay-limit"
+                  name="new-task-replay-limit"
+                  type="number"
+                  min={0}
+                  max={10}
+                  value={maxReplayCount}
+                  onChange={(event) => {
+                    const value = Number(event.target.value);
+                    if (Number.isFinite(value)) setMaxReplayCount(Math.min(10, Math.max(0, value)));
+                  }}
+                  disabled={submitting}
+                  className="mt-1.5 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-normal text-slate-700 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 disabled:opacity-60"
+                />
+              </label>
+            </div>
+          </details>
           {error ? (
             <div className="mt-3">
               <InlineError error={error} />

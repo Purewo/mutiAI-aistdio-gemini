@@ -23,11 +23,11 @@ The frontend is developed locally against the running backend. No remote deploym
 
 - Develop and verify against the real local backend. It is the acceptance target for every stage.
 - The captured responses under `fixtures/api/` are an offline regression and visual reference, and are useful for states that are expensive to reproduce against a live Runtime.
-- You may create clearly labeled frontend-only mock data when extra records, text lengths, or state combinations are useful for inspecting page composition, spacing, overflow, and responsive behavior.
+- You may create clearly labeled frontend-only mock data when extra records, text lengths, or state combinations are useful for inspecting page composition, spacing, and desktop overflow.
 - Keep UI-only mock data outside `contracts/` and `fixtures/api/`. Do not edit captured fixtures or describe synthetic UI data as a real backend response.
 - Reuse only fields, enum values, and resource relationships that exist in the checked-in contracts. Mock data may vary content and quantity for visual review, but it must not expand the backend contract.
 - Keep mock/demo mode explicitly separable from the real API client. A real request failure must render an error state and must never trigger a silent fallback to mock data.
-- Codex is responsible for the implementation, repository lint/typecheck/build checks, and real-backend browser verification: authentication, network requests, SSE reconnect behavior, Artifact access, Task usage, browser console output, interactions, and responsive layout.
+- Codex is responsible for the implementation, repository lint/typecheck/build checks, and real-backend desktop browser verification: authentication, network requests, SSE reconnect behavior, Artifact access, Task usage, browser console output, interactions, and desktop layout.
 - Contract defects are backend-owned. Fix them in `Purewo/mutiAI` as their own commits, then refresh this repository's snapshots.
 
 ## Product flow for M3
@@ -216,7 +216,7 @@ Deliverables:
 - Task Token totals and per-Assignment usage rows.
 - Separate labels for Provider-observed counters and conservative `charged_tokens` budget values.
 - Assignment and execution details required by the task packet, including Runtime IDs, requested and actual model, security snapshot, delivery summaries, and context-compaction count when returned.
-- Responsive layout and accessible interaction states for the core desktop and narrow-screen flows.
+- Desktop layout and accessible interaction states for the V1 desktop flow. Mobile and narrow-screen UX are deferred to a separate product redesign.
 
 Acceptance gate:
 
@@ -231,7 +231,7 @@ Acceptance gate:
 - State which contract snapshot and fixtures the implementation used.
 - List known limitations or missing backend fields instead of filling them with invented data.
 - Do not mark a stage complete when code has only passed fixture or mock checks.
-- Each stage is verified against the real backend with browser, console, network, SSE, Artifact, and responsive-layout checks before it is called done.
+- Each stage is verified against the real backend with a desktop browser, console, network, SSE, Artifact, and desktop-layout checks before it is called done. Mobile verification is not a V1 gate.
 
 ## Explicit non-goals
 

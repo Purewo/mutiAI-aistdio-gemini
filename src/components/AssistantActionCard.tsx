@@ -35,6 +35,7 @@ const ACTION_TYPE_LABELS: Record<string, string> = {
   'organization.confirm': '确认组织方案',
   'organization.publish': '发布组织',
   'task.submit': '提交任务',
+  'task.replay': '重放任务',
   'task.retry': '重试任务',
   'task.cancel': '取消任务',
   'approval.decide': '处理 Runtime 审批',
@@ -86,6 +87,13 @@ export default function AssistantActionCard({
   const showsAttachmentBinding =
     action.action_type === 'task.submit' &&
     (attachmentInputs.length > 0 || actionContracts.length > 0 || inputBinding !== null);
+  const replayPayload =
+    action.action_type === 'task.replay' && action.payload && typeof action.payload === 'object'
+      ? action.payload
+      : null;
+  const replayScope = replayPayload && typeof replayPayload.scope === 'string' ? replayPayload.scope : null;
+  const replayReason = replayPayload && typeof replayPayload.reason === 'string' ? replayPayload.reason : null;
+  const replayFeedback = replayPayload && typeof replayPayload.feedback === 'string' ? replayPayload.feedback : null;
 
   const decide = async (decision: 'confirm' | 'decline') => {
     setBusy(decision);
@@ -121,6 +129,34 @@ export default function AssistantActionCard({
         <p className="mb-2 truncate font-mono text-[11px] text-slate-400">
           目标 {action.target_type} · {action.target_id}
         </p>
+      ) : null}
+
+      {replayPayload ? (
+        <div className="mb-3 rounded-xl border border-orange-100 bg-orange-50/60 px-3 py-2.5 text-xs leading-relaxed text-orange-900">
+          <p>
+            <span className="font-semibold">范围：</span>
+            {replayScope === 'full'
+              ? '完整重放'
+              : replayScope === 'from_step'
+                ? '从指定步骤继续'
+                : replayScope === 'step_only'
+                  ? '仅重放指定步骤'
+                  : replayScope ?? '后端已声明'}
+          </p>
+          {replayReason ? (
+            <p className="mt-1">
+              <span className="font-semibold">原因：</span>{replayReason}
+            </p>
+          ) : null}
+          {replayFeedback ? (
+            <p className="mt-1 whitespace-pre-wrap">
+              <span className="font-semibold">反馈：</span>{replayFeedback}
+            </p>
+          ) : null}
+          <p className="mt-1 text-orange-800/75">
+            这是一次新的业务执行尝试，原计划和产物不会被覆盖。
+          </p>
+        </div>
       ) : null}
 
       {/* The failure message is the backend's localized text, shown verbatim. */}

@@ -38,6 +38,7 @@ import PageHeader from '../components/PageHeader';
 import PlanGraph from '../components/PlanGraph';
 import TaskEventLogView from '../components/TaskEventLogView';
 import TaskInputBindingStatus from '../components/TaskInputBindingStatus';
+import TaskReplayPanel from '../components/TaskReplayPanel';
 import TaskTimingPanel from '../components/TaskTimingPanel';
 import TaskUsagePanel from '../components/TaskUsagePanel';
 import {
@@ -119,6 +120,13 @@ export default function TaskDetail() {
 
         <ControlsSection task={task} onTaskUpdated={live.setTask} onReload={live.refresh} />
 
+        <TaskReplayPanel
+          task={task}
+          onTaskUpdated={live.setTask}
+          onReload={live.refresh}
+          onReconnect={live.reconnect}
+        />
+
         <TaskInputBindingSection task={task} />
 
         {live.approvals.length > 0 ? (
@@ -137,7 +145,12 @@ export default function TaskDetail() {
 
         {task.artifacts.length > 0 ? (
           <Section icon={<Package className="h-5 w-5 text-emerald-600" />} title="交付结果">
-            <ArtifactList artifacts={task.artifacts} />
+            <ArtifactList
+              artifacts={task.artifacts}
+              replayNumberById={new Map(
+                task.replay_runs.map((replay) => [replay.replay_run_id, replay.replay_number]),
+              )}
+            />
           </Section>
         ) : null}
 
@@ -316,7 +329,7 @@ function ControlsSection({
   const [busy, setBusy] = useState<'retry' | 'cancel' | null>(null);
   const [error, setError] = useState<ApiError | null>(null);
 
-  const retryable = task.status === 'failed' || task.status === 'needs_revision';
+  const retryable = task.status === 'failed';
   const cancellable =
     task.status === 'running' || task.status === 'waiting' || task.status === 'planning';
   if (!retryable && !cancellable) return null;
@@ -491,6 +504,9 @@ function PlanSection({
   const [generating, setGenerating] = useState(false);
   const [error, setError] = useState<ApiError | null>(null);
   const plan = task.execution_plan;
+  const latestReplay = [...task.replay_runs].sort(
+    (left, right) => right.replay_number - left.replay_number,
+  )[0];
 
   const generatePlan = async () => {
     setGenerating(true);
@@ -546,6 +562,23 @@ function PlanSection({
             </p>
           </div>
           <PlanGraph steps={plan.steps} />
+          {latestReplay &&
+          task.base_execution_plan &&
+          task.base_execution_plan.plan_id !== plan.plan_id ? (
+            <details className="rounded-2xl border border-violet-200 bg-violet-50/30 p-4">
+              <summary className="cursor-pointer text-sm font-semibold text-violet-800">
+                查看第 {latestReplay.replay_number} 次重放与基准计划的步骤血缘
+              </summary>
+              <p className="mb-3 mt-2 text-xs leading-relaxed text-slate-600">
+                紫色步骤在本次重放中重新执行；虚线步骤固定复用早先的不可变产物。卡片里的步骤状态属于基准计划，当前执行状态以上方第 {plan.plan_version} 版计划为准。
+              </p>
+              <PlanGraph
+                steps={task.base_execution_plan.steps}
+                replayExecutedStepKeys={latestReplay.executed_step_keys}
+                replayReusedStepKeys={latestReplay.reused_step_keys}
+              />
+            </details>
+          ) : null}
           <StartRow task={task} onTaskUpdated={onTaskUpdated} onReload={onReload} />
         </div>
       )}
@@ -638,6 +671,14 @@ function InputsSection({ task, onUploaded }: { task: Task; onUploaded: () => Pro
 
   if (!plan) return null;
 
+  const replay = task.replay_runs.find((item) => item.replay_plan_id === plan.plan_id);
+  const replayInputArtifactId = (contractKey: string): string | null => {
+    const binding = replay?.input_artifact_bindings.find(
+      (item) => item.contract_key === contractKey && typeof item.artifact_id === 'string',
+    );
+    return binding && typeof binding.artifact_id === 'string' ? binding.artifact_id : null;
+  };
+
   const setPendingFor = (key: string, value: PendingUpload | null) => {
     setPending((current) => {
       const next = new Map(current);
@@ -692,9 +733,14 @@ function InputsSection({ task, onUploaded }: { task: Task; onUploaded: () => Pro
     >
       <ul className="space-y-3">
         {plan.initial_input_contracts.map((contractKey) => {
-          const artifact = task.artifacts.find(
+          const uploadedArtifact = task.artifacts.find(
             (item) => item.origin === 'task_input' && item.contract_key === contractKey,
           );
+          const pinnedArtifactId = replayInputArtifactId(contractKey);
+          const pinnedArtifact = pinnedArtifactId
+            ? task.artifacts.find((item) => item.artifact_id === pinnedArtifactId)
+            : undefined;
+          const artifact = pinnedArtifact ?? uploadedArtifact;
           const entry = pending.get(contractKey);
           return (
             <li
@@ -706,7 +752,9 @@ function InputsSection({ task, onUploaded }: { task: Task; onUploaded: () => Pro
                 {artifact ? (
                   <span className="inline-flex items-center gap-1.5 text-sm font-medium text-emerald-700">
                     <CheckCircle2 className="h-4 w-4" aria-hidden="true" />
-                    已上传 {artifact.file_name}（{artifact.byte_size} 字节 · {artifact.status}）
+                    {pinnedArtifact
+                      ? `重放已固定复用 ${artifact.file_name}（第 ${replay?.replay_number ?? '—'} 次 · ${artifact.status}）`
+                      : `已上传 ${artifact.file_name}（${artifact.byte_size} 字节 · ${artifact.status}）`}
                   </span>
                 ) : (
                   <>
@@ -799,6 +847,9 @@ function TimingBreakdown({
 }
 
 function AssignmentsSection({ task }: { task: Task }) {
+  const replayNumberById = new Map(
+    task.replay_runs.map((replay) => [replay.replay_run_id, replay.replay_number]),
+  );
   return (
     <Section icon={<ListChecks className="h-5 w-5 text-blue-600" />} title="岗位任务">
       <ul className="space-y-2">
@@ -815,6 +866,11 @@ function AssignmentsSection({ task }: { task: Task }) {
                 </span>
                 <span className="text-xs text-slate-400">{assignment.assignment_kind}</span>
                 <AssignmentStatusBadge status={assignment.status} />
+                {assignment.replay_run_id && replayNumberById.has(assignment.replay_run_id) ? (
+                  <span className="rounded-full border border-violet-200 bg-violet-50 px-2 py-0.5 text-[11px] font-semibold text-violet-700">
+                    第 {replayNumberById.get(assignment.replay_run_id)} 次重放
+                  </span>
+                ) : null}
                 {assignment.wall_duration_seconds !== null ? (
                   <span className="ml-auto inline-flex items-center gap-1 text-xs font-medium text-slate-500">
                     <Clock className="h-3.5 w-3.5 text-slate-400" aria-hidden="true" />

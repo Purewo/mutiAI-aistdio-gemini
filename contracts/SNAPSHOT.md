@@ -1,14 +1,15 @@
 # Contract snapshot metadata
 
 - Source repository: `Purewo/mutiAI`
-- Source commit: `d8d6c11`
-- Sync date: `2026-07-28`
+- Source commit: `868139c`
+- Sync date: `2026-07-29`
 - Snapshot method: Mechanically copied from the authoritative core repository.
 - Review status: Reviewed against the M2.3 source files, Runtime feasibility,
   account self-service, persisted AssistantAction localization, and the assistant
   rich-content and attachment additions, including product-owned nested
   resource parents and explicit assistant-attachment Task input bindings,
-  through `d8d6c11`.
+  through `868139c`, including bounded Task replay policy, replay runs, and
+  immutable replay lineage.
 
 `ApprovalResponse.cwd` was removed upstream and host paths are sanitized. The generated types no
 longer expose it and no view reads it.

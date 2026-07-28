@@ -2867,6 +2867,285 @@
         }
       }
     },
+    "/api/v1/tasks/{task_id}/replay-policy": {
+      "patch": {
+        "tags": [
+          "tasks"
+        ],
+        "summary": "Update Task Replay Policy",
+        "operationId": "update_task_replay_policy_api_v1_tasks__task_id__replay_policy_patch",
+        "parameters": [
+          {
+            "name": "task_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Task Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TaskReplayPolicyRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Too Many Requests"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        }
+      }
+    },
+    "/api/v1/tasks/{task_id}/replays": {
+      "post": {
+        "tags": [
+          "tasks"
+        ],
+        "summary": "Create Task Replay",
+        "operationId": "create_task_replay_api_v1_tasks__task_id__replays_post",
+        "parameters": [
+          {
+            "name": "task_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Task Id"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128,
+              "title": "Idempotency-Key"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TaskReplayRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskReplayRunResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Too Many Requests"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "tasks"
+        ],
+        "summary": "List Task Replays",
+        "operationId": "list_task_replays_api_v1_tasks__task_id__replays_get",
+        "parameters": [
+          {
+            "name": "task_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Task Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TaskReplayRunResponse"
+                  },
+                  "title": "Response List Task Replays Api V1 Tasks  Task Id  Replays Get"
+                }
+              }
+            }
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Too Many Requests"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        }
+      }
+    },
     "/api/v1/tasks/{task_id}/artifacts/{artifact_id}/content": {
       "get": {
         "tags": [
@@ -3836,6 +4115,17 @@
             ],
             "title": "Source Workspace Id"
           },
+          "replay_run_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Replay Run Id"
+          },
           "contract_key": {
             "type": "string",
             "title": "Contract Key"
@@ -3927,6 +4217,7 @@
           "producer_assignment_id",
           "producer_plan_step_id",
           "source_workspace_id",
+          "replay_run_id",
           "contract_key",
           "schema_version",
           "artifact_version",
@@ -3997,6 +4288,17 @@
             ],
             "title": "Plan Step Id"
           },
+          "replay_run_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Replay Run Id"
+          },
           "status": {
             "$ref": "#/components/schemas/AssignmentStatus"
           },
@@ -4060,6 +4362,7 @@
           "acceptance_criteria",
           "execution_id",
           "plan_step_id",
+          "replay_run_id",
           "status",
           "result_summary",
           "runtime_execution",
@@ -7093,6 +7396,17 @@
           },
           "capability_requirements": {
             "$ref": "#/components/schemas/WorkloadRequirements"
+          },
+          "replay_policy": {
+            "$ref": "#/components/schemas/TaskReplayPolicy",
+            "default": "manual"
+          },
+          "max_replay_count": {
+            "type": "integer",
+            "maximum": 10.0,
+            "minimum": 0.0,
+            "title": "Max Replay Count",
+            "default": 3
           }
         },
         "type": "object",
@@ -7485,6 +7799,306 @@
         ],
         "title": "TaskPlanDiagramSource"
       },
+      "TaskReplayContextPolicy": {
+        "type": "string",
+        "enum": [
+          "continue_context",
+          "fresh_context"
+        ],
+        "title": "TaskReplayContextPolicy"
+      },
+      "TaskReplayPolicy": {
+        "type": "string",
+        "enum": [
+          "manual",
+          "auto_within_limit"
+        ],
+        "title": "TaskReplayPolicy"
+      },
+      "TaskReplayPolicyRequest": {
+        "properties": {
+          "replay_policy": {
+            "$ref": "#/components/schemas/TaskReplayPolicy"
+          },
+          "max_replay_count": {
+            "type": "integer",
+            "maximum": 10.0,
+            "minimum": 0.0,
+            "title": "Max Replay Count"
+          }
+        },
+        "type": "object",
+        "required": [
+          "replay_policy",
+          "max_replay_count"
+        ],
+        "title": "TaskReplayPolicyRequest"
+      },
+      "TaskReplayRequest": {
+        "properties": {
+          "scope": {
+            "$ref": "#/components/schemas/TaskReplayScope"
+          },
+          "target_plan_step_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 36,
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Target Plan Step Id"
+          },
+          "reason": {
+            "type": "string",
+            "maxLength": 10000,
+            "minLength": 1,
+            "title": "Reason"
+          },
+          "feedback": {
+            "type": "string",
+            "maxLength": 20000,
+            "title": "Feedback",
+            "default": ""
+          },
+          "context_policy": {
+            "$ref": "#/components/schemas/TaskReplayContextPolicy",
+            "default": "continue_context"
+          }
+        },
+        "type": "object",
+        "required": [
+          "scope",
+          "reason"
+        ],
+        "title": "TaskReplayRequest"
+      },
+      "TaskReplayRunResponse": {
+        "properties": {
+          "replay_run_id": {
+            "type": "string",
+            "title": "Replay Run Id"
+          },
+          "task_id": {
+            "type": "string",
+            "title": "Task Id"
+          },
+          "parent_replay_run_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Parent Replay Run Id"
+          },
+          "base_plan_id": {
+            "type": "string",
+            "title": "Base Plan Id"
+          },
+          "replay_plan_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Replay Plan Id"
+          },
+          "target_plan_step_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Target Plan Step Id"
+          },
+          "replay_number": {
+            "type": "integer",
+            "title": "Replay Number"
+          },
+          "scope": {
+            "$ref": "#/components/schemas/TaskReplayScope"
+          },
+          "context_policy": {
+            "$ref": "#/components/schemas/TaskReplayContextPolicy"
+          },
+          "trigger": {
+            "type": "string",
+            "title": "Trigger"
+          },
+          "reason": {
+            "type": "string",
+            "title": "Reason"
+          },
+          "feedback": {
+            "type": "string",
+            "title": "Feedback"
+          },
+          "executed_step_keys": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Executed Step Keys"
+          },
+          "reused_step_keys": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Reused Step Keys"
+          },
+          "input_artifact_bindings": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "type": "array",
+            "title": "Input Artifact Bindings"
+          },
+          "effective_artifact_bindings": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "type": "array",
+            "title": "Effective Artifact Bindings"
+          },
+          "status": {
+            "$ref": "#/components/schemas/TaskReplayStatus"
+          },
+          "lead_decision": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lead Decision"
+          },
+          "result_summary": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Result Summary"
+          },
+          "issues": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Issues"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "started_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Started At"
+          },
+          "completed_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Completed At"
+          },
+          "wall_duration_seconds": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Wall Duration Seconds"
+          }
+        },
+        "type": "object",
+        "required": [
+          "replay_run_id",
+          "task_id",
+          "parent_replay_run_id",
+          "base_plan_id",
+          "replay_plan_id",
+          "target_plan_step_id",
+          "replay_number",
+          "scope",
+          "context_policy",
+          "trigger",
+          "reason",
+          "feedback",
+          "executed_step_keys",
+          "reused_step_keys",
+          "input_artifact_bindings",
+          "effective_artifact_bindings",
+          "status",
+          "lead_decision",
+          "result_summary",
+          "issues",
+          "created_at",
+          "started_at",
+          "completed_at",
+          "wall_duration_seconds"
+        ],
+        "title": "TaskReplayRunResponse"
+      },
+      "TaskReplayScope": {
+        "type": "string",
+        "enum": [
+          "full",
+          "from_step",
+          "step_only"
+        ],
+        "title": "TaskReplayScope"
+      },
+      "TaskReplayStatus": {
+        "type": "string",
+        "enum": [
+          "created",
+          "running",
+          "waiting",
+          "completed",
+          "needs_revision",
+          "failed",
+          "cancelled"
+        ],
+        "title": "TaskReplayStatus"
+      },
       "TaskResponse": {
         "properties": {
           "task_id": {
@@ -7526,6 +8140,17 @@
           "orchestration_mode": {
             "$ref": "#/components/schemas/TaskOrchestrationMode"
           },
+          "replay_policy": {
+            "$ref": "#/components/schemas/TaskReplayPolicy"
+          },
+          "max_replay_count": {
+            "type": "integer",
+            "title": "Max Replay Count"
+          },
+          "replay_count": {
+            "type": "integer",
+            "title": "Replay Count"
+          },
           "status": {
             "$ref": "#/components/schemas/TaskStatus"
           },
@@ -7556,6 +8181,23 @@
                 "type": "null"
               }
             ]
+          },
+          "base_execution_plan": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/TaskExecutionPlanResponse"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "replay_runs": {
+            "items": {
+              "$ref": "#/components/schemas/TaskReplayRunResponse"
+            },
+            "type": "array",
+            "title": "Replay Runs"
           },
           "artifacts": {
             "items": {
@@ -7608,10 +8250,15 @@
           "requested_input_contracts",
           "input_binding",
           "orchestration_mode",
+          "replay_policy",
+          "max_replay_count",
+          "replay_count",
           "status",
           "result_summary",
           "assignments",
           "execution_plan",
+          "base_execution_plan",
+          "replay_runs",
           "artifacts",
           "created_at",
           "updated_at",

@@ -49,12 +49,26 @@ function layerSteps(steps: readonly PlanStep[]): LayeredStep[][] {
   return layers;
 }
 
-function StepCard({ step, dependencyNames }: { step: PlanStep; dependencyNames: string[] }) {
+function StepCard({
+  step,
+  dependencyNames,
+  replayDisposition,
+}: {
+  step: PlanStep;
+  dependencyNames: string[];
+  replayDisposition?: 'executed' | 'reused';
+}) {
   const isLeadReview = step.step_kind === 'lead_review';
   return (
     <div
       className={`flex h-full w-full flex-col rounded-2xl border p-3.5 text-left shadow-sm lg:w-60 ${
-        isLeadReview ? 'border-indigo-200 bg-indigo-50/50' : 'border-slate-200 bg-white'
+        replayDisposition === 'reused'
+          ? 'border-dashed border-slate-300 bg-slate-50/80 opacity-80'
+          : replayDisposition === 'executed'
+            ? 'border-violet-200 bg-violet-50/40'
+            : isLeadReview
+              ? 'border-indigo-200 bg-indigo-50/50'
+              : 'border-slate-200 bg-white'
       }`}
     >
       <div className="mb-2 flex items-center gap-2">
@@ -115,6 +129,16 @@ function StepCard({ step, dependencyNames }: { step: PlanStep; dependencyNames: 
       ) : null}
 
       <div className="mt-auto flex flex-wrap gap-1">
+        {replayDisposition === 'executed' ? (
+          <span className="rounded-full border border-violet-200 bg-white px-2 py-0.5 text-[10px] font-semibold text-violet-700">
+            本次执行
+          </span>
+        ) : null}
+        {replayDisposition === 'reused' ? (
+          <span className="rounded-full border border-dashed border-slate-300 bg-white px-2 py-0.5 text-[10px] font-semibold text-slate-500">
+            固定复用
+          </span>
+        ) : null}
         {isLeadReview ? (
           <span className="rounded-full border border-indigo-200 bg-white px-2 py-0.5 text-[10px] font-semibold text-indigo-700">
             负责人评审
@@ -173,10 +197,20 @@ function describeTopology(layers: LayeredStep[][]): string {
   return `并行分支：最宽一层有 ${widest} 个步骤可同时执行，其余按依赖先后进行。`;
 }
 
-export default function PlanGraph({ steps }: { steps: readonly PlanStep[] }) {
+export default function PlanGraph({
+  steps,
+  replayExecutedStepKeys = [],
+  replayReusedStepKeys = [],
+}: {
+  steps: readonly PlanStep[];
+  replayExecutedStepKeys?: readonly string[];
+  replayReusedStepKeys?: readonly string[];
+}) {
   const layers = layerSteps(steps);
   const nameById = new Map(steps.map((step) => [step.plan_step_id, step.step_key]));
   const topology = describeTopology(layers);
+  const replayed = new Set(replayExecutedStepKeys);
+  const reused = new Set(replayReusedStepKeys);
 
   return (
     <div className="overflow-x-auto rounded-2xl border border-slate-200/60 bg-white/80 p-6 shadow-sm">
@@ -230,6 +264,13 @@ export default function PlanGraph({ steps }: { steps: readonly PlanStep[] }) {
                   <li key={step.plan_step_id}>
                     <StepCard
                       step={step}
+                      replayDisposition={
+                        reused.has(step.step_key)
+                          ? 'reused'
+                          : replayed.has(step.step_key)
+                            ? 'executed'
+                            : undefined
+                      }
                       dependencyNames={step.dependency_step_ids.map(
                         (id) => nameById.get(id) ?? id.slice(0, 8),
                       )}

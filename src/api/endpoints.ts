@@ -33,6 +33,9 @@ import type {
   Task,
   TaskCreateRequest,
   TaskInputArtifactRequest,
+  TaskReplayPolicyRequest,
+  TaskReplayRequest,
+  TaskReplayRun,
   TaskTokenUsage,
   User,
 } from './types';
@@ -439,6 +442,39 @@ export function startTask(taskId: string, signal?: AbortSignal): Promise<Task> {
 /** Retry failed Assignments without replaying completed siblings. */
 export function retryTask(taskId: string, signal?: AbortSignal): Promise<Task> {
   return requestJson<Task>(`/tasks/${encode(taskId)}/retry`, { method: 'POST', signal });
+}
+
+/** Update the persisted business replay policy and limit for a Task. */
+export function updateTaskReplayPolicy(
+  taskId: string,
+  body: TaskReplayPolicyRequest,
+  signal?: AbortSignal,
+): Promise<Task> {
+  return requestJson<Task>(`/tasks/${encode(taskId)}/replay-policy`, {
+    method: 'PATCH',
+    body,
+    signal,
+  });
+}
+
+/** List immutable replay runs. TaskResponse embeds the same records; this route is useful for a refresh. */
+export function listTaskReplays(taskId: string, signal?: AbortSignal): Promise<TaskReplayRun[]> {
+  return requestJson<TaskReplayRun[]>(`/tasks/${encode(taskId)}/replays`, { signal });
+}
+
+/** Create one bounded business replay. Reusing the key is idempotent and does not consume the limit twice. */
+export function createTaskReplay(
+  taskId: string,
+  body: TaskReplayRequest,
+  idempotencyKey: string,
+  signal?: AbortSignal,
+): Promise<TaskReplayRun> {
+  return requestJson<TaskReplayRun>(`/tasks/${encode(taskId)}/replays`, {
+    method: 'POST',
+    body,
+    idempotencyKey,
+    signal,
+  });
 }
 
 /**

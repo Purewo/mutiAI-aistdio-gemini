@@ -605,6 +605,41 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/tasks/{task_id}/replay-policy": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Update Task Replay Policy */
+        patch: operations["update_task_replay_policy_api_v1_tasks__task_id__replay_policy_patch"];
+        trace?: never;
+    };
+    "/api/v1/tasks/{task_id}/replays": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Task Replays */
+        get: operations["list_task_replays_api_v1_tasks__task_id__replays_get"];
+        put?: never;
+        /** Create Task Replay */
+        post: operations["create_task_replay_api_v1_tasks__task_id__replays_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/tasks/{task_id}/artifacts/{artifact_id}/content": {
         parameters: {
             query?: never;
@@ -848,6 +883,8 @@ export interface components {
             producer_plan_step_id: string | null;
             /** Source Workspace Id */
             source_workspace_id: string | null;
+            /** Replay Run Id */
+            replay_run_id: string | null;
             /** Contract Key */
             contract_key: string;
             /** Schema Version */
@@ -904,6 +941,8 @@ export interface components {
             execution_id: string;
             /** Plan Step Id */
             plan_step_id: string | null;
+            /** Replay Run Id */
+            replay_run_id: string | null;
             status: components["schemas"]["AssignmentStatus"];
             /** Result Summary */
             result_summary: string | null;
@@ -1878,6 +1917,13 @@ export interface components {
             /** @default legacy */
             orchestration_mode: components["schemas"]["TaskOrchestrationMode"];
             capability_requirements?: components["schemas"]["WorkloadRequirements"];
+            /** @default manual */
+            replay_policy: components["schemas"]["TaskReplayPolicy"];
+            /**
+             * Max Replay Count
+             * @default 3
+             */
+            max_replay_count: number;
         };
         /** TaskExecutionPlanResponse */
         TaskExecutionPlanResponse: {
@@ -2012,6 +2058,102 @@ export interface components {
             /** Plan Id */
             plan_id: string;
         };
+        /**
+         * TaskReplayContextPolicy
+         * @enum {string}
+         */
+        TaskReplayContextPolicy: "continue_context" | "fresh_context";
+        /**
+         * TaskReplayPolicy
+         * @enum {string}
+         */
+        TaskReplayPolicy: "manual" | "auto_within_limit";
+        /** TaskReplayPolicyRequest */
+        TaskReplayPolicyRequest: {
+            replay_policy: components["schemas"]["TaskReplayPolicy"];
+            /** Max Replay Count */
+            max_replay_count: number;
+        };
+        /** TaskReplayRequest */
+        TaskReplayRequest: {
+            scope: components["schemas"]["TaskReplayScope"];
+            /** Target Plan Step Id */
+            target_plan_step_id?: string | null;
+            /** Reason */
+            reason: string;
+            /**
+             * Feedback
+             * @default
+             */
+            feedback: string;
+            /** @default continue_context */
+            context_policy: components["schemas"]["TaskReplayContextPolicy"];
+        };
+        /** TaskReplayRunResponse */
+        TaskReplayRunResponse: {
+            /** Replay Run Id */
+            replay_run_id: string;
+            /** Task Id */
+            task_id: string;
+            /** Parent Replay Run Id */
+            parent_replay_run_id: string | null;
+            /** Base Plan Id */
+            base_plan_id: string;
+            /** Replay Plan Id */
+            replay_plan_id: string | null;
+            /** Target Plan Step Id */
+            target_plan_step_id: string | null;
+            /** Replay Number */
+            replay_number: number;
+            scope: components["schemas"]["TaskReplayScope"];
+            context_policy: components["schemas"]["TaskReplayContextPolicy"];
+            /** Trigger */
+            trigger: string;
+            /** Reason */
+            reason: string;
+            /** Feedback */
+            feedback: string;
+            /** Executed Step Keys */
+            executed_step_keys: string[];
+            /** Reused Step Keys */
+            reused_step_keys: string[];
+            /** Input Artifact Bindings */
+            input_artifact_bindings: {
+                [key: string]: unknown;
+            }[];
+            /** Effective Artifact Bindings */
+            effective_artifact_bindings: {
+                [key: string]: unknown;
+            }[];
+            status: components["schemas"]["TaskReplayStatus"];
+            /** Lead Decision */
+            lead_decision: string | null;
+            /** Result Summary */
+            result_summary: string | null;
+            /** Issues */
+            issues: string[];
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Started At */
+            started_at: string | null;
+            /** Completed At */
+            completed_at: string | null;
+            /** Wall Duration Seconds */
+            wall_duration_seconds: number | null;
+        };
+        /**
+         * TaskReplayScope
+         * @enum {string}
+         */
+        TaskReplayScope: "full" | "from_step" | "step_only";
+        /**
+         * TaskReplayStatus
+         * @enum {string}
+         */
+        TaskReplayStatus: "created" | "running" | "waiting" | "completed" | "needs_revision" | "failed" | "cancelled";
         /** TaskResponse */
         TaskResponse: {
             /** Task Id */
@@ -2027,12 +2169,20 @@ export interface components {
             requested_input_contracts: components["schemas"]["TaskInputContractSpec"][];
             input_binding: components["schemas"]["TaskInputBindingReport"] | null;
             orchestration_mode: components["schemas"]["TaskOrchestrationMode"];
+            replay_policy: components["schemas"]["TaskReplayPolicy"];
+            /** Max Replay Count */
+            max_replay_count: number;
+            /** Replay Count */
+            replay_count: number;
             status: components["schemas"]["TaskStatus"];
             /** Result Summary */
             result_summary: string | null;
             /** Assignments */
             assignments: components["schemas"]["AssignmentResponse"][];
             execution_plan: components["schemas"]["TaskExecutionPlanResponse"] | null;
+            base_execution_plan: components["schemas"]["TaskExecutionPlanResponse"] | null;
+            /** Replay Runs */
+            replay_runs: components["schemas"]["TaskReplayRunResponse"][];
             /** Artifacts */
             artifacts: components["schemas"]["ArtifactResponse"][];
             /**
@@ -4421,6 +4571,217 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["TaskResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Too Many Requests */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    update_task_replay_policy_api_v1_tasks__task_id__replay_policy_patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                task_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TaskReplayPolicyRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TaskResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Too Many Requests */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    list_task_replays_api_v1_tasks__task_id__replays_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                task_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TaskReplayRunResponse"][];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Too Many Requests */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    create_task_replay_api_v1_tasks__task_id__replays_post: {
+        parameters: {
+            query?: never;
+            header: {
+                "Idempotency-Key": string;
+            };
+            path: {
+                task_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TaskReplayRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TaskReplayRunResponse"];
                 };
             };
             /** @description Unauthorized */

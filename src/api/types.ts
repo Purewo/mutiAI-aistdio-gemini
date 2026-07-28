@@ -65,6 +65,13 @@ export type ArtifactStatus = Schemas['ArtifactStatus'];
 export type ArtifactInputBinding = Schemas['ArtifactInputBindingResponse'];
 export type ArtifactInputBindingStatus = Schemas['ArtifactInputBindingStatus'];
 export type TaskInputArtifactRequest = Schemas['TaskInputArtifactRequest'];
+export type TaskReplayPolicy = Schemas['TaskReplayPolicy'];
+export type TaskReplayPolicyRequest = Schemas['TaskReplayPolicyRequest'];
+export type TaskReplayContextPolicy = Schemas['TaskReplayContextPolicy'];
+export type TaskReplayRequest = Schemas['TaskReplayRequest'];
+export type TaskReplayRun = Schemas['TaskReplayRunResponse'];
+export type TaskReplayScope = Schemas['TaskReplayScope'];
+export type TaskReplayStatus = Schemas['TaskReplayStatus'];
 
 /* Approvals */
 export type Approval = Schemas['ApprovalResponse'];
@@ -144,7 +151,7 @@ export function isTerminalTaskStatus(status: TaskStatus): boolean {
  *
  * Terminal statuses qualify, and so does `needs_revision`: the organization lead has returned a
  * decision and the Task is parked awaiting user-directed follow-up, so polling the event stream
- * would produce nothing but empty responses. It stays retryable, and it is not an error.
+ * would produce nothing but empty responses. It stays replayable, and it is not an error.
  */
 export function isQuiescentTaskStatus(status: TaskStatus): boolean {
   return isTerminalTaskStatus(status) || status === 'needs_revision';
