@@ -1,6 +1,6 @@
 # M3 frontend task packet
 
-Status: Ready for Fable5 real-backend integration.
+Status: Codex-owned; real-backend integration and browser acceptance are active.
 
 ## Contract source
 
@@ -172,4 +172,6 @@ Render plan topology from `execution_plan.steps[*].plan_step_id` and `dependency
 - Assistant Actions show explicit proposed, pending, completed, failed, and declined states and never treat a chat reply as mutation completion.
 - Browser console has no uncaught errors, and network requests match the OpenAPI contract.
 
-After Gemini submits the frontend change, Codex will run the frontend against the real local backend and perform browser verification before calling M3 complete.
+Codex implements the frontend change, runs it against the real local backend,
+and performs browser verification before calling M3 complete. Do not treat a
+Gemini or Fable5 handoff as a pending delivery step.

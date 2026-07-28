@@ -43,7 +43,10 @@ export function resolveBackendUrl(backendUrl: string): string {
   return `${API_ORIGIN}${backendUrl}`;
 }
 
-function buildUrl(path: string, query?: Record<string, string | number | boolean | undefined>): string {
+export function buildApiUrl(
+  path: string,
+  query?: Record<string, string | number | boolean | undefined>,
+): string {
   const base = `${API_BASE_URL}${path}`;
   if (!query) return base;
   const search = new URLSearchParams();
@@ -73,6 +76,8 @@ export function setUnauthorizedListener(listener: UnauthorizedListener | null): 
 export interface RequestOptions {
   method?: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
   body?: unknown;
+  /** Multipart request body. The browser supplies its boundary header. */
+  formData?: FormData;
   query?: Record<string, string | number | boolean | undefined>;
   /**
    * Suppress the global unauthenticated transition for this request. Set it on sign-in, where a 401
@@ -105,12 +110,14 @@ async function performRequest(path: string, options: RequestOptions): Promise<Re
 
   let response: Response;
   try {
-    response = await fetch(buildUrl(path, options.query), {
+    response = await fetch(buildApiUrl(path, options.query), {
       method: options.method ?? 'GET',
       headers,
       // Send the HttpOnly session cookie, including when the API base points at another origin.
       credentials: 'include',
-      body: options.body === undefined ? undefined : JSON.stringify(options.body),
+      body:
+        options.formData ??
+        (options.body === undefined ? undefined : JSON.stringify(options.body)),
       signal: options.signal,
     });
   } catch (cause) {

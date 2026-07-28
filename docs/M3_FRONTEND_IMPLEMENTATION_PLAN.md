@@ -1,13 +1,13 @@
 # M3 frontend implementation plan
 
-Status: In implementation. Owned locally by the frontend owner; see `CLAUDE.md`.
+Status: In implementation. Owned by Codex; see `AGENTS.md` and `docs/CURRENT_STATUS.md`.
 
 This plan turns the M3 product scope into bounded, reviewable frontend stages. It defines implementation order and acceptance gates, not calendar estimates.
 
 Read these files before implementation:
 
-- `CLAUDE.md`
-- `GEMINI.md`
+- `AGENTS.md`
+- `docs/CURRENT_STATUS.md`
 - `docs/M3_FRONTEND_TASK_PACKET.md`
 - `docs/LOCAL_INTEGRATION_REVIEW.md`
 - `contracts/openapi.v1.json`
@@ -27,7 +27,7 @@ The frontend is developed locally against the running backend. No remote deploym
 - Keep UI-only mock data outside `contracts/` and `fixtures/api/`. Do not edit captured fixtures or describe synthetic UI data as a real backend response.
 - Reuse only fields, enum values, and resource relationships that exist in the checked-in contracts. Mock data may vary content and quantity for visual review, but it must not expand the backend contract.
 - Keep mock/demo mode explicitly separable from the real API client. A real request failure must render an error state and must never trigger a silent fallback to mock data.
-- The frontend owner is responsible for the implementation, the repository lint, typecheck, and build checks, and the real-backend browser verification: authentication, network requests, SSE reconnect behavior, Artifact access, Task usage, browser console output, interactions, and responsive layout.
+- Codex is responsible for the implementation, repository lint/typecheck/build checks, and real-backend browser verification: authentication, network requests, SSE reconnect behavior, Artifact access, Task usage, browser console output, interactions, and responsive layout.
 - Contract defects are backend-owned. Fix them in `Purewo/mutiAI` as their own commits, then refresh this repository's snapshots.
 
 ## Product flow for M3

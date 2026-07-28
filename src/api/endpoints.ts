@@ -5,7 +5,7 @@
  * Response types come from `types.ts`, which aliases the generated OpenAPI schema, so a contract
  * refresh surfaces as a type error rather than a silent runtime mismatch.
  */
-import { requestJson, requestVoid } from './http';
+import { buildApiUrl, requestJson, requestVoid } from './http';
 import type {
   Approval,
   ApprovalDecisionRequest,
@@ -14,6 +14,7 @@ import type {
   UpdateUserRequest,
   AssistantAction,
   AssistantActionDecisionRequest,
+  AssistantAttachment,
   AssistantConversation,
   AssistantMessagePage,
   AssistantSubmission,
@@ -222,6 +223,47 @@ export function submitAssistantMessage(
   return requestJson<AssistantSubmission>(
     `/assistant/conversations/${encode(conversationId)}/messages`,
     { method: 'POST', body, idempotencyKey, signal },
+  );
+}
+
+/**
+ * Upload one product-owned assistant attachment before submitting the message that references it.
+ * Uploading never binds the file to a Task; that would require a separate explicit product Action.
+ */
+export function uploadAssistantAttachment(
+  conversationId: string,
+  file: File,
+  signal?: AbortSignal,
+): Promise<AssistantAttachment> {
+  const formData = new FormData();
+  formData.append('file', file, file.name);
+  return requestJson<AssistantAttachment>(
+    `/assistant/conversations/${encode(conversationId)}/attachments`,
+    { method: 'POST', formData, signal },
+  );
+}
+
+/** Revoke an uploaded attachment that has not been referenced by a persisted message. */
+export function revokeAssistantAttachment(
+  conversationId: string,
+  attachmentId: string,
+  signal?: AbortSignal,
+): Promise<AssistantAttachment> {
+  return requestJson<AssistantAttachment>(
+    `/assistant/conversations/${encode(conversationId)}/attachments/${encode(attachmentId)}`,
+    { method: 'DELETE', signal },
+  );
+}
+
+/** Owner-scoped preview or download URL for a persisted assistant attachment. */
+export function getAssistantAttachmentContentUrl(
+  conversationId: string,
+  attachmentId: string,
+  download = false,
+): string {
+  return buildApiUrl(
+    `/assistant/conversations/${encode(conversationId)}/attachments/${encode(attachmentId)}/content`,
+    download ? { download: true } : undefined,
   );
 }
 

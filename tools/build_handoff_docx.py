@@ -1,4 +1,4 @@
-"""Build the Gemini handoff Word document from its Markdown source."""
+"""Build the archived Gemini product-scope handoff Word document."""
 
 from __future__ import annotations
 
@@ -81,7 +81,7 @@ def configure_document(document: Document) -> None:
         style.paragraph_format.space_after = Pt(6)
 
     footer = section.footer.paragraphs[0]
-    footer.add_run("mutiAI Gemini 前端交接说明  |  ")
+    footer.add_run("Nexwork 历史 Gemini 前端交接资料  |  ")
     add_page_number(footer)
 
 
@@ -96,7 +96,7 @@ def add_title_page(document: Document) -> None:
 
     subtitle_p = document.add_paragraph()
     subtitle_p.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    subtitle = subtitle_p.add_run("Gemini 前端项目交接说明")
+    subtitle = subtitle_p.add_run("历史 Gemini 前端项目交接资料")
     set_run_font(subtitle, "Microsoft YaHei", 20)
     subtitle.font.color.rgb = RGBColor(31, 78, 120)
 
@@ -114,7 +114,9 @@ def add_title_page(document: Document) -> None:
     note = document.add_paragraph()
     note.alignment = WD_ALIGN_PARAGRAPH.CENTER
     note.paragraph_format.space_before = Pt(40)
-    note_run = note.add_run("用于 Gemini 在 Google AI Studio 中快速接管前端工作的战前资料")
+    note_run = note.add_run(
+        "历史归档：当前前端由 Codex 正式负责，请以 AGENTS.md 和 docs/CURRENT_STATUS.md 为准"
+    )
     set_run_font(note_run, "Microsoft YaHei", 10.5)
     note_run.italic = True
 

@@ -4,9 +4,9 @@
 
 目标读者：前端开发者。
 
-> **所有权说明（2026-07-26 更新）**：本文档最初写给在 Google AI Studio 中通过 GitHub 访问本仓库的 Gemini 协作者。
-> 前端现在由本地前端负责人开发，可以直接运行和调试真实后端。第 7 节和第 10 节描述的远程协作流程已被
-> `CLAUDE.md` 和 `docs/LOCAL_INTEGRATION_REVIEW.md` 取代。第 1 至 6 节的产品背景、页面范围和契约规则仍然有效。
+> **所有权说明（2026-07-28 更新）**：本文档最初写给在 Google AI Studio 中通过 GitHub 访问本仓库的 Gemini 协作者，后来由 Fable5 承担本地前端实现。
+> 现在由 Codex 正式接手前端实现、真实后端集成、浏览器验收和修复提交。当前规则与交接入口请以
+> `AGENTS.md` 和 `docs/CURRENT_STATUS.md` 为准；本文档的产品背景、页面范围和契约边界仍然有效。
 
 ## 1. 你正在参与什么项目
 
@@ -161,7 +161,8 @@ mutiAI 是一套可视化 AI 研发组织系统。普通用户不是直接与许
 
 ## 7. GitHub 工作方式
 
-> 本节的远程协作流程已由本地开发流程取代，参见 `CLAUDE.md` 和 `docs/LOCAL_INTEGRATION_REVIEW.md`。
+> 本节的远程协作流程已由 Codex 的本地开发流程取代，参见 `AGENTS.md`、`docs/CURRENT_STATUS.md` 和
+> `docs/LOCAL_INTEGRATION_REVIEW.md`。
 > 分支粒度和提交说明的要求仍然适用。
 
 前端代码应当提交到专用分支或 Pull Request，不要直接把未验证的实现合入 `main`。

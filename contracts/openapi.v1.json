@@ -6089,6 +6089,37 @@
         ],
         "title": "PlanStepStatus"
       },
+      "ResourceParentRef": {
+        "properties": {
+          "resource_type": {
+            "type": "string",
+            "enum": [
+              "organization",
+              "organization_spec_version",
+              "task",
+              "plan",
+              "artifact",
+              "feasibility_check",
+              "runtime_binding"
+            ],
+            "title": "Resource Type"
+          },
+          "resource_id": {
+            "type": "string",
+            "maxLength": 100,
+            "minLength": 1,
+            "title": "Resource Id"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "resource_type",
+          "resource_id"
+        ],
+        "title": "ResourceParentRef",
+        "description": "Product-owned parent context for a nested resource reference."
+      },
       "ResourceRefContentBlock": {
         "properties": {
           "text": {
@@ -6127,6 +6158,16 @@
             "maxLength": 120,
             "minLength": 1,
             "title": "Label"
+          },
+          "parent": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ResourceParentRef"
+              },
+              {
+                "type": "null"
+              }
+            ]
           }
         },
         "additionalProperties": false,
@@ -7224,6 +7265,188 @@
         ],
         "title": "TaskInputArtifactRequest"
       },
+      "TaskInputBindingFailure": {
+        "properties": {
+          "contract_key": {
+            "type": "string",
+            "maxLength": 64,
+            "minLength": 1,
+            "title": "Contract Key"
+          },
+          "code": {
+            "type": "string",
+            "maxLength": 100,
+            "minLength": 1,
+            "title": "Code"
+          },
+          "message": {
+            "type": "string",
+            "maxLength": 1000,
+            "minLength": 1,
+            "title": "Message"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "contract_key",
+          "code",
+          "message"
+        ],
+        "title": "TaskInputBindingFailure"
+      },
+      "TaskInputBindingReport": {
+        "properties": {
+          "task_id": {
+            "type": "string",
+            "maxLength": 100,
+            "minLength": 1,
+            "title": "Task Id"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "waiting_for_plan",
+              "bound",
+              "partial",
+              "failed"
+            ],
+            "title": "Status"
+          },
+          "bound_artifact_ids": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "maxItems": 20,
+            "title": "Bound Artifact Ids",
+            "default": []
+          },
+          "remaining_contract_keys": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "maxItems": 100,
+            "title": "Remaining Contract Keys",
+            "default": []
+          },
+          "failures": {
+            "items": {
+              "$ref": "#/components/schemas/TaskInputBindingFailure"
+            },
+            "type": "array",
+            "maxItems": 20,
+            "title": "Failures",
+            "default": []
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "task_id",
+          "status"
+        ],
+        "title": "TaskInputBindingReport"
+      },
+      "TaskInputContractSpec": {
+        "properties": {
+          "contract_key": {
+            "type": "string",
+            "pattern": "^[a-z0-9][a-z0-9._-]{0,63}$",
+            "title": "Contract Key"
+          },
+          "schema_version": {
+            "type": "string",
+            "maxLength": 20,
+            "minLength": 1,
+            "title": "Schema Version",
+            "default": "1.0"
+          },
+          "media_type": {
+            "type": "string",
+            "maxLength": 255,
+            "minLength": 1,
+            "title": "Media Type"
+          },
+          "file_name": {
+            "type": "string",
+            "maxLength": 255,
+            "minLength": 1,
+            "title": "File Name"
+          },
+          "source_attachment_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 100
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Attachment Id"
+          },
+          "source_message_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 100
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Message Id"
+          },
+          "source_action_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 100
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Action Id"
+          },
+          "source_sha256": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Sha256"
+          },
+          "source_byte_size": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 20971520.0,
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Byte Size"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "contract_key",
+          "media_type",
+          "file_name"
+        ],
+        "title": "TaskInputContractSpec",
+        "description": "User-declared Task input contract with optional attachment provenance."
+      },
       "TaskOrchestrationMode": {
         "type": "string",
         "enum": [
@@ -7282,6 +7505,23 @@
           },
           "capability_requirements": {
             "$ref": "#/components/schemas/WorkloadRequirements"
+          },
+          "requested_input_contracts": {
+            "items": {
+              "$ref": "#/components/schemas/TaskInputContractSpec"
+            },
+            "type": "array",
+            "title": "Requested Input Contracts"
+          },
+          "input_binding": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/TaskInputBindingReport"
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "orchestration_mode": {
             "$ref": "#/components/schemas/TaskOrchestrationMode"
@@ -7365,6 +7605,8 @@
           "organization_spec_version_id",
           "request",
           "capability_requirements",
+          "requested_input_contracts",
+          "input_binding",
           "orchestration_mode",
           "status",
           "result_summary",

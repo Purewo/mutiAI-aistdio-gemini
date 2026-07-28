@@ -9,6 +9,7 @@ import {
   FileUp,
   Gauge,
   ListChecks,
+  Link2,
   Loader2,
   Package,
   Play,
@@ -36,6 +37,7 @@ import FeasibilityPanel from '../components/FeasibilityPanel';
 import PageHeader from '../components/PageHeader';
 import PlanGraph from '../components/PlanGraph';
 import TaskEventLogView from '../components/TaskEventLogView';
+import TaskInputBindingStatus from '../components/TaskInputBindingStatus';
 import TaskTimingPanel from '../components/TaskTimingPanel';
 import TaskUsagePanel from '../components/TaskUsagePanel';
 import {
@@ -117,6 +119,8 @@ export default function TaskDetail() {
 
         <ControlsSection task={task} onTaskUpdated={live.setTask} onReload={live.refresh} />
 
+        <TaskInputBindingSection task={task} />
+
         {live.approvals.length > 0 ? (
           <ApprovalsSection
             taskId={task.task_id}
@@ -160,6 +164,39 @@ export default function TaskDetail() {
         ) : null}
       </div>
     </Shell>
+  );
+}
+
+function TaskInputBindingSection({ task }: { task: Task }) {
+  if (task.requested_input_contracts.length === 0 && !task.input_binding) return null;
+
+  const attachmentCount = task.requested_input_contracts.filter(
+    (contract) => contract.source_attachment_id,
+  ).length;
+
+  return (
+    <Section
+      icon={<Link2 className="h-5 w-5 text-indigo-600" />}
+      title="Task 输入绑定"
+      extra={
+        <span className="text-sm text-slate-400">
+          {attachmentCount} 项来自小助理附件
+        </span>
+      }
+    >
+      <div className="space-y-3">
+        <p className="rounded-xl border border-indigo-100 bg-indigo-50/60 px-3.5 py-2.5 text-xs leading-relaxed text-indigo-800">
+          这里展示确认后的输入来源链。Task 只接收已明确映射的附件，并把它们物化为
+          <span className="mx-1 font-mono font-semibold">origin=task_input</span>
+          Artifact；绑定本身不会启动任务。
+        </p>
+        <TaskInputBindingStatus
+          contracts={task.requested_input_contracts}
+          report={task.input_binding}
+          artifacts={task.artifacts}
+        />
+      </div>
+    </Section>
   );
 }
 
@@ -562,7 +599,7 @@ function StartRow({
             ? '计划已校验，所需输入齐备，可以开始执行。'
             : !planValidated
               ? `计划当前状态为「${plan.status}」，尚不能开始执行。`
-              : `还有 ${missingInputs.length} 项声明的初始输入未上传：${missingInputs.join('、')}`}
+              : `还有 ${missingInputs.length} 项声明的初始输入未绑定或上传：${missingInputs.join('、')}`}
         </div>
         <button
           type="button"
@@ -856,4 +893,3 @@ function AssignmentsSection({ task }: { task: Task }) {
     </Section>
   );
 }
-

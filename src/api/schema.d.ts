@@ -1571,6 +1571,19 @@ export interface components {
          * @enum {string}
          */
         PlanStepStatus: "pending_dependency" | "ready" | "submitted" | "running" | "waiting" | "validating_output" | "completed" | "blocked" | "failed" | "cancelled";
+        /**
+         * ResourceParentRef
+         * @description Product-owned parent context for a nested resource reference.
+         */
+        ResourceParentRef: {
+            /**
+             * Resource Type
+             * @enum {string}
+             */
+            resource_type: "organization" | "organization_spec_version" | "task" | "plan" | "artifact" | "feasibility_check" | "runtime_binding";
+            /** Resource Id */
+            resource_id: string;
+        };
         /** ResourceRefContentBlock */
         ResourceRefContentBlock: {
             /** Text */
@@ -1589,6 +1602,7 @@ export interface components {
             resource_id: string;
             /** Label */
             label: string;
+            parent?: components["schemas"]["ResourceParentRef"] | null;
         };
         /** RuntimeBindingResponse */
         RuntimeBindingResponse: {
@@ -1919,6 +1933,67 @@ export interface components {
             /** Source Delivery Id */
             source_delivery_id: string;
         };
+        /** TaskInputBindingFailure */
+        TaskInputBindingFailure: {
+            /** Contract Key */
+            contract_key: string;
+            /** Code */
+            code: string;
+            /** Message */
+            message: string;
+        };
+        /** TaskInputBindingReport */
+        TaskInputBindingReport: {
+            /** Task Id */
+            task_id: string;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "waiting_for_plan" | "bound" | "partial" | "failed";
+            /**
+             * Bound Artifact Ids
+             * @default []
+             */
+            bound_artifact_ids: string[];
+            /**
+             * Remaining Contract Keys
+             * @default []
+             */
+            remaining_contract_keys: string[];
+            /**
+             * Failures
+             * @default []
+             */
+            failures: components["schemas"]["TaskInputBindingFailure"][];
+        };
+        /**
+         * TaskInputContractSpec
+         * @description User-declared Task input contract with optional attachment provenance.
+         */
+        TaskInputContractSpec: {
+            /** Contract Key */
+            contract_key: string;
+            /**
+             * Schema Version
+             * @default 1.0
+             */
+            schema_version: string;
+            /** Media Type */
+            media_type: string;
+            /** File Name */
+            file_name: string;
+            /** Source Attachment Id */
+            source_attachment_id?: string | null;
+            /** Source Message Id */
+            source_message_id?: string | null;
+            /** Source Action Id */
+            source_action_id?: string | null;
+            /** Source Sha256 */
+            source_sha256?: string | null;
+            /** Source Byte Size */
+            source_byte_size?: number | null;
+        };
         /**
          * TaskOrchestrationMode
          * @description Select the compatibility workflow or the planned linear workflow.
@@ -1948,6 +2023,9 @@ export interface components {
             /** Request */
             request: string;
             capability_requirements: components["schemas"]["WorkloadRequirements"];
+            /** Requested Input Contracts */
+            requested_input_contracts: components["schemas"]["TaskInputContractSpec"][];
+            input_binding: components["schemas"]["TaskInputBindingReport"] | null;
             orchestration_mode: components["schemas"]["TaskOrchestrationMode"];
             status: components["schemas"]["TaskStatus"];
             /** Result Summary */

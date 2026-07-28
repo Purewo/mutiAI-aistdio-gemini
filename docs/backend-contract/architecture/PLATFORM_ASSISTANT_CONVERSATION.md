@@ -120,6 +120,14 @@ charts and execution-plan diagrams identify a persisted
 `OrganizationSpecVersion` or `TaskExecutionPlan`; the frontend renders them
 with the same graph components used by the organization and Task pages.
 
+Nested resource references may include an optional product-owned `parent`
+locator containing the parent resource type and ID. The backend resolves this
+context from the database after the ownership check; the Runtime cannot supply
+or override it. New `organization_spec_version` references identify their
+parent `organization`, which lets a reference card navigate independently
+without guessing a nested route. Historical blocks without `parent` remain
+valid.
+
 #### Attachments
 
 Assistant uploads are separate product resources. The upload route returns an
@@ -127,8 +135,34 @@ Assistant uploads are separate product resources. The upload route returns an
 backend changes the resource from `uploaded` to `attached` in the same product
 transaction as the message. An unreferenced upload can be revoked, while an
 attached resource cannot be silently removed. Chat attachments never become
-Task input bindings. Binding one to a Task requires a future explicit,
-confirmed product Action.
+Task input bindings implicitly. Binding one to a Task requires an explicit,
+confirmed `task.submit` Action for a planned Task. Each `attachment_inputs`
+entry maps one attachment ID to a declared contract key and schema version.
+The mapping is accepted only when the attachment belongs to the current
+Conversation, owner, and source Turn message. Attachment IDs and contract keys
+cannot repeat within the Action.
+
+The Runtime does not supply authoritative file metadata. Before an Action
+enters `proposed`, the backend restores the file name, media type, SHA-256, byte
+size, and source message identity from the product database and freezes them in
+the normalized Action payload. After confirmation, the Task persists a
+`requested_input_contracts` snapshot with the source Action and attachment
+provenance. The organization lead must preserve every requested contract key in
+the execution plan. Once the plan is validated, the product verifies the bytes
+again and publishes an immutable `origin=task_input` Artifact with a stable
+delivery identity. A changed file, stale mapping, metadata conflict, or omitted
+plan contract fails closed and produces no Artifact.
+
+Planning and attachment conversion remain recoverable boundaries. A plan-ready
+callback performs the first idempotent binding attempt, and startup recovery
+reconciles planned Tasks that still have attachment-backed inputs. Repeated
+reconciliation reuses the same Artifact. `task.submit` Action results expose an
+`input_binding` report with `bound`, `partial`, `failed`, or
+`waiting_for_plan`, bound Artifact IDs, remaining contract keys, and failures.
+Asynchronous updates append `assistant.task_input_bindings.updated`; clients
+refresh the Task and Action resources after the event. Attachment binding does
+not auto-start the Task. Additional unbound plan inputs still use the existing
+Task input upload flow.
 
 Attachments are stored below the configured assistant-attachment root, outside
 source repositories and all managed Runtime Workspaces. Public responses never
@@ -142,7 +176,9 @@ Markdown, plain text, and tab-separated text. Each upload is capped by
 `assistant_attachment_max_bytes` (10 MiB by default). The assistant's
 `mutiai_get_attachment_content` tool is stricter: it reads only attached UTF-8
 JSON or text, refuses binary or malformed content, and refuses content over
-64 KiB without truncation or guessing.
+64 KiB without truncation or guessing. Explicit Task input conversion supports
+binary files but applies the Task input limit of 20 MiB and verifies the full
+byte stream without truncation.
 
 ### AssistantTurn
 
@@ -247,6 +283,13 @@ released JSON or text Artifact content up to 64 KiB, read Task token usage, and 
 feasibility checks. Organization confirmation/publication, Task
 submission/retry/cancel, and approval decisions remain explicit
 `AssistantAction` mutations.
+
+For an explicitly authorized chat file, the `task.submit` payload accepts an
+`attachment_inputs` mapping containing only `attachment_id`, `contract_key`,
+and `schema_version` from the Runtime. The product normalizes and validates the
+mapping before confirmation, then exposes the persisted binding report through
+the Task resource, completed Action, and conversation event stream. It never
+accepts a Runtime filesystem path as an attachment or Task input identity.
 
 The Artifact content tool accepts only Task and Artifact identities. It reuses
 the product's owner scope, released-state, managed-root, byte-size, and SHA-256

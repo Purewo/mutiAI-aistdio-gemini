@@ -1,4 +1,4 @@
-# Nexwork web frontend rules
+# Nexwork web frontend rules (legacy pointer)
 
 This repository owns the Nexwork web frontend only. It is the frontend main workspace.
 
@@ -8,15 +8,14 @@ the historical working name `mutiAI` until a separate rename is planned, so `Pur
 
 ## Ownership
 
-Since 2026-07-26 the frontend is developed locally by the project's frontend owner, who has direct
-access to the backend repository, the running API, and a real browser. This replaces the earlier
-Google AI Studio arrangement in which a remote collaborator wrote candidate code against fixtures
-and a separate integrator performed acceptance without modifying the implementation. The frontend
-owner now writes the implementation, verifies it against the real backend in a browser, and owns
-the corrective commits.
+As of 2026-07-28, Codex is the formal frontend owner. Codex writes the
+implementation, verifies it against the real backend in a browser, and owns
+the corrective commits. The earlier Google AI Studio/Gemini and Fable5
+arrangement is historical and no longer defines delivery ownership.
 
-`GEMINI.md` and `docs/GEMINI_HANDOFF.md` remain for product background and page-scope intent. Where
-they describe the old remote-collaborator workflow, this file takes precedence.
+`AGENTS.md` and `docs/CURRENT_STATUS.md` are authoritative for current
+ownership and handoff. `GEMINI.md` and `docs/GEMINI_HANDOFF.md` remain for
+product background and page-scope intent only.
 
 ## Contract boundary
 

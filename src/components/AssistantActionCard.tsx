@@ -8,9 +8,15 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, Check, AlertCircle, Loader2, X } from 'lucide-react';
-import type { AssistantAction, AssistantActionStatus } from '../api/types';
+import type { AssistantAction, AssistantActionStatus, Task } from '../api/types';
 import { describeApiError } from '../api/errors';
 import { formatDateTime } from '../lib/format';
+import TaskInputBindingStatus from './TaskInputBindingStatus';
+import {
+  attachmentInputsFromAction,
+  inputBindingFromAction,
+  taskIdFromAction,
+} from '../assistant/taskInputBindings';
 
 const STATUS_PRESENTATION: Record<AssistantActionStatus, { label: string; tone: string }> = {
   proposed: { label: '待确认', tone: 'border-blue-200 bg-blue-50 text-blue-700' },
@@ -35,7 +41,11 @@ const ACTION_TYPE_LABELS: Record<string, string> = {
 };
 
 /** Link to the persisted resource an action targets, when the frontend has a route for it. */
-function targetLink(action: AssistantAction): { to: string; label: string } | null {
+function targetLink(action: AssistantAction, task: Task | null): { to: string; label: string } | null {
+  if (action.action_type === 'task.submit') {
+    const taskId = task?.task_id ?? taskIdFromAction(action);
+    if (taskId) return { to: `/tasks/${encodeURIComponent(taskId)}`, label: '查看任务' };
+  }
   if (!action.target_id) return null;
   if (action.target_type === 'organization') {
     return { to: `/orgs/${action.target_id}`, label: '查看组织' };
@@ -48,9 +58,11 @@ function targetLink(action: AssistantAction): { to: string; label: string } | nu
 
 export default function AssistantActionCard({
   action,
+  task = null,
   onDecide,
 }: {
   action: AssistantAction;
+  task?: Task | null;
   onDecide: (actionId: string, decision: 'confirm' | 'decline') => Promise<void>;
 }) {
   const [busy, setBusy] = useState<'confirm' | 'decline' | null>(null);
@@ -61,7 +73,19 @@ export default function AssistantActionCard({
     tone: 'border-slate-200 bg-slate-50 text-slate-600',
   };
   const pending = action.status === 'confirmed' || action.status === 'executing';
-  const link = targetLink(action);
+  const link = targetLink(action, task);
+  const attachmentInputs = attachmentInputsFromAction(action);
+  const actionContracts = (() => {
+    const contracts = task?.requested_input_contracts ?? [];
+    const exact = contracts.filter((contract) => contract.source_action_id === action.action_id);
+    return exact.length > 0
+      ? exact
+      : contracts.filter((contract) => contract.source_attachment_id !== null);
+  })();
+  const inputBinding = task?.input_binding ?? inputBindingFromAction(action);
+  const showsAttachmentBinding =
+    action.action_type === 'task.submit' &&
+    (attachmentInputs.length > 0 || actionContracts.length > 0 || inputBinding !== null);
 
   const decide = async (decision: 'confirm' | 'decline') => {
     setBusy(decision);
@@ -113,6 +137,33 @@ export default function AssistantActionCard({
             ) : null}
           </span>
         </p>
+      ) : null}
+
+      {showsAttachmentBinding ? (
+        <div className="mb-3 space-y-2">
+          <p
+            className={`rounded-xl border px-3 py-2 text-xs leading-relaxed ${
+              action.status === 'proposed'
+                ? 'border-amber-200 bg-amber-50 text-amber-800'
+                : action.status === 'declined' || action.status === 'cancelled' || action.status === 'expired'
+                  ? 'border-slate-200 bg-slate-50 text-slate-600'
+                  : 'border-indigo-100 bg-indigo-50/70 text-indigo-800'
+            }`}
+          >
+            {action.status === 'proposed'
+              ? '普通聊天附件不会进入 Task。只有确认这个 planned Action 后，下面的附件才会按声明的 contract key 绑定。'
+              : action.status === 'declined' || action.status === 'cancelled' || action.status === 'expired'
+                ? '这次附件映射没有执行，附件仍只属于小助理对话。'
+                : '附件映射已经明确授权；当前状态来自 Task 数据库，完成绑定也不会自动启动任务。'}
+          </p>
+          <TaskInputBindingStatus
+            actionInputs={attachmentInputs}
+            contracts={actionContracts}
+            report={inputBinding}
+            artifacts={task?.artifacts}
+            title={action.status === 'proposed' ? '待确认的附件输入映射' : '附件输入映射'}
+          />
+        </div>
       ) : null}
 
       {error ? (

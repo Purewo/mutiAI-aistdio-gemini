@@ -1,13 +1,13 @@
 # Local integration and review boundary
 
-The frontend is developed locally against the running backend. The frontend owner can start the API,
-issue real requests, and drive a real browser, so contract-backed behavior is verified directly
-instead of being inferred from captured responses.
+The frontend is developed locally against the running backend. Codex can start
+the API, issue real requests, and drive a real browser, so contract-backed
+behavior is verified directly instead of being inferred from captured responses.
 
-This replaces the earlier arrangement in which a Google AI Studio collaborator wrote candidate code
-against fixtures and a separate integrator performed acceptance without modifying the
-implementation. The frontend owner now writes the implementation, verifies it, and owns the
-corrective commits.
+This replaces the earlier Google AI Studio/Gemini and Fable5 arrangement in
+which a remote collaborator wrote candidate code against fixtures and a
+separate integrator performed acceptance. Codex now writes the implementation,
+verifies it, and owns the corrective commits.
 
 The captured responses under `fixtures/api/` remain useful as an offline regression and visual
 reference, and for exercising states that are expensive to reproduce against a live Runtime. They

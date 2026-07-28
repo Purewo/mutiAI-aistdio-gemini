@@ -1,12 +1,13 @@
-# Frontend instructions
+# Frontend instructions (historical Gemini entrypoint)
 
-Ownership note: since 2026-07-26 this frontend is developed locally by the project's frontend owner,
-who can run and debug the real backend directly. `CLAUDE.md` holds the current working rules and
-takes precedence wherever this file or `docs/GEMINI_HANDOFF.md` describes the earlier Google AI
-Studio collaborator workflow. The product background, page scope, and contract rules below remain
-accurate.
+Ownership note: as of 2026-07-28, Codex formally owns frontend implementation,
+integration, browser verification, and corrective commits. This file is kept for
+historical Gemini context; `AGENTS.md` and `docs/CURRENT_STATUS.md` are the
+current instructions and handoff.
 
-Read `CLAUDE.md`, `docs/GEMINI_HANDOFF.md`, `docs/M3_FRONTEND_TASK_PACKET.md`, `docs/M3_FRONTEND_IMPLEMENTATION_PLAN.md`, and `docs/LOCAL_INTEGRATION_REVIEW.md` before changing the frontend.
+Read `AGENTS.md`, `docs/CURRENT_STATUS.md`, `docs/M3_FRONTEND_TASK_PACKET.md`,
+`docs/M3_FRONTEND_IMPLEMENTATION_PLAN.md`, and `docs/LOCAL_INTEGRATION_REVIEW.md`
+before changing the frontend.
 
 ## Rules
 
@@ -26,4 +27,4 @@ Read `CLAUDE.md`, `docs/GEMINI_HANDOFF.md`, `docs/M3_FRONTEND_TASK_PACKET.md`, `
 
 ## Handoff expectation
 
-A frontend commit is complete only after it has been verified in a real browser against the running backend. Lint, typecheck, build, fixture, and mock checks support construction and visual review; they are not proof of real integration. The frontend owner writes the implementation, performs that browser verification, and owns the corrective commits. Contract defects remain backend-owned and are fixed in `Purewo/mutiAI` before this repository's snapshots are refreshed.
+A frontend commit is complete only after it has been verified in a real browser against the running backend. Lint, typecheck, build, fixture, and mock checks support construction and visual review; they are not proof of real integration. Codex writes the implementation, performs that browser verification, and owns the corrective commits. Contract defects remain backend-owned and are fixed in `Purewo/mutiAI` before this repository's snapshots are refreshed.

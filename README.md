@@ -1,10 +1,12 @@
-# mutiAI web frontend
+# Nexwork web frontend
 
-This repository contains the web frontend for mutiAI. It is the implementation repository used by Gemini through GitHub and AI Studio.
+This repository contains the Nexwork web frontend. Codex is the current
+implementation and integration owner; the earlier Gemini and Fable5 workflow
+is retained only as historical context.
 
 The product-core repository is [Purewo/mutiAI](https://github.com/Purewo/mutiAI). It owns the authoritative product semantics and transport contracts. This repository consumes generated clients or versioned contract snapshots from that repository and must not redefine backend resource shapes independently.
 
-The project is currently in the design and bootstrap phase. Read [the Gemini handoff](docs/GEMINI_HANDOFF.md) before implementing a page.
+The active milestone is the M3 web product loop. Read [the current frontend status](docs/CURRENT_STATUS.md) and [Codex repository instructions](AGENTS.md) before implementing a page. The original [Gemini handoff](docs/GEMINI_HANDOFF.md) remains useful for product background and scope, not ownership.
 
 ## First-release direction
 
@@ -19,4 +21,8 @@ The project is currently in the design and bootstrap phase. Read [the Gemini han
 
 ## Delivery boundary
 
-Gemini can implement bounded frontend work and submit a branch or pull request. Final completion requires local integration with the real backend, type checking, tests, and browser verification by the project integrator. The integrator reports defects with evidence and does not modify Gemini's implementation during review; fixes return to Gemini.
+Codex implements bounded frontend work, runs repository checks, integrates with
+the real local backend, and owns browser verification and corrective commits.
+Backend behavior and published contracts remain owned by `Purewo/mutiAI`; this
+repository consumes refreshed snapshots and reports contract defects with
+evidence instead of inventing frontend-only shapes.

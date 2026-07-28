@@ -113,6 +113,23 @@ The Runtime instructions contain only:
 
 The original user request is available to the organization lead for planning and review. It is not copied verbatim into every specialist Assignment when doing so exposes inputs outside that step's contract.
 
+## Lead review evidence
+
+The organization lead receives only the final Artifact contracts declared by the frozen review step. The product does not broaden that file access to every upstream Artifact merely to prove that orchestration occurred.
+
+Before creating `lead.review`, the scheduler derives a structured `execution_evidence` packet from the product database. The packet contains:
+
+- The immutable plan identity, definition hash, validation result, and source.
+- The completed `lead.plan` Assignment and RuntimeExecution identity.
+- Every completed specialist step, its dependency keys, role owner, and Assignment status.
+- Each exact materialized input binding and released output Artifact identity, contract, hash, size, media type, and validation result.
+- Product-observed Runtime model, security mode, start time, completion time, and run duration.
+- Deterministic checks that declared contracts match materialized inputs and released outputs.
+
+The evidence excludes Workspace paths, upstream file contents not declared for review, Codex transcripts, hidden reasoning, and internal tool events. It attests to product-controlled scheduling, Assignment ownership, bindings, and Artifact validation. Under `demo_full_access`, it does not claim that the operating system prevented every possible undeclared read.
+
+The lead uses this evidence as authoritative for orchestration facts and reviews the supplied final Artifact against the original request. It does not require private Runtime history or repair specialist output.
+
 ## Artifact model
 
 An Artifact record contains:
@@ -129,6 +146,36 @@ An Artifact record contains:
 Artifacts are immutable after release. A retry creates a new Artifact version instead of overwriting a released object.
 
 Initial Task inputs are released Artifacts with `origin=task_input` and no producer Assignment or producer Workspace. They satisfy only contracts listed in `TaskExecutionPlan.initial_input_contracts`. Assignment outputs use `origin=assignment` and always record their producer Assignment, plan step, and Workspace.
+
+## Convert a chat attachment into a Task input
+
+A platform-assistant attachment remains Conversation context unless the user
+explicitly confirms a planned `task.submit` Action that maps it to a Task input
+contract. The product performs the conversion as follows:
+
+1. Validate that the Action's source Turn, source message, Conversation, owner,
+   attachment, and declared contract form one product-owned provenance chain.
+2. Restore the attachment's file name, media type, SHA-256, and byte size from
+   the database. Ignore any Runtime-provided copies of those facts.
+3. Persist the normalized contract and source provenance in
+   `Task.requested_input_contracts` before planning.
+4. Require the lead plan to include every requested contract key in
+   `initial_input_contracts` without renaming it.
+5. After plan validation, verify the stored bytes still match the confirmed
+   hash and size, then publish them with
+   `source_delivery_id=assistant-attachment:{attachment_id}`.
+6. Reconcile the same mapping after asynchronous plan completion or process
+   restart. Repeated attempts reuse the existing Artifact.
+
+The latest binding report is persisted on the Task and exposed as
+`TaskResponse.input_binding`; SSE only tells clients to refresh that resource.
+The report distinguishes attachment-backed contracts already bound, contracts
+still awaiting another upload, and failed conversions. A binding
+failure does not start the Task and does not create a partial Artifact. The
+Task remains queryable so the user can correct the input through a new explicit
+operation. Binding does not grant an organization role access to the chat
+Conversation, source message, or assistant attachment store; roles receive only
+the materialized Task input Artifact declared by their plan step.
 
 ## Filesystem handoff
 
@@ -237,6 +284,7 @@ The frontend renders the product plan and event stream, not LangGraph internals.
 - Waiting dependency, ready, Runtime, validation, and terminal states.
 - Input and output Artifact IDs and validation status.
 - Runtime binding, Thread, Turn, Workspace, usage, and recovery facts.
+- Per-step dependency wait and active duration, plus per-Assignment Runtime queue, run, and wall duration.
 
 This contract remains usable if LangGraph is replaced by another orchestration engine.
 

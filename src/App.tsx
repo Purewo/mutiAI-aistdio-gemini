@@ -4,7 +4,6 @@ import { AuthProvider } from './auth/AuthProvider';
 import RequireAuth from './components/RequireAuth';
 import SidebarLayout from './components/SidebarLayout';
 import { LoadingState } from './components/states';
-import Assistant from './pages/Assistant';
 import Login from './pages/Login';
 import NotFound from './pages/NotFound';
 import OrgDetail from './pages/OrgDetail';
@@ -26,7 +25,8 @@ export default function App() {
           {/* Everything below requires a backend-confirmed session. */}
           <Route element={<RequireAuth />}>
             <Route element={<SidebarLayout />}>
-              <Route path="/" element={<Assistant />} />
+              {/* SidebarLayout keeps the assistant mounted and owns the root-route surface. */}
+              <Route index element={null} />
               <Route path="/orgs" element={<OrgsList />} />
               <Route path="/orgs/:organizationId" element={<OrgDetail />} />
               <Route path="/tasks/:taskId" element={<TaskDetail />} />

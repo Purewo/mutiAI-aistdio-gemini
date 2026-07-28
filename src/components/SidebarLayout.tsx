@@ -1,12 +1,15 @@
 import React, { useState } from 'react';
-import { NavLink, Outlet, useNavigate } from 'react-router-dom';
+import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { Cpu, LogOut, MessageSquare, Smartphone, Sparkles, User, Users } from 'lucide-react';
 import { useAuth } from '../auth/context';
 import { describeApiError } from '../api/errors';
+import Assistant from '../pages/Assistant';
 
 export default function SidebarLayout() {
   const { state, signOut } = useAuth();
+  const location = useLocation();
   const navigate = useNavigate();
+  const assistantVisible = location.pathname === '/';
   const [signingOut, setSigningOut] = useState(false);
   const [signOutError, setSignOutError] = useState<string | null>(null);
 
@@ -87,8 +90,21 @@ export default function SidebarLayout() {
         </div>
       </aside>
 
-      <main className="flex h-full min-w-0 flex-1 flex-col overflow-hidden bg-slate-50/50">
-        <Outlet />
+      <main className="relative flex h-full min-w-0 flex-1 flex-col overflow-hidden bg-slate-50/50">
+        {/*
+          Keep the conversation mounted and fully laid out like a chat client. `visibility` hides
+          the layer without collapsing its box, so route changes preserve the rendered history,
+          product-backed diagrams, event stream, dimensions, and exact scroll position.
+        */}
+        <section
+          aria-hidden={!assistantVisible}
+          className={`absolute inset-0 h-full min-h-0 ${
+            assistantVisible ? 'visible' : 'invisible pointer-events-none'
+          }`}
+        >
+          <Assistant />
+        </section>
+        {assistantVisible ? null : <Outlet />}
       </main>
     </div>
   );
