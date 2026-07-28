@@ -8,6 +8,7 @@ import {
   ExternalLink,
   File,
   FileCode2,
+  FileText,
   Link2,
   Loader2,
   RefreshCw,
@@ -21,6 +22,7 @@ import {
   getTask,
   listOrganizationVersions,
 } from '../api/endpoints';
+import { resolveBackendUrl } from '../api/http';
 import { describeApiError } from '../api/errors';
 import type {
   AssistantContentBlock,
@@ -33,7 +35,7 @@ import { formatBytes } from '../lib/format';
 import OrganizationGraph from './OrganizationGraph';
 import PlanGraph from './PlanGraph';
 
-const SUPPORTED_CONTENT_SCHEMA_VERSION = '1.0';
+const SUPPORTED_CONTENT_SCHEMA_VERSIONS = new Set(['1.0', '1.1']);
 
 /**
  * Render the backend-owned assistant content contract.
@@ -48,7 +50,7 @@ export default function AssistantMessageContent({
   message: AssistantMessage;
   inverted?: boolean;
 }) {
-  const supported = message.content_schema_version === SUPPORTED_CONTENT_SCHEMA_VERSION;
+  const supported = SUPPORTED_CONTENT_SCHEMA_VERSIONS.has(message.content_schema_version);
   const blocks = supported ? message.content_blocks : [];
 
   if (blocks.length === 0) {
@@ -104,6 +106,8 @@ function ContentBlock({
       return <ResourceReferenceBlock block={block} inverted={inverted} />;
     case 'diagram':
       return <DiagramBlock block={block} />;
+    case 'html_report':
+      return <HtmlReportBlock block={block} />;
     default: {
       // A future backend schema can reach an older deployed bundle before it is refreshed. Every
       // block is required to carry `text`, so degrade without guessing its shape.
@@ -304,6 +308,95 @@ function AttachmentBlock({
         </a>
       </div>
     </section>
+  );
+}
+
+function HtmlReportBlock({
+  block,
+}: {
+  block: Extract<AssistantContentBlock, { type: 'html_report' }>;
+}) {
+  const [previewFailed, setPreviewFailed] = useState(false);
+  const previewUrl = resolveBackendUrl(block.preview_url);
+  const downloadUrl = resolveBackendUrl(block.download_url);
+  const previewAvailable = block.preview_status === 'available' && !previewFailed;
+
+  return (
+    <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+      <header className="flex flex-wrap items-start gap-3 border-b border-slate-200 bg-slate-50/80 px-4 py-3">
+        <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl border border-indigo-100 bg-indigo-50 text-indigo-600">
+          <FileText className="h-4 w-4" aria-hidden="true" />
+        </div>
+        <div className="min-w-0 flex-1">
+          <p className="truncate text-sm font-semibold text-slate-800">{block.title}</p>
+          <p className="mt-0.5 text-xs leading-relaxed text-slate-500">{block.text}</p>
+        </div>
+        <div className="flex items-center gap-1.5">
+          <Link
+            to={`/tasks/${encodeURIComponent(block.source.task_id)}`}
+            className="inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-semibold text-indigo-700 transition-colors hover:bg-indigo-50 focus:outline-none focus-visible:ring-4 focus-visible:ring-indigo-500/15"
+          >
+            查看任务
+            <ExternalLink className="h-3.5 w-3.5" aria-hidden="true" />
+          </Link>
+          <a
+            href={downloadUrl}
+            className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs font-semibold text-slate-600 transition-colors hover:bg-slate-100 focus:outline-none focus-visible:ring-4 focus-visible:ring-indigo-500/15"
+          >
+            <Download className="h-3.5 w-3.5" aria-hidden="true" />
+            下载报告
+          </a>
+        </div>
+      </header>
+
+      <div className="border-b border-slate-200 px-4 py-2 text-[11px] text-slate-400">
+        <span>{block.media_type}</span>
+        <span className="mx-1.5">·</span>
+        <span>{formatBytes(block.byte_size)}</span>
+        <span className="mx-1.5">·</span>
+        <span className="font-mono" title={block.sha256}>SHA-256 {block.sha256.slice(0, 12)}…</span>
+      </div>
+
+      {block.preview_status === 'too_large' ? (
+        <ReportFallback message="报告超过在线预览大小限制，请下载后查看。" />
+      ) : previewAvailable ? (
+        <div className="bg-slate-100 p-3">
+          <iframe
+            key={previewUrl}
+            src={previewUrl}
+            title={block.title}
+            sandbox=""
+            referrerPolicy="no-referrer"
+            loading="lazy"
+            onError={() => setPreviewFailed(true)}
+            className="h-[420px] w-full rounded-xl border border-slate-200 bg-white shadow-inner"
+          />
+          <p className="mt-2 text-[11px] leading-relaxed text-slate-400">
+            这是后端校验后的静态报告预览，脚本、外部资源和交互能力均已禁用。
+          </p>
+        </div>
+      ) : (
+        <ReportFallback message="报告预览暂时不可用，请下载原始报告。" onRetry={() => setPreviewFailed(false)} />
+      )}
+    </section>
+  );
+}
+
+function ReportFallback({ message, onRetry }: { message: string; onRetry?: () => void }) {
+  return (
+    <div className="flex flex-wrap items-center gap-2 bg-amber-50 px-4 py-5 text-sm text-amber-800">
+      <AlertTriangle className="h-4 w-4 flex-shrink-0 text-amber-600" aria-hidden="true" />
+      <span className="min-w-0 flex-1">{message}</span>
+      {onRetry ? (
+        <button
+          type="button"
+          onClick={onRetry}
+          className="rounded-lg px-2 py-1 text-xs font-semibold hover:bg-amber-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/30"
+        >
+          重试
+        </button>
+      ) : null}
+    </div>
   );
 }
 

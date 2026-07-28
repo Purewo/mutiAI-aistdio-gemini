@@ -3244,6 +3244,16 @@
               }
             },
             "description": "Unprocessable Entity"
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Request Entity Too Large"
           }
         }
       }
@@ -5016,6 +5026,9 @@
                 },
                 {
                   "$ref": "#/components/schemas/DiagramContentBlock"
+                },
+                {
+                  "$ref": "#/components/schemas/HtmlReportContentBlock"
                 }
               ],
               "discriminator": {
@@ -5025,6 +5038,7 @@
                   "code": "#/components/schemas/CodeContentBlock",
                   "diagram": "#/components/schemas/DiagramContentBlock",
                   "error": "#/components/schemas/ErrorContentBlock",
+                  "html_report": "#/components/schemas/HtmlReportContentBlock",
                   "markdown": "#/components/schemas/MarkdownContentBlock",
                   "resource_ref": "#/components/schemas/ResourceRefContentBlock",
                   "text": "#/components/schemas/TextContentBlock"
@@ -5893,6 +5907,117 @@
           "environment"
         ],
         "title": "HealthResponse"
+      },
+      "HtmlReportContentBlock": {
+        "properties": {
+          "text": {
+            "type": "string",
+            "maxLength": 40000,
+            "minLength": 1,
+            "title": "Text"
+          },
+          "type": {
+            "type": "string",
+            "const": "html_report",
+            "title": "Type",
+            "default": "html_report"
+          },
+          "title": {
+            "type": "string",
+            "maxLength": 120,
+            "minLength": 1,
+            "title": "Title"
+          },
+          "source": {
+            "$ref": "#/components/schemas/HtmlReportSource"
+          },
+          "render_mode": {
+            "type": "string",
+            "const": "static",
+            "title": "Render Mode",
+            "default": "static"
+          },
+          "preview_status": {
+            "type": "string",
+            "enum": [
+              "available",
+              "too_large"
+            ],
+            "title": "Preview Status"
+          },
+          "preview_url": {
+            "type": "string",
+            "maxLength": 500,
+            "minLength": 1,
+            "title": "Preview Url"
+          },
+          "download_url": {
+            "type": "string",
+            "maxLength": 500,
+            "minLength": 1,
+            "title": "Download Url"
+          },
+          "media_type": {
+            "type": "string",
+            "const": "text/html",
+            "title": "Media Type",
+            "default": "text/html"
+          },
+          "byte_size": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Byte Size"
+          },
+          "sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Sha256"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "text",
+          "title",
+          "source",
+          "preview_status",
+          "preview_url",
+          "download_url",
+          "byte_size",
+          "sha256"
+        ],
+        "title": "HtmlReportContentBlock",
+        "description": "A safe, product-validated static HTML Artifact preview."
+      },
+      "HtmlReportSource": {
+        "properties": {
+          "kind": {
+            "type": "string",
+            "const": "artifact",
+            "title": "Kind"
+          },
+          "task_id": {
+            "type": "string",
+            "maxLength": 100,
+            "minLength": 1,
+            "title": "Task Id"
+          },
+          "artifact_id": {
+            "type": "string",
+            "maxLength": 100,
+            "minLength": 1,
+            "title": "Artifact Id"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "kind",
+          "task_id",
+          "artifact_id"
+        ],
+        "title": "HtmlReportSource",
+        "description": "Product-owned source identity for a rendered HTML report."
       },
       "LoginRequest": {
         "properties": {

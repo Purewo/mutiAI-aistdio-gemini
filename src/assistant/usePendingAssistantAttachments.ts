@@ -6,7 +6,7 @@ import {
 import { apiErrorFromThrown } from '../api/errors';
 import type { AssistantAttachment } from '../api/types';
 
-export const MAX_ASSISTANT_ATTACHMENT_BYTES = 10 * 1024 * 1024;
+export const MAX_ASSISTANT_ATTACHMENT_BYTES = 20 * 1024 * 1024;
 export const MAX_ASSISTANT_ATTACHMENTS_PER_MESSAGE = 20;
 
 export const ASSISTANT_ATTACHMENT_ACCEPT = [
@@ -114,7 +114,7 @@ export function usePendingAssistantAttachments(
       const normalized: File[] = [];
       for (const file of selected) {
         if (file.size > MAX_ASSISTANT_ATTACHMENT_BYTES) {
-          setError(new Error(`${file.name} 超过 10 MiB 上传限制。`));
+          setError(new Error(`${file.name} 超过 20 MiB 上传限制。`));
           continue;
         }
         const mediaType = file.type || inferMediaType(file.name);

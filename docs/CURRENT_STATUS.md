@@ -20,8 +20,10 @@ contract model.
 
 ## Current implementation
 
-The active branch is `feat/m3-frontend-foundation`, currently at `ad9d659`
-(`chore: sync assistant rich content contract`) and tracking its remote branch.
+The active branch is `feat/m3-frontend-foundation`. The committed frontend
+baseline before the content Schema `1.1` handoff was `a8cbc0d`
+(`feat: consume activity and media semantics`); this branch tracks its remote
+feature branch.
 The React/Vite/TypeScript application currently exposes:
 
 - `/login`: browser-session login and session recovery.
@@ -42,19 +44,21 @@ Transport is centralized in `src/api/`, assistant state in
 shared graph, Artifact, status, and state components under `src/components/`.
 
 The platform-assistant frontend now also consumes the versioned assistant
-contract directly: `content_schema_version = 1.0`. `content_blocks` is
+contract directly: historical `content_schema_version = 1.0` and current
+`content_schema_version = 1.1`. `content_blocks` is
 authoritative, and the legacy `text` field is only a compatibility fallback. The
 renderer supports
 text, safe Markdown, code with copy affordance, errors, owner-scoped
-attachments, product resource references, and product-backed organization and
-execution-plan diagrams. Organization diagrams reuse `OrganizationGraph` and
+attachments, product resource references, product-backed organization and
+execution-plan diagrams, and product-owned static HTML report Artifacts.
+Organization diagrams reuse `OrganizationGraph` and
 execution-plan diagrams reuse `PlanGraph`; neither accepts model-supplied graph
 nodes, URLs, or product state.
 
 Chat attachments use the independent assistant attachment lifecycle: upload
 before send, explicit `attachment_refs` on message submission, revocation only
 while still unattached, and owner-scoped preview/download routes after send.
-The composer enforces the current 10 MiB per-file limit, the backend media
+The composer enforces the current 20 MiB per-file limit, the backend media
 allowlist, and a 20-attachment per-message client limit. It also states that a
 chat attachment is never implicitly bound as Task input.
 
@@ -284,6 +288,60 @@ contained only the two known React Router v7 future-flag warnings, and related
 authenticated requests returned `200` apart from expected StrictMode aborts
 immediately replaced by successful requests. Mobile adaptation remains outside
 the V1 gate.
+
+## Assistant composer auto-resize acceptance
+
+- Verified on 2026-07-29 at `http://127.0.0.1:3001/` through the authenticated
+  platform-assistant page. The composer starts at `44px`, grows with multiline
+  input, caps at `128px` (about five lines), and then scrolls internally.
+- A real multiline message submission returned `202`; while the Turn was
+  running, the cleared and disabled composer immediately returned to `44px`.
+- Desktop `1440x900` and mobile `390x844` checks passed. The narrow viewport had
+  no document-level horizontal overflow, and clearing the composer remains
+  `44px` even when the placeholder itself wraps.
+- Console output contains only the two known React Router v7 future-flag
+  warnings. Related authenticated requests returned `200`, apart from expected
+  StrictMode aborts immediately replaced by successful requests.
+- `npm run typecheck`, `npm run lint`, and `npm run build` passed. Vite retains
+  its existing non-fatal main-chunk size warning.
+
+## Assistant content 1.1 and static HTML report integration
+
+The authoritative OpenAPI, generated TypeScript, backend boundary documents,
+and Assistant fixture snapshot were refreshed through backend documentation
+commit `aa16233` and contract implementation `68866d8`. The renderer now accepts
+both historical content Schema `1.0` and current Schema `1.1`; unknown future
+versions still use the message-level plain-text fallback instead of guessing.
+
+- Schema `1.1` adds the product-owned `html_report` block. The frontend reads
+  only the backend-generated source identity and preview/download URLs. Available
+  reports render in an empty-permission `sandbox` iframe with no raw HTML
+  injection, scripts, same-origin permission, forms, popups, or external-resource
+  authority. Oversized and failed previews keep an explicit download fallback.
+- The assistant attachment upload guard and composer wording now match the
+  backend's 20 MiB per-file limit. The media allowlist and 20-file message limit
+  remain unchanged.
+- Chrome DevTools verification used the real authenticated stack at
+  `http://127.0.0.1:3000/` with a desktop `1440x900` viewport. Persisted message
+  `526ae79f-e6c9-4c25-b236-7f2920cde5d3` returned
+  `content_schema_version: "1.1"` with `markdown`, `resource_ref`, and `diagram`
+  blocks. The warning "内容版本 1.1 暂未支持" was absent; the real Task card and
+  execution-plan graph rendered, and the Task card navigated to
+  `/tasks/b619f191-7595-43f4-ab09-066ba5a466c2`.
+- The assistant page and the Task round trip both retained a 1440 px document
+  width with no horizontal overflow. All related authenticated requests returned
+  `200`; StrictMode aborts were immediately replaced by successful requests.
+  After replacing the inactive mounted assistant layer's `aria-hidden` behavior
+  with `inert`, the focus/accessibility console warning no longer reproduced and
+  the final Console was empty.
+- `npm run typecheck`, `npm run lint`, and `npm run build` passed. The production
+  build retains its existing non-fatal main-chunk size warning.
+
+No released `text/html` Artifact exists yet on the live stock-analysis Task, so
+the real persisted `html_report` iframe and download response remain the next
+end-to-end acceptance once that Task produces and the assistant references the
+report. The contracted fixture and frontend renderer are in place; no synthetic
+product record was created to fake this state.
 
 ## Known follow-up risks
 

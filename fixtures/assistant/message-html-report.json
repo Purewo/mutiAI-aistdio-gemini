@@ -1,0 +1,39 @@
+{
+  "message_id": "html-report-message-id",
+  "conversation_id": "html-report-conversation-id",
+  "sequence": 7,
+  "role": "assistant",
+  "status": "completed",
+  "content_schema_version": "1.1",
+  "text": "The static trend report is ready.",
+  "content_blocks": [
+    {
+      "type": "markdown",
+      "text": "The static trend report is ready.",
+      "truncated": false
+    },
+    {
+      "type": "html_report",
+      "text": "Preview or download the static trend report.",
+      "title": "Trend report",
+      "source": {
+        "kind": "artifact",
+        "task_id": "html-report-task-id",
+        "artifact_id": "html-report-artifact-id"
+      },
+      "render_mode": "static",
+      "preview_status": "available",
+      "preview_url": "/api/v1/tasks/html-report-task-id/artifacts/html-report-artifact-id/content",
+      "download_url": "/api/v1/tasks/html-report-task-id/artifacts/html-report-artifact-id/content?download=true",
+      "media_type": "text/html",
+      "byte_size": 24576,
+      "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    }
+  ],
+  "attachment_refs": [],
+  "reply_to_message_id": null,
+  "related_resource_type": "artifact",
+  "related_resource_id": "html-report-artifact-id",
+  "created_at": "2026-07-29T12:00:00Z",
+  "completed_at": "2026-07-29T12:00:01Z"
+}

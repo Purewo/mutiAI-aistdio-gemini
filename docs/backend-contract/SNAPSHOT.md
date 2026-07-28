@@ -1,7 +1,7 @@
 # Backend documentation snapshot metadata
 
 - Source repository: `Purewo/mutiAI`
-- Source commit: `808f996` (contract implementation `1cffbfb`)
+- Source commit: `aa16233` (contract implementation `68866d8`)
 - Sync date: `2026-07-29`
 - Snapshot method: Mechanically copied read-only backend boundary and acceptance documents.
 
@@ -10,7 +10,8 @@ rich-content and attachment boundaries, product-owned nested resource parents,
 explicit assistant-attachment Task input binding, Runtime feasibility policy,
 and planned Task Artifact handoff, including bounded Task replay and its
 immutable plan, Assignment, and Artifact lineage, plus stable activity phases
-and normalized organization media requirements. The
+and normalized organization media requirements, plus public HTTPS feasibility
+semantics and assistant content Schema `1.1` static HTML reports. The
 `/api/v1/assistant` payloads are part of the OpenAPI snapshot and the event
 schema under `contracts/events/`.
 

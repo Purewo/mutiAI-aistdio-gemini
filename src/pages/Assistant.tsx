@@ -31,6 +31,9 @@ const EMPTY_SUGGESTIONS = [
   '帮我建一个把业务数据变成分析报告的组织',
 ];
 
+const COMPOSER_MIN_HEIGHT = 44;
+const COMPOSER_MAX_HEIGHT = 128;
+
 export default function Assistant() {
   const user = useAuthenticatedUser();
   const conversation = useAssistantConversation(user.user_id);
@@ -63,6 +66,23 @@ export default function Assistant() {
     if (!element) return;
     element.scrollTop = element.scrollHeight;
   }, [messages, actions, activeTurn]);
+
+  useLayoutEffect(() => {
+    const element = composerRef.current;
+    if (!element) return;
+
+    if (input.length === 0) {
+      element.style.height = `${COMPOSER_MIN_HEIGHT}px`;
+      element.style.overflowY = 'hidden';
+      return;
+    }
+
+    // Reset before measuring so shrinking non-empty text is reflected.
+    element.style.height = 'auto';
+    const nextHeight = Math.min(Math.max(element.scrollHeight, COMPOSER_MIN_HEIGHT), COMPOSER_MAX_HEIGHT);
+    element.style.height = `${nextHeight}px`;
+    element.style.overflowY = element.scrollHeight > COMPOSER_MAX_HEIGHT ? 'auto' : 'hidden';
+  }, [input]);
 
   /**
    * Actions render under the assistant message that produced them, matched by the Turn that
@@ -268,7 +288,7 @@ export default function Assistant() {
                 pendingAttachments.attachments.length >= MAX_ASSISTANT_ATTACHMENTS_PER_MESSAGE
               }
               aria-label="添加附件"
-              title="添加 JSON、PDF、XLSX、图片、CSV、Markdown 或文本（单个不超过 10 MiB）"
+              title="添加 JSON、PDF、XLSX、图片、CSV、Markdown 或文本（单个不超过 20 MiB）"
               className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl text-slate-500 transition-colors hover:bg-slate-100 hover:text-indigo-700 focus:outline-none focus-visible:ring-4 focus-visible:ring-indigo-500/15 disabled:cursor-not-allowed disabled:opacity-40"
             >
               {pendingAttachments.uploadingCount > 0 ? (
@@ -292,7 +312,7 @@ export default function Assistant() {
               }
               rows={1}
               disabled={turnRunning}
-              className="max-h-40 min-h-[44px] flex-1 resize-none bg-transparent px-3 py-2.5 text-sm text-slate-700 placeholder-slate-400 focus:outline-none disabled:cursor-not-allowed"
+              className="max-h-32 min-h-[44px] flex-1 resize-none overflow-y-hidden bg-transparent px-3 py-2.5 text-sm text-slate-700 placeholder-slate-400 focus:outline-none disabled:cursor-not-allowed"
             />
             <button
               type="submit"
@@ -372,7 +392,9 @@ function MessageRow({
       <div className="min-w-0 flex-1 space-y-3">
         <div
           className={`rounded-2xl rounded-tl-sm border border-slate-200/60 bg-white px-4 py-3 text-sm leading-relaxed text-slate-700 shadow-sm ${
-            message.content_blocks.some((block) => block.type === 'diagram') ? 'max-w-full' : 'max-w-[90%]'
+            message.content_blocks.some((block) => block.type === 'diagram' || block.type === 'html_report')
+              ? 'max-w-full'
+              : 'max-w-[90%]'
           }`}
         >
           <AssistantMessageContent message={message} />

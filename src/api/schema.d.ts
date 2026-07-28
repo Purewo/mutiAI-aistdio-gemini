@@ -1155,7 +1155,7 @@ export interface components {
             /** Text */
             text: string;
             /** Content Blocks */
-            content_blocks: (components["schemas"]["TextContentBlock"] | components["schemas"]["MarkdownContentBlock"] | components["schemas"]["CodeContentBlock"] | components["schemas"]["ErrorContentBlock"] | components["schemas"]["AttachmentContentBlock"] | components["schemas"]["ResourceRefContentBlock"] | components["schemas"]["DiagramContentBlock"])[];
+            content_blocks: (components["schemas"]["TextContentBlock"] | components["schemas"]["MarkdownContentBlock"] | components["schemas"]["CodeContentBlock"] | components["schemas"]["ErrorContentBlock"] | components["schemas"]["AttachmentContentBlock"] | components["schemas"]["ResourceRefContentBlock"] | components["schemas"]["DiagramContentBlock"] | components["schemas"]["HtmlReportContentBlock"])[];
             /** Attachment Refs */
             attachment_refs: {
                 [key: string]: unknown;
@@ -1428,6 +1428,62 @@ export interface components {
             service: string;
             /** Environment */
             environment: string;
+        };
+        /**
+         * HtmlReportContentBlock
+         * @description A safe, product-validated static HTML Artifact preview.
+         */
+        HtmlReportContentBlock: {
+            /** Text */
+            text: string;
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            type: "html_report";
+            /** Title */
+            title: string;
+            source: components["schemas"]["HtmlReportSource"];
+            /**
+             * Render Mode
+             * @default static
+             * @constant
+             */
+            render_mode: "static";
+            /**
+             * Preview Status
+             * @enum {string}
+             */
+            preview_status: "available" | "too_large";
+            /** Preview Url */
+            preview_url: string;
+            /** Download Url */
+            download_url: string;
+            /**
+             * Media Type
+             * @default text/html
+             * @constant
+             */
+            media_type: "text/html";
+            /** Byte Size */
+            byte_size: number;
+            /** Sha256 */
+            sha256: string;
+        };
+        /**
+         * HtmlReportSource
+         * @description Product-owned source identity for a rendered HTML report.
+         */
+        HtmlReportSource: {
+            /**
+             * Kind
+             * @constant
+             */
+            kind: "artifact";
+            /** Task Id */
+            task_id: string;
+            /** Artifact Id */
+            artifact_id: string;
         };
         /** LoginRequest */
         LoginRequest: {
@@ -4884,6 +4940,15 @@ export interface operations {
             };
             /** @description Conflict */
             409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Request Entity Too Large */
+            413: {
                 headers: {
                     [name: string]: unknown;
                 };

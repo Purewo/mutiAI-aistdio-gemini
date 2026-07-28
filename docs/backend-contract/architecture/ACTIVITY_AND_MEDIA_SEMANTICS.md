@@ -57,11 +57,31 @@ identifies the affected role, Runtime binding, capability, required value, and
 alternatives.
 
 The default local Runtime profile explicitly supports common text, JSON, CSV,
-XLSX, PDF, JPEG, and PNG inputs and common text, JSON, CSV, and XLSX outputs. Its
+XLSX, PDF, JPEG, and PNG inputs and common text, Markdown, static HTML, JSON,
+CSV, PNG, and XLSX outputs. Its
 media inventory remains incomplete. An unlisted required format is therefore
 `capability_unknown`, not fabricated support or a fabricated hard mismatch.
 User-declared complete profiles remain authoritative and can produce a hard
 unsupported-media finding.
+
+## Public HTTPS destinations
+
+Feasibility validator `1.1` distinguishes a public HTTPS destination from a
+managed external-service integration. A bare public DNS hostname such as
+`stockanalysis.com`, or an explicit HTTPS URL without embedded credentials,
+uses the binding's `network_access` policy. It does not require the Runtime
+profile to enumerate every public hostname in `external_services`.
+
+Named integrations, credentialed APIs, proprietary services, private hosts, and
+non-HTTPS endpoints remain subject to the explicit external-service inventory.
+An incomplete inventory therefore continues to fail closed for requirements such
+as a Bloomberg Terminal or another managed service. `workspace_restricted`
+continues to disable network access regardless of hostname classification.
+
+This result proves only that product policy allows the Runtime to attempt the
+connection. Endpoint availability, response status, schema, timestamp, and data
+quality remain execution evidence and must be recorded in the resulting
+Artifact manifest.
 
 ## Attachment-backed Task inputs
 

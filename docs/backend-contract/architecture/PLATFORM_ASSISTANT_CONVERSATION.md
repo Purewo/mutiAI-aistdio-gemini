@@ -106,8 +106,8 @@ Runtime tool items, raw commands, hidden reasoning, and private model history ar
 `content_blocks` is the only rendering contract for a message. Each block carries
 a plain-text `text` fallback, and `content_schema_version` is stored on the
 message so clients can choose a compatible renderer. V1 uses validated blocks
-for Markdown, code, errors, attachments, product resource references, and
-product-backed diagrams. The legacy `text` field remains a compatibility
+for Markdown, code, errors, attachments, product resource references,
+product-backed diagrams, and static HTML report Artifacts. The legacy `text` field remains a compatibility
 projection and is not a source from which clients reconstruct structure.
 
 The Runtime output may contain ordinary `reply` Markdown and restricted
@@ -119,6 +119,13 @@ V1 does not accept Mermaid or arbitrary model-defined diagrams. Organization
 charts and execution-plan diagrams identify a persisted
 `OrganizationSpecVersion` or `TaskExecutionPlan`; the frontend renders them
 with the same graph components used by the organization and Task pages.
+
+Assistant content schema `1.1` adds `html_report`. The Runtime identifies only a
+released Artifact; the backend checks ownership, release state, `text/html`
+media, byte identity, and the static report policy before generating preview and
+download URLs. Raw HTML never enters the Message contract. V1 reports contain no
+JavaScript or external resources and render only in a sandboxed iframe. See
+`docs/architecture/HTML_REPORT_ARTIFACT.md`.
 
 Nested resource references may include an optional product-owned `parent`
 locator containing the parent resource type and ID. The backend resolves this
@@ -173,12 +180,13 @@ grant Runtime filesystem access.
 
 The supported upload media types are JSON, PDF, XLSX, JPEG, PNG, WebP, CSV,
 Markdown, plain text, and tab-separated text. Each upload is capped by
-`assistant_attachment_max_bytes` (10 MiB by default). The assistant's
+`assistant_attachment_max_bytes` (20 MiB by default). The assistant's
 `mutiai_get_attachment_content` tool is stricter: it reads only attached UTF-8
-JSON or text, refuses binary or malformed content, and refuses content over
-64 KiB without truncation or guessing. Explicit Task input conversion supports
-binary files but applies the Task input limit of 20 MiB and verifies the full
-byte stream without truncation.
+JSON, plain text, or Markdown, refuses binary or malformed content, and refuses
+content over 500 KiB without truncation or guessing. Each tool call returns at
+most 64 Ki characters and provides a character offset for safe continuation.
+Explicit Task input conversion supports binary files but applies the Task input
+limit of 20 MiB and verifies the full byte stream without truncation.
 
 ### AssistantTurn
 
