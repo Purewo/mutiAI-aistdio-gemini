@@ -7,8 +7,9 @@
  * editing in V1.
  */
 import { useEffect, useRef } from 'react';
-import { Crown, Info, User2 } from 'lucide-react';
+import { Crown, FileInput, FileOutput, Info, User2 } from 'lucide-react';
 import type { AgentRoleSpec, OrganizationSpec } from '../api/types';
+import { formatMediaTypes } from '../lib/media';
 
 interface RoleNode {
   role: AgentRoleSpec;
@@ -91,6 +92,41 @@ function RoleCard({ role }: { role: AgentRoleSpec }) {
       <p className="mb-3 line-clamp-3 text-xs leading-relaxed text-slate-600">
         {role.responsibility}
       </p>
+
+      {role.capability_requirements &&
+      (role.capability_requirements.input_media_types.length > 0 ||
+        role.capability_requirements.output_media_types.length > 0) ? (
+        <div className="mb-3 space-y-1.5 border-t border-slate-100 pt-2.5 text-[10px] text-slate-500">
+          {role.capability_requirements.input_media_types.length > 0 ? (
+            <p
+              className="flex items-start gap-1.5"
+              title={role.capability_requirements.input_media_types.join(', ')}
+            >
+              <FileInput className="mt-0.5 h-3 w-3 flex-shrink-0 text-slate-400" aria-hidden="true" />
+              <span>
+                输入格式：
+                <strong className="font-semibold text-slate-700">
+                  {formatMediaTypes(role.capability_requirements.input_media_types)}
+                </strong>
+              </span>
+            </p>
+          ) : null}
+          {role.capability_requirements.output_media_types.length > 0 ? (
+            <p
+              className="flex items-start gap-1.5"
+              title={role.capability_requirements.output_media_types.join(', ')}
+            >
+              <FileOutput className="mt-0.5 h-3 w-3 flex-shrink-0 text-slate-400" aria-hidden="true" />
+              <span>
+                输出格式：
+                <strong className="font-semibold text-slate-700">
+                  {formatMediaTypes(role.capability_requirements.output_media_types)}
+                </strong>
+              </span>
+            </p>
+          ) : null}
+        </div>
+      ) : null}
 
       <div className="flex flex-wrap items-center gap-1.5">
         {lead ? (

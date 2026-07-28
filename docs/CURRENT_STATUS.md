@@ -245,6 +245,46 @@ The live desktop acceptance used Task
 - `npm run typecheck`, `npm run lint`, and `npm run build` passed on
   2026-07-29. Vite retains its existing non-fatal main-chunk size warning.
 
+## Activity and media semantics acceptance
+
+The frontend contract snapshot and generated TypeScript were refreshed from
+backend worktree commit `808f996` (feature implementation `1cffbfb`). The new
+`activity_phase` field is consumed as the sole product activity wording for
+Task, Assignment, PlanStep, and RuntimeExecution resources. The frontend no
+longer infers activity from `turn_id`, `wait_reason`, or raw state transitions:
+
+- Task and Assignment badges use backend-derived labels such as `工作中`,
+  `工作中 · 等待结果`, `排队中`, `等待审批`, and `正在整理结果`.
+- Plan graph cards use each persisted PlanStep activity phase. Assignment
+  details show a separate Runtime activity badge while retaining the raw
+  Runtime status as a diagnostic field.
+- The captured `task-waiting-activity.json` fixture was rendered through the
+  real fixture route at desktop `1440x900`. Two records with the same raw
+  `waiting` status visibly rendered as `工作中 · 等待结果` and `排队中`.
+
+Organization media requirements are rendered only when the backend supplied
+normalized `capability_requirements`:
+
+- Organization role cards display friendly labels for backend MIME values,
+  including `Excel / XLSX`, `CSV`, `PDF`, and image formats, with the raw MIME
+  retained in the title tooltip.
+- Feasibility findings translate media capability names and values without
+  inventing support. Unknown or blocked findings remain backend-provided
+  preview results.
+- Task input binding cards display a friendly media label while retaining the
+  authoritative MIME value in the tooltip. Users still do not enter MIME types,
+  hashes, or storage paths.
+- The refreshed feasibility fixture set includes generic proposals with no
+  guessed media requirements, normalized Excel/CSV proposals, unknown-capability
+  drafts, blocked proposals, and the activity waiting example. The desktop
+  fixture route rendered the Excel/CSV proposal graph and a feasible check.
+
+The desktop browser run had no document horizontal overflow. Console output
+contained only the two known React Router v7 future-flag warnings, and related
+authenticated requests returned `200` apart from expected StrictMode aborts
+immediately replaced by successful requests. Mobile adaptation remains outside
+the V1 gate.
+
 ## Known follow-up risks
 
 - V1 currently targets desktop web browsers. Mobile and narrow-screen UX,

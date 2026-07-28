@@ -1,14 +1,14 @@
 {
-  "feasibility_check_id": "c4a6ab57-a643-4e13-b763-521ac3237713",
+  "feasibility_check_id": "9e0ff510-f261-4408-8cb3-7bdd39798be4",
   "target_type": "organization_version",
-  "target_id": "db02cbe4-4970-4ebe-8e7c-a676c2e1668c",
+  "target_id": "5a05ed9f-6118-4a2e-99e6-d3f84df94f40",
   "phase": "proposal",
   "validator_version": "1.0",
-  "input_hash": "537d4460a2eb35eb88b8d85ad1ba474690aa52bf2acb0dd25a34e1df6ea5a21c",
+  "input_hash": "2484aa0054fd58a99835e3e3291485a0b1fcfd1a7ad5f8dd5f70d33ceeaf7546",
   "requirements": [
     {
       "role_key": "lead",
-      "binding_key": "linux-standard",
+      "binding_key": "media-text-only",
       "requirements": {
         "schema_version": "1.0",
         "os_families": [],
@@ -31,12 +31,10 @@
     },
     {
       "role_key": "specialist",
-      "binding_key": "linux-standard",
+      "binding_key": "media-text-only",
       "requirements": {
         "schema_version": "1.0",
-        "os_families": [
-          "windows"
-        ],
+        "os_families": [],
         "requires_gui": false,
         "requires_gpu": false,
         "min_gpu_memory_mb": null,
@@ -47,7 +45,9 @@
         "required_external_services": [],
         "required_hardware": [],
         "required_proprietary_software": [],
-        "input_media_types": [],
+        "input_media_types": [
+          "application/pdf"
+        ],
         "output_media_types": [],
         "estimated_duration_seconds": null,
         "estimated_input_size_bytes": null,
@@ -58,40 +58,42 @@
   "profile_revisions": [
     {
       "role_key": "lead",
-      "binding_key": "linux-standard",
-      "runtime_binding_id": "2ed18518-f0ed-4d49-bbcc-f3e6a08f95e9",
-      "capability_profile_id": "7c1ef848-63c1-4778-b537-de3954380c9c",
+      "binding_key": "media-text-only",
+      "runtime_binding_id": "cd6eefca-9d1b-466c-8e7f-1b798498a661",
+      "capability_profile_id": "4ae30645-5d0d-4d0d-90e7-19bf860f369c",
       "revision": 1
     },
     {
       "role_key": "specialist",
-      "binding_key": "linux-standard",
-      "runtime_binding_id": "2ed18518-f0ed-4d49-bbcc-f3e6a08f95e9",
-      "capability_profile_id": "7c1ef848-63c1-4778-b537-de3954380c9c",
+      "binding_key": "media-text-only",
+      "runtime_binding_id": "cd6eefca-9d1b-466c-8e7f-1b798498a661",
+      "capability_profile_id": "4ae30645-5d0d-4d0d-90e7-19bf860f369c",
       "revision": 1
     }
   ],
   "outcome": "blocked",
   "findings": [
     {
-      "reason_code": "OS_CAPABILITY_MISMATCH",
+      "reason_code": "INPUT_MEDIA_UNSUPPORTED",
       "role_key": "specialist",
-      "binding_key": "linux-standard",
-      "capability": "os_family",
+      "binding_key": "media-text-only",
+      "capability": "supported_input_media_types",
       "required": [
-        "windows"
+        "application/pdf"
       ],
-      "actual": "linux",
+      "actual": [
+        "text/plain"
+      ],
       "alternative_codes": [
-        "use_linux_native_tool",
-        "use_compatible_binding"
+        "convert_input",
+        "use_capable_binding"
       ],
-      "message": "任务要求的操作系统与 Runtime 不匹配。",
+      "message": "Input media unsupported.",
       "alternatives": [
-        "改用可在 Linux 上运行的工具或流程。",
-        "改用操作系统兼容的 Runtime binding。"
+        "Convert input.",
+        "Use capable binding."
       ]
     }
   ],
-  "created_at": "2026-07-28T17:37:15.054963Z"
+  "created_at": "2026-07-28T17:37:15.778573Z"
 }

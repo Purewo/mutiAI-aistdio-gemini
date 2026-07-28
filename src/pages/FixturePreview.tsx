@@ -12,7 +12,9 @@
  */
 import { useState } from 'react';
 import { FlaskConical } from 'lucide-react';
-import type { Task } from '../api/types';
+import type { FeasibilityCheck, OrganizationVersion, Task } from '../api/types';
+import FeasibilityPanel from '../components/FeasibilityPanel';
+import OrganizationGraph from '../components/OrganizationGraph';
 import PageHeader from '../components/PageHeader';
 import PlanGraph from '../components/PlanGraph';
 import {
@@ -25,19 +27,25 @@ import linearPlanned from '../../fixtures/api/task-linear-planned.json';
 import linearCompleted from '../../fixtures/api/task-linear-completed.json';
 import parallelPlanned from '../../fixtures/api/task-parallel-planned.json';
 import parallelCompleted from '../../fixtures/api/task-parallel-completed.json';
-import waitingTask from '../../fixtures/api/task-waiting-waiting.json';
+import waitingActivityTask from '../../fixtures/feasibility/task-waiting-activity.json';
+import organizationMediaCheck from '../../fixtures/feasibility/organization-media-excel-csv-check.json';
+import organizationMediaProposal from '../../fixtures/feasibility/organization-media-excel-csv-proposal.json';
 import failedTask from '../../fixtures/api/task-failed-failed.json';
 
 /**
- * The fixtures were captured at baseline 356ae35, before `capability_requirements` joined
- * TaskResponse, so they are cast through unknown. Refreshing them is backend-owned work.
+ * Older task fixtures predate the current TaskResponse shape, so they are cast through unknown.
+ * The activity fixture is the current backend capture for the queue/result semantic acceptance.
  */
 const SCENARIOS: Array<{ key: string; label: string; task: Task }> = [
   { key: 'linear-planned', label: '线性 · 已规划', task: linearPlanned as unknown as Task },
   { key: 'parallel-planned', label: '并行 · 已规划', task: parallelPlanned as unknown as Task },
   { key: 'linear-completed', label: '线性 · 已完成', task: linearCompleted as unknown as Task },
   { key: 'parallel-completed', label: '并行 · 已完成', task: parallelCompleted as unknown as Task },
-  { key: 'waiting', label: '等待中', task: waitingTask as unknown as Task },
+  {
+    key: 'waiting-activity',
+    label: '活动语义 · 工作中/排队中',
+    task: waitingActivityTask as unknown as Task,
+  },
   { key: 'failed', label: '已失败', task: failedTask as unknown as Task },
 ];
 
@@ -49,7 +57,7 @@ export default function FixturePreview() {
 
   return (
     <div className="flex h-full flex-col bg-slate-50/50">
-      <PageHeader title="Fixture 预览（开发专用）" description="捕获自后端契约基线 356ae35 的固定响应" />
+      <PageHeader title="Fixture 预览（开发专用）" description="捕获自后端契约快照的固定响应" />
 
       <div className="border-b border-amber-200/60 bg-amber-50/80 px-6 py-2 sm:px-8">
         <p className="mx-auto flex max-w-5xl items-center gap-2 text-xs leading-relaxed text-amber-800">
@@ -79,7 +87,7 @@ export default function FixturePreview() {
 
           <section className="rounded-2xl border border-slate-200/60 bg-white p-5 shadow-sm">
             <div className="mb-2 flex flex-wrap items-center gap-2">
-              <TaskStatusBadge status={task.status} />
+              <TaskStatusBadge status={task.status} activityPhase={task.activity_phase} />
               {plan ? <PlanStatusBadge status={plan.status} /> : null}
               <span className="font-mono text-xs text-slate-400">{task.task_id}</span>
             </div>
@@ -115,7 +123,10 @@ export default function FixturePreview() {
                     {assignment.agent_role_key}
                   </span>
                   <span className="text-xs text-slate-400">{assignment.assignment_kind}</span>
-                  <AssignmentStatusBadge status={assignment.status} />
+                  <AssignmentStatusBadge
+                    status={assignment.status}
+                    activityPhase={assignment.activity_phase}
+                  />
                   {assignment.result_summary ? (
                     <DeliverySummary summary={assignment.result_summary} />
                   ) : null}
@@ -123,6 +134,22 @@ export default function FixturePreview() {
               ))}
             </ul>
           ) : null}
+
+          <section className="space-y-3 border-t border-slate-200 pt-6">
+            <div>
+              <h2 className="text-base font-bold text-slate-800">组织媒体要求 · Excel / CSV</h2>
+              <p className="mt-1 text-xs leading-relaxed text-slate-500">
+                后端从自然语言需求归一化后的岗位格式要求；未声明格式的普通组织不会显示这一块。
+              </p>
+              <p className="mt-2 rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 shadow-sm">
+                {(organizationMediaProposal as unknown as OrganizationVersion).source_request}
+              </p>
+            </div>
+            <OrganizationGraph
+              spec={(organizationMediaProposal as unknown as OrganizationVersion).spec}
+            />
+            <FeasibilityPanel checks={[organizationMediaCheck as unknown as FeasibilityCheck]} />
+          </section>
         </div>
       </div>
     </div>

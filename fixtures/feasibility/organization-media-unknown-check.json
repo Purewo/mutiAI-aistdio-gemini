@@ -1,19 +1,19 @@
 {
-  "feasibility_check_id": "d1bb9cf1-e7a7-4bcb-8548-b42f14d38d18",
-  "target_type": "task",
-  "target_id": "6fcac52d-0190-4b0d-85eb-3e99468ddd29",
-  "phase": "task_submission",
+  "feasibility_check_id": "f59995d2-e9ca-482d-b9f7-6b0d9eddf6aa",
+  "target_type": "organization_version",
+  "target_id": "9898dfe7-0c24-415e-a67b-e76d0864a05e",
+  "phase": "proposal",
   "validator_version": "1.0",
-  "input_hash": "8027b53ebd063dc4bf0f32c9cd04fedf423ce6f4fcd01c56014cca3f2270b55b",
+  "input_hash": "59e4bd027aadcfd1b587aba42fa58b69dfc35821ed18567d7ed32cb509bea835",
   "requirements": [
     {
       "role_key": "lead",
-      "binding_key": "linux-unknown-gpu",
+      "binding_key": "media-unknown",
       "requirements": {
         "schema_version": "1.0",
         "os_families": [],
         "requires_gui": false,
-        "requires_gpu": true,
+        "requires_gpu": false,
         "min_gpu_memory_mb": null,
         "min_cpu_capacity": "light",
         "min_memory_mb": null,
@@ -31,12 +31,12 @@
     },
     {
       "role_key": "specialist",
-      "binding_key": "linux-unknown-gpu",
+      "binding_key": "media-unknown",
       "requirements": {
         "schema_version": "1.0",
         "os_families": [],
         "requires_gui": false,
-        "requires_gpu": true,
+        "requires_gpu": false,
         "min_gpu_memory_mb": null,
         "min_cpu_capacity": "light",
         "min_memory_mb": null,
@@ -45,7 +45,10 @@
         "required_external_services": [],
         "required_hardware": [],
         "required_proprietary_software": [],
-        "input_media_types": [],
+        "input_media_types": [
+          "image/jpeg",
+          "image/png"
+        ],
         "output_media_types": [],
         "estimated_duration_seconds": null,
         "estimated_input_size_bytes": null,
@@ -56,55 +59,41 @@
   "profile_revisions": [
     {
       "role_key": "lead",
-      "binding_key": "linux-unknown-gpu",
-      "runtime_binding_id": "1a85754f-d5a4-46ef-911a-cf96a8e5cdd7",
-      "capability_profile_id": "8a652ff9-a26c-45f1-821c-aff83f5bccce",
+      "binding_key": "media-unknown",
+      "runtime_binding_id": "4a21d9f3-70b8-4ba9-a5d8-4239b64f702e",
+      "capability_profile_id": "9731a35a-2d4b-4401-bf80-d19abc80ee31",
       "revision": 1
     },
     {
       "role_key": "specialist",
-      "binding_key": "linux-unknown-gpu",
-      "runtime_binding_id": "1a85754f-d5a4-46ef-911a-cf96a8e5cdd7",
-      "capability_profile_id": "8a652ff9-a26c-45f1-821c-aff83f5bccce",
+      "binding_key": "media-unknown",
+      "runtime_binding_id": "4a21d9f3-70b8-4ba9-a5d8-4239b64f702e",
+      "capability_profile_id": "9731a35a-2d4b-4401-bf80-d19abc80ee31",
       "revision": 1
     }
   ],
   "outcome": "capability_unknown",
   "findings": [
     {
-      "reason_code": "GPU_CAPABILITY_UNKNOWN",
-      "role_key": "lead",
-      "binding_key": "linux-unknown-gpu",
-      "capability": "gpu_available",
-      "required": true,
-      "actual": null,
-      "alternative_codes": [
-        "declare_capabilities",
-        "use_capable_binding"
-      ],
-      "message": "Runtime 没有声明 GPU 能力。",
-      "alternatives": [
-        "补充可信的 Runtime 能力档案。",
-        "改用能力档案满足要求的 Runtime binding。"
-      ]
-    },
-    {
-      "reason_code": "GPU_CAPABILITY_UNKNOWN",
+      "reason_code": "MEDIA_CAPABILITY_UNKNOWN",
       "role_key": "specialist",
-      "binding_key": "linux-unknown-gpu",
-      "capability": "gpu_available",
-      "required": true,
+      "binding_key": "media-unknown",
+      "capability": "supported_input_media_types",
+      "required": [
+        "image/jpeg",
+        "image/png"
+      ],
       "actual": null,
       "alternative_codes": [
         "declare_capabilities",
         "use_capable_binding"
       ],
-      "message": "Runtime 没有声明 GPU 能力。",
+      "message": "Media capability unknown.",
       "alternatives": [
-        "补充可信的 Runtime 能力档案。",
-        "改用能力档案满足要求的 Runtime binding。"
+        "Declare capabilities.",
+        "Use capable binding."
       ]
     }
   ],
-  "created_at": "2026-07-28T17:37:15.224234Z"
+  "created_at": "2026-07-28T17:37:15.730836Z"
 }

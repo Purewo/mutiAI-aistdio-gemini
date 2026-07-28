@@ -15,7 +15,9 @@ Read these files before implementation:
 - `contracts/task-event.v1.json`
 - `fixtures/api/README.md`
 
-The contract baseline is backend commit `356ae35`. Use only repository-visible files and repository-relative paths. Do not invent backend fields, endpoints, or states.
+The contract baseline is backend worktree commit `808f996` (activity/media
+contract implementation `1cffbfb`). Use only repository-visible files and
+repository-relative paths. Do not invent backend fields, endpoints, or states.
 
 ## Real-integration and mock boundary
 

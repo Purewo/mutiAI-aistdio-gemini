@@ -764,6 +764,12 @@ export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
         /**
+         * ActivityPhase
+         * @description Product activity phases that do not expose state-machine internals.
+         * @enum {string}
+         */
+        ActivityPhase: "pending" | "submitted" | "queued" | "working" | "waiting_result" | "waiting_approval" | "waiting_external" | "validating_output" | "completed" | "needs_revision" | "blocked" | "failed" | "cancelled";
+        /**
          * AgentRoleSpec
          * @description One persistent formal role in an organization definition.
          */
@@ -944,6 +950,7 @@ export interface components {
             /** Replay Run Id */
             replay_run_id: string | null;
             status: components["schemas"]["AssignmentStatus"];
+            activity_phase: components["schemas"]["ActivityPhase"];
             /** Result Summary */
             result_summary: string | null;
             runtime_execution: components["schemas"]["RuntimeExecutionResponse"] | null;
@@ -1587,6 +1594,7 @@ export interface components {
             /** Dependency Step Ids */
             dependency_step_ids: string[];
             status: components["schemas"]["PlanStepStatus"];
+            activity_phase: components["schemas"]["ActivityPhase"];
             /** Assignment Id */
             assignment_id: string | null;
             /** Input Bindings */
@@ -1853,6 +1861,7 @@ export interface components {
             /** Network Access */
             network_access: boolean | null;
             status: components["schemas"]["RuntimeExecutionStatus"];
+            activity_phase: components["schemas"]["ActivityPhase"];
             /** Runtime Job Id */
             runtime_job_id: string | null;
             /** Thread Id */
@@ -2175,6 +2184,7 @@ export interface components {
             /** Replay Count */
             replay_count: number;
             status: components["schemas"]["TaskStatus"];
+            activity_phase: components["schemas"]["ActivityPhase"];
             /** Result Summary */
             result_summary: string | null;
             /** Assignments */

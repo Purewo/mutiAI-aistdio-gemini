@@ -1,12 +1,12 @@
 /**
  * Status badges for Task, plan, plan-step, and Assignment states.
  *
- * Labels translate the contracted enums for display; the underlying value always comes from the
- * backend. `waiting` is presented as a resumable boundary (Runtime Turn, capacity queue, or
- * approval), never as an error, and `needs_revision` is a lead decision awaiting user-directed
- * follow-up. Unknown enum values render as-is instead of crashing the view.
+ * Product activity wording comes from backend-derived `activity_phase`. Raw state-machine statuses
+ * remain available for diagnostics but are not used to guess whether work is queued, active, or
+ * waiting for a result. Unknown enum values render as-is instead of crashing the view.
  */
 import type {
+  ActivityPhase,
   AssignmentStatus,
   PlanStepStatus,
   TaskExecutionPlanStatus,
@@ -20,11 +20,66 @@ interface Presentation {
 
 const FALLBACK: Presentation = { label: '', tone: 'border-slate-200 bg-slate-50 text-slate-600' };
 
-function Badge({ presentation, raw }: { presentation: Presentation | undefined; raw: string }) {
+function Badge({
+  presentation,
+  raw,
+  title,
+}: {
+  presentation: Presentation | undefined;
+  raw: string;
+  title?: string;
+}) {
   const { label, tone } = presentation ?? { ...FALLBACK, label: raw };
   return (
-    <span className={`rounded-full border px-2.5 py-1 text-xs font-semibold ${tone}`}>{label}</span>
+    <span
+      className={`rounded-full border px-2.5 py-1 text-xs font-semibold ${tone}`}
+      title={title}
+    >
+      {label}
+    </span>
   );
+}
+
+/**
+ * Backend-derived product activity wording. This is deliberately separate from the state-machine
+ * status: clients must display this field rather than infer activity from Runtime IDs or wait
+ * diagnostics.
+ */
+const ACTIVITY: Record<ActivityPhase, Presentation> = {
+  pending: { label: '尚未开始', tone: 'border-slate-200 bg-slate-50 text-slate-600' },
+  submitted: { label: '已提交', tone: 'border-blue-200 bg-blue-50 text-blue-700' },
+  queued: { label: '排队中', tone: 'border-amber-200 bg-amber-50 text-amber-700' },
+  working: { label: '工作中', tone: 'border-indigo-200 bg-indigo-50 text-indigo-700' },
+  waiting_result: {
+    label: '工作中 · 等待结果',
+    tone: 'border-indigo-200 bg-indigo-50 text-indigo-700',
+  },
+  waiting_approval: { label: '等待审批', tone: 'border-amber-200 bg-amber-50 text-amber-700' },
+  waiting_external: { label: '等待中', tone: 'border-amber-200 bg-amber-50 text-amber-700' },
+  validating_output: {
+    label: '正在整理结果',
+    tone: 'border-violet-200 bg-violet-50 text-violet-700',
+  },
+  completed: { label: '已完成', tone: 'border-emerald-200/50 bg-emerald-50 text-emerald-700' },
+  needs_revision: { label: '需修订', tone: 'border-orange-200 bg-orange-50 text-orange-700' },
+  blocked: { label: '已阻断', tone: 'border-red-200 bg-red-50 text-red-700' },
+  failed: { label: '失败', tone: 'border-red-200 bg-red-50 text-red-700' },
+  cancelled: { label: '已取消', tone: 'border-slate-300 bg-slate-100 text-slate-500' },
+};
+
+function activityPhaseLabel(activityPhase: ActivityPhase | null | undefined): string | null {
+  return activityPhase ? ACTIVITY[activityPhase]?.label ?? activityPhase : null;
+}
+
+export function ActivityPhaseBadge({
+  activityPhase,
+  title,
+}: {
+  activityPhase: ActivityPhase | null | undefined;
+  title?: string;
+}) {
+  if (!activityPhase) return null;
+  return <Badge presentation={ACTIVITY[activityPhase]} raw={activityPhase} title={title} />;
 }
 
 const TASK: Record<TaskStatus, Presentation> = {
@@ -38,8 +93,21 @@ const TASK: Record<TaskStatus, Presentation> = {
   cancelled: { label: '已取消', tone: 'border-slate-300 bg-slate-100 text-slate-500' },
 };
 
-export function TaskStatusBadge({ status }: { status: TaskStatus }) {
-  return <Badge presentation={TASK[status]} raw={status} />;
+export function TaskStatusBadge({
+  status,
+  activityPhase,
+}: {
+  status: TaskStatus;
+  activityPhase?: ActivityPhase | null;
+}) {
+  return activityPhase ? (
+    <ActivityPhaseBadge
+      activityPhase={activityPhase}
+      title={`活动阶段：${activityPhaseLabel(activityPhase)} · 任务状态：${status}`}
+    />
+  ) : (
+    <Badge presentation={TASK[status]} raw={status} />
+  );
 }
 
 const PLAN: Record<TaskExecutionPlanStatus, Presentation> = {
@@ -69,8 +137,21 @@ const PLAN_STEP: Record<PlanStepStatus, Presentation> = {
   cancelled: { label: '已取消', tone: 'border-slate-300 bg-slate-100 text-slate-500' },
 };
 
-export function PlanStepStatusBadge({ status }: { status: PlanStepStatus }) {
-  return <Badge presentation={PLAN_STEP[status]} raw={status} />;
+export function PlanStepStatusBadge({
+  status,
+  activityPhase,
+}: {
+  status: PlanStepStatus;
+  activityPhase?: ActivityPhase | null;
+}) {
+  return activityPhase ? (
+    <ActivityPhaseBadge
+      activityPhase={activityPhase}
+      title={`活动阶段：${activityPhaseLabel(activityPhase)} · 步骤状态：${status}`}
+    />
+  ) : (
+    <Badge presentation={PLAN_STEP[status]} raw={status} />
+  );
 }
 
 const ASSIGNMENT: Record<AssignmentStatus, Presentation> = {
@@ -83,8 +164,21 @@ const ASSIGNMENT: Record<AssignmentStatus, Presentation> = {
   cancelled: { label: '已取消', tone: 'border-slate-300 bg-slate-100 text-slate-500' },
 };
 
-export function AssignmentStatusBadge({ status }: { status: AssignmentStatus }) {
-  return <Badge presentation={ASSIGNMENT[status]} raw={status} />;
+export function AssignmentStatusBadge({
+  status,
+  activityPhase,
+}: {
+  status: AssignmentStatus;
+  activityPhase?: ActivityPhase | null;
+}) {
+  return activityPhase ? (
+    <ActivityPhaseBadge
+      activityPhase={activityPhase}
+      title={`活动阶段：${activityPhaseLabel(activityPhase)} · 岗位状态：${status}`}
+    />
+  ) : (
+    <Badge presentation={ASSIGNMENT[status]} raw={status} />
+  );
 }
 
 /**

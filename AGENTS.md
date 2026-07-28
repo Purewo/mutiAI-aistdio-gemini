@@ -63,6 +63,7 @@ desktop browser, including Console, Network, desktop layout, and reconnect
 behavior when applicable. Record the verified URL, state, and any remaining
 risk in `docs/CURRENT_STATUS.md` or the relevant task document.
 
-The active branch at takeover is `feat/m3-frontend-foundation`, with frontend
-baseline `ad9d659` and contract snapshot source `b409e9b`. Compare current
-`HEAD` and `contracts/SNAPSHOT.md` before relying on those hashes.
+The active branch at takeover is `feat/m3-frontend-foundation`, with the current
+frontend baseline recorded in `git log` and contract snapshot source recorded in
+`contracts/SNAPSHOT.md`. Compare current `HEAD` and the snapshot metadata before
+relying on historical hashes.

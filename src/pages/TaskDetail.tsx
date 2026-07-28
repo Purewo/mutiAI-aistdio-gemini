@@ -42,6 +42,7 @@ import TaskReplayPanel from '../components/TaskReplayPanel';
 import TaskTimingPanel from '../components/TaskTimingPanel';
 import TaskUsagePanel from '../components/TaskUsagePanel';
 import {
+  ActivityPhaseBadge,
   AssignmentStatusBadge,
   DeliverySummary,
   PlanStatusBadge,
@@ -102,7 +103,10 @@ export default function TaskDetail() {
   const task = live.task;
 
   return (
-    <Shell status={<TaskStatusBadge status={task.status} />} organizationId={task.organization_id}>
+    <Shell
+      status={<TaskStatusBadge status={task.status} activityPhase={task.activity_phase} />}
+      organizationId={task.organization_id}
+    >
       <div className="mx-auto max-w-6xl space-y-8">
         {live.connection !== 'live' ? (
           <ReconnectBanner
@@ -865,7 +869,10 @@ function AssignmentsSection({ task }: { task: Task }) {
                   {assignment.agent_role_key}
                 </span>
                 <span className="text-xs text-slate-400">{assignment.assignment_kind}</span>
-                <AssignmentStatusBadge status={assignment.status} />
+                <AssignmentStatusBadge
+                  status={assignment.status}
+                  activityPhase={assignment.activity_phase}
+                />
                 {assignment.replay_run_id && replayNumberById.has(assignment.replay_run_id) ? (
                   <span className="rounded-full border border-violet-200 bg-violet-50 px-2 py-0.5 text-[11px] font-semibold text-violet-700">
                     第 {replayNumberById.get(assignment.replay_run_id)} 次重放
@@ -889,6 +896,15 @@ function AssignmentsSection({ task }: { task: Task }) {
               */}
               {execution ? (
                 <dl className="mt-2 flex flex-wrap gap-x-6 gap-y-0.5 text-[11px] text-slate-400">
+                  <div className="flex gap-1">
+                    <dt>Runtime 活动</dt>
+                    <dd>
+                      <ActivityPhaseBadge
+                        activityPhase={execution.activity_phase}
+                        title={`Runtime 状态：${execution.status}`}
+                      />
+                    </dd>
+                  </div>
                   <div className="flex gap-1">
                     <dt>Runtime 状态</dt>
                     <dd>{execution.status}</dd>

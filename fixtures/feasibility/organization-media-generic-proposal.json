@@ -1,0 +1,71 @@
+{
+  "spec_version_id": "06f99b69-b984-4406-8da4-2f630a3247d8",
+  "organization_id": "c573e19a-2289-4298-94bc-94eba0958bdf",
+  "version_number": 1,
+  "status": "proposal",
+  "spec": {
+    "schema_version": "1.0",
+    "name": "Runtime Feasibility Demo",
+    "description": "Captured feasibility contract fixture",
+    "roles": [
+      {
+        "role_key": "lead",
+        "name": "Organization Lead",
+        "responsibility": "Plan, delegate, review, and summarize",
+        "is_lead": true,
+        "reports_to": null,
+        "runtime_binding_key": "codex-local-default",
+        "capability_requirements": {
+          "schema_version": "1.0",
+          "os_families": [],
+          "requires_gui": false,
+          "requires_gpu": false,
+          "min_gpu_memory_mb": null,
+          "min_cpu_capacity": "light",
+          "min_memory_mb": null,
+          "required_tools": [],
+          "requires_network": false,
+          "required_external_services": [],
+          "required_hardware": [],
+          "required_proprietary_software": [],
+          "input_media_types": [],
+          "output_media_types": [],
+          "estimated_duration_seconds": null,
+          "estimated_input_size_bytes": null,
+          "resource_intensive": false
+        }
+      },
+      {
+        "role_key": "specialist",
+        "name": "Specialist",
+        "responsibility": "Analyze bounded data.",
+        "is_lead": false,
+        "reports_to": "lead",
+        "runtime_binding_key": "codex-local-default",
+        "capability_requirements": {
+          "schema_version": "1.0",
+          "os_families": [],
+          "requires_gui": false,
+          "requires_gpu": false,
+          "min_gpu_memory_mb": null,
+          "min_cpu_capacity": "light",
+          "min_memory_mb": null,
+          "required_tools": [],
+          "requires_network": false,
+          "required_external_services": [],
+          "required_hardware": [],
+          "required_proprietary_software": [],
+          "input_media_types": [],
+          "output_media_types": [],
+          "estimated_duration_seconds": null,
+          "estimated_input_size_bytes": null,
+          "resource_intensive": false
+        }
+      }
+    ]
+  },
+  "source_request": "创建一个数据分析团队",
+  "created_at": "2026-07-28T17:37:15.622511Z",
+  "confirmed_at": null,
+  "published_at": null
+}

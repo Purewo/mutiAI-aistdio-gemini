@@ -1,5 +1,5 @@
 {
-  "source_commit": "a4bced0ca2919f0e7c6647685a50da6d387d78f7",
+  "source_commit": "1cffbfba90bcca6f9cedb1630146ab1831fbfdb7",
   "generator": "scripts/export_feasibility_fixtures.py",
   "transport": "FastAPI TestClient",
   "locale": "zh-CN"

@@ -16,6 +16,7 @@ import type {
 } from '../api/types';
 import type { AssistantAttachmentInput } from '../assistant/taskInputBindings';
 import { formatBytes } from '../lib/format';
+import { formatMediaType } from '../lib/media';
 
 interface InputTrace {
   contractKey: string;
@@ -155,7 +156,9 @@ export default function TaskInputBindingStatus({
                       ) : null}
                     </div>
                     <div className="mt-1.5 flex min-w-0 flex-wrap gap-x-2 gap-y-0.5 text-[10px] text-slate-400">
-                      <span className="truncate" title={trace.mediaType}>{trace.mediaType}</span>
+                      <span className="truncate" title={trace.mediaType}>
+                        {formatMediaType(trace.mediaType)}
+                      </span>
                       {trace.attachmentId ? (
                         <span className="font-mono" title={trace.attachmentId}>
                           attachment:{shortIdentity(trace.attachmentId)}

@@ -3780,6 +3780,26 @@
   },
   "components": {
     "schemas": {
+      "ActivityPhase": {
+        "type": "string",
+        "enum": [
+          "pending",
+          "submitted",
+          "queued",
+          "working",
+          "waiting_result",
+          "waiting_approval",
+          "waiting_external",
+          "validating_output",
+          "completed",
+          "needs_revision",
+          "blocked",
+          "failed",
+          "cancelled"
+        ],
+        "title": "ActivityPhase",
+        "description": "Product activity phases that do not expose state-machine internals."
+      },
       "AgentRoleSpec": {
         "properties": {
           "role_key": {
@@ -4302,6 +4322,9 @@
           "status": {
             "$ref": "#/components/schemas/AssignmentStatus"
           },
+          "activity_phase": {
+            "$ref": "#/components/schemas/ActivityPhase"
+          },
           "result_summary": {
             "anyOf": [
               {
@@ -4364,6 +4387,7 @@
           "plan_step_id",
           "replay_run_id",
           "status",
+          "activity_phase",
           "result_summary",
           "runtime_execution",
           "created_at",
@@ -6283,6 +6307,9 @@
           "status": {
             "$ref": "#/components/schemas/PlanStepStatus"
           },
+          "activity_phase": {
+            "$ref": "#/components/schemas/ActivityPhase"
+          },
           "assignment_id": {
             "anyOf": [
               {
@@ -6366,6 +6393,7 @@
           "output_contracts",
           "dependency_step_ids",
           "status",
+          "activity_phase",
           "assignment_id",
           "input_bindings",
           "created_at",
@@ -7115,6 +7143,9 @@
           "status": {
             "$ref": "#/components/schemas/RuntimeExecutionStatus"
           },
+          "activity_phase": {
+            "$ref": "#/components/schemas/ActivityPhase"
+          },
           "runtime_job_id": {
             "anyOf": [
               {
@@ -7337,6 +7368,7 @@
           "sandbox_mode",
           "network_access",
           "status",
+          "activity_phase",
           "runtime_job_id",
           "thread_id",
           "turn_id",
@@ -8154,6 +8186,9 @@
           "status": {
             "$ref": "#/components/schemas/TaskStatus"
           },
+          "activity_phase": {
+            "$ref": "#/components/schemas/ActivityPhase"
+          },
           "result_summary": {
             "anyOf": [
               {
@@ -8254,6 +8289,7 @@
           "max_replay_count",
           "replay_count",
           "status",
+          "activity_phase",
           "result_summary",
           "assignments",
           "execution_plan",

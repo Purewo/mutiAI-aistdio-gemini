@@ -89,7 +89,7 @@ function StepCard({
           <p className="truncate text-sm font-semibold text-slate-900">{step.step_key}</p>
           <p className="truncate font-mono text-[11px] text-slate-400">岗位 {step.role_key}</p>
         </div>
-        <PlanStepStatusBadge status={step.status} />
+        <PlanStepStatusBadge status={step.status} activityPhase={step.activity_phase} />
       </div>
 
       {/* Wrappers keep line-clamp working: it needs display:-webkit-box, which a flex child loses. */}

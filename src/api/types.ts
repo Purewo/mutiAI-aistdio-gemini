@@ -12,6 +12,9 @@ import type { components } from './schema';
 
 type Schemas = components['schemas'];
 
+/* Stable product activity wording */
+export type ActivityPhase = Schemas['ActivityPhase'];
+
 /* Account */
 export type User = Schemas['UserResponse'];
 export type LoginRequest = Schemas['LoginRequest'];

@@ -8,6 +8,7 @@
  */
 import { AlertTriangle, CheckCircle2, HelpCircle, ShieldAlert } from 'lucide-react';
 import type { FeasibilityCheck, FeasibilityFinding, FeasibilityOutcome } from '../api/types';
+import { formatMediaType } from '../lib/media';
 
 const OUTCOME_PRESENTATION: Record<
   FeasibilityOutcome,
@@ -53,9 +54,30 @@ export function FeasibilityOutcomeBadge({ outcome }: { outcome: FeasibilityOutco
   );
 }
 
-function formatCapabilityValue(value: unknown): string {
+function capabilityLabel(capability: string): string {
+  return (
+    {
+      input_media_types: '输入格式',
+      output_media_types: '输出格式',
+      supported_input_media_types: '支持的输入格式',
+      supported_output_media_types: '支持的输出格式',
+    }[capability] ?? capability
+  );
+}
+
+function formatCapabilityValue(capability: string, value: unknown): string {
   if (value === null || value === undefined) return '未声明';
-  if (Array.isArray(value)) return value.length > 0 ? value.join(', ') : '（空）';
+  if (Array.isArray(value)) {
+    return value.length > 0
+      ? value
+          .map((item) =>
+            capability.includes('media_types') && typeof item === 'string'
+              ? formatMediaType(item)
+              : item,
+          )
+          .join('、')
+      : '（空）';
+  }
   if (typeof value === 'object') return JSON.stringify(value);
   return String(value);
 }
@@ -76,8 +98,9 @@ function FindingRow({ finding }: { finding: FeasibilityFinding }) {
           {finding.binding_key}
         </span>
         <span className="rounded-full border border-slate-200 bg-slate-50 px-2 py-0.5 text-slate-600">
-          {finding.capability}：需 {formatCapabilityValue(finding.required)} / 实际{' '}
-          {formatCapabilityValue(finding.actual)}
+          {capabilityLabel(finding.capability)}：需{' '}
+          {formatCapabilityValue(finding.capability, finding.required)} / 实际{' '}
+          {formatCapabilityValue(finding.capability, finding.actual)}
         </span>
       </div>
 
