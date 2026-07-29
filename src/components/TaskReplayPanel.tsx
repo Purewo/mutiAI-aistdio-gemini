@@ -56,18 +56,6 @@ function ReplayStatusBadge({ status }: { status: TaskReplayStatus }) {
   );
 }
 
-function isStrictLinear(steps: readonly PlanStep[]): boolean {
-  const ordered = [...steps].sort((left, right) => left.sequence - right.sequence);
-  if (ordered.length === 0) return false;
-  return ordered.every((step, index) => {
-    if (index === 0) return step.dependency_step_ids.length === 0;
-    return (
-      step.dependency_step_ids.length === 1 &&
-      step.dependency_step_ids[0] === ordered[index - 1].plan_step_id
-    );
-  });
-}
-
 function specialistSteps(task: Task): PlanStep[] {
   return (task.base_execution_plan?.steps ?? task.execution_plan?.steps ?? []).filter(
     (step) => step.step_kind === 'specialist',
@@ -268,7 +256,6 @@ function ReplayComposer({
   onReconnect: () => void;
 }) {
   const baseSteps = useMemo(() => specialistSteps(task), [task]);
-  const linear = isStrictLinear(task.base_execution_plan?.steps ?? []);
   const stepOnlyTargets = baseSteps.filter((step) => step.output_contracts.length > 0);
   const [scope, setScope] = useState<TaskReplayScope>('full');
   const [targetStepId, setTargetStepId] = useState('');
@@ -368,9 +355,9 @@ function ReplayComposer({
                 value="from_step"
                 current={scope}
                 title="从某一步继续"
-                description="复用上游产物，重做所选步骤及其后续步骤。"
-                disabled={!linear}
-                disabledHint="并行计划不支持线性后缀重放"
+                description="复用旁路和上游产物，重做所选步骤的完整下游闭包。"
+                disabled={baseSteps.length === 0}
+                disabledHint="当前计划没有可重放的岗位步骤"
                 onChange={setScope}
               />
               <ScopeOption

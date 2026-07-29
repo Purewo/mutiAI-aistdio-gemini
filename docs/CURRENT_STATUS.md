@@ -359,6 +359,50 @@ product record was created to fake this state.
   historical references but now point to Codex ownership; do not use them as
   current assignment instructions.
 
+## Mixed topology browser acceptance
+
+The mixed-topology contract snapshot is synced from backend commit
+`1a30205` under `docs/backend-contract/architecture/MIXED_TASK_TOPOLOGY.md`
+and `docs/backend-contract/acceptance/MIXED_TOPOLOGY_SCENARIO.md`. On the live
+desktop stack at `http://127.0.0.1:3000/`, Task
+`5b218f5a-1b7c-4903-8330-13d058d56667` used the published organization
+`87cca41d-7771-4a81-a754-76837cac14e7` and completed the real four-wave DAG:
+
+- `sales_totals` and `cost_totals` were independent ready roots and ran in the
+  same wave.
+- `join_profit_metrics` was created only after both root Artifacts were
+  released.
+- `interpret_performance` and `audit_margin_difference` were created in the
+  same downstream wave after the join Artifact.
+- `final_lead_review` was created only after both terminal Artifacts were
+  released and completed the Task.
+
+The UI rendered the graph from `dependency_step_ids`, labelled the topology as
+mixed serial-parallel, exposed released input and specialist Artifacts, and
+showed the final review. A real technical Retry recovered the failed
+`audit_margin_difference` branch after an intentional product validation
+failure (`Unexpected UTF-8 BOM`); the completed sibling and all upstream
+Artifacts remained unchanged, and `replay_count` stayed zero. The final
+Artifact JSON returned HTTP 200 and contained the expected sales, cost, profit,
+highest-store values, and margins. The backend's `margin_audit_json` reports
+`6.39` percentage points because it subtracts the two rounded margins; the
+scenario's unrounded calculation is approximately `6.38`, so this arithmetic
+rounding policy remains a backend follow-up rather than a frontend rewrite.
+
+Desktop `1440x900` had no horizontal overflow (`scrollWidth === clientWidth`),
+and after reconnect the event log remained 139 unique sequence numbers. The
+Console contained only the known React Router future-flag warnings plus one
+backend-generated 500 for the permanently mounted Assistant's old Schema 1.1
+message history. The mixed worktree is based before backend commits `68866d8`
+and `aa16233`; it must be rebased or merged with those Assistant Schema 1.1
+fixes before this 500 can be considered resolved. No mobile acceptance was run;
+mobile is intentionally outside the V1 target.
+
+The frontend correction made in this gate removes the obsolete strict-linear
+guard from the `from_step` replay control. Mixed DAGs now submit the contracted
+downstream-closure replay scope; the backend remains authoritative for the
+actual closure and lineage.
+
 ## Next acceptance gate
 
 Continue from the backend M3 gate: run the deterministic wait/cancel,

@@ -2,10 +2,9 @@
  * Renders a persisted TaskExecutionPlan as a layered dependency graph.
  *
  * Edges come exclusively from each step's `plan_step_id` and `dependency_step_ids`; array order is
- * never used to infer topology. Steps are layered by dependency depth, so the two contracted M2.3
- * shapes render naturally: a strict-linear chain becomes one column of single-step layers, and a
- * parallel fan-out becomes one wide layer of specialists joined by the lead-review layer. The
- * component draws whatever the persisted edges describe and offers no editing.
+ * never used to infer topology. Steps are layered by dependency depth, so strict-linear, pure-
+ * parallel, and arbitrary mixed DAGs render from the same persisted contract. The component draws
+ * whatever the persisted edges describe and offers no editing.
  */
 import { ChevronDown, ChevronRight, Crown, User2, Workflow } from 'lucide-react';
 import type { PlanStep } from '../api/types';
@@ -184,8 +183,7 @@ function StepCard({
 
 /**
  * Describe the shape the persisted dependencies actually form, so a reader does not have to infer
- * concurrency from the layout. Only the two contracted M2.3 shapes are named; anything else is
- * reported neutrally rather than guessed at.
+ * concurrency from the layout.
  */
 function describeTopology(layers: LayeredStep[][]): string {
   const widths = layers.map((layer) => layer.length);
@@ -194,7 +192,10 @@ function describeTopology(layers: LayeredStep[][]): string {
     return `严格线性：${widths.length} 个步骤依次执行，每一步都要等上一步完成。`;
   }
   const widest = Math.max(...widths);
-  return `并行分支：最宽一层有 ${widest} 个步骤可同时执行，其余按依赖先后进行。`;
+  if (widths.length === 2 && widths[0] > 1 && widths[1] === 1) {
+    return `纯并行：${widths[0]} 个岗位步骤可同时执行，完成后进入负责人审核。`;
+  }
+  return `混合串并行：共 ${widths.length} 个依赖阶段，最宽一层有 ${widest} 个步骤可同时执行。`;
 }
 
 export default function PlanGraph({
