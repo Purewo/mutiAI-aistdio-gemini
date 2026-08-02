@@ -1639,3 +1639,42 @@ regeneration or additional browser gate is required. F0 through F2, D1-A
 through D1-E, and Q0 are accepted. Feature work is frozen while the frontend
 and backend enter combined review, semantic merge, and release-candidate
 closure.
+
+## Integrated main candidate audit (2026-08-02)
+
+The complete `feat/m3-frontend-foundation` history was reviewed and
+fast-forwarded into local `main`; both local branches pointed to candidate
+commit `aaa7387` at the merge gate. The repository had one frontend worktree,
+no stash, and no additional local or remote frontend feature branch. The
+candidate includes the accepted Assistant rich-content/input flow,
+organization preview, mixed-DAG Replay, Task Graph Projection, D1 Artifact
+Streams, Q0 role queue, F0-F2 Coordination, Expert Marketplace, Channel,
+theme, and responsive surfaces.
+
+The frontend OpenAPI snapshot, backend main snapshot, and live
+`http://127.0.0.1:8150/api/openapi.json` were semantically identical at 89
+paths and 209 schemas. Regenerating `src/api/schema.d.ts` produced no diff.
+`npm run typecheck`, `npm run lint`, `npm run build`, and `git diff --check`
+passed on `main`; the build retained only the existing non-fatal 919.39 kB
+main-chunk warning.
+
+Chrome DevTools MCP completed the post-merge browser gate through
+`http://127.0.0.1:3168` with its proxy targeting backend main at
+`http://127.0.0.1:8150`. The published organization
+`7d7c9c5b-4e00-4e46-86a6-ffdd2f8528a4` rendered the read-only organization
+blueprint, and completed Task `4e0cc1ae-cce9-4da3-ab48-f6965545137f`
+rendered Projection `1.4`, the feedback-loop canvas, persisted Artifacts,
+execution details, usage, approvals, and terminal event stream. Desktop
+`1440x900` and portrait `390x844` had no document horizontal overflow; the
+portrait gate found no visible interaction target below 44px. Theme switching
+worked in both directions. Console contained only the two existing React
+Router v7 future-flag warnings. Authenticated Task, graph, stream, execution,
+usage, approval, organization, Assistant, and SSE requests completed with HTTP
+200; initial aborted duplicate reads were React StrictMode replacements.
+
+Post-merge screenshots are retained at
+`C:\Users\28788\AppData\Local\Temp\nexwork-main-final-desktop.png`,
+`nexwork-main-final-mobile-390x844.png`,
+`nexwork-main-task-desktop-1440x900.png`, and
+`nexwork-main-task-mobile-390x844.png`. The frontend remains served on port
+3168 against backend main on 8150 for the next deep-integration pressure pass.
