@@ -15,6 +15,7 @@ import { useApiResource } from '../api/useApiResource';
 import ExpertCapabilityPanel from '../components/ExpertCapabilityPanel';
 import PageHeader from '../components/PageHeader';
 import { ErrorState, InlineError, LoadingState } from '../components/states';
+import { describeExpertUnavailability } from '../expert/eligibility';
 import { formatDateTime } from '../lib/format';
 
 export default function ExpertDetail() {
@@ -148,12 +149,7 @@ export default function ExpertDetail() {
                 {!version.eligible ? (
                   <div className="flex items-start gap-2 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2.5 text-xs leading-5 text-amber-800">
                     <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
-                    <span>
-                      此版本不能创建新会话
-                      {version.eligibility_reason_codes.length > 0
-                        ? `：${version.eligibility_reason_codes.join('、')}`
-                        : '。'}
-                    </span>
+                    <span>{describeExpertUnavailability(version.eligibility_reason_codes)}</span>
                   </div>
                 ) : null}
 

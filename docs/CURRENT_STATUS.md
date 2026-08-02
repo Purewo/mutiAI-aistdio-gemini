@@ -1710,3 +1710,41 @@ web-conversation persistence rule without changing the public OpenAPI shape;
 the frontend, backend snapshot, and current 8150 OpenAPI remain semantically
 identical at 89 paths and 209 schemas. The singleton migration is not yet live
 on 8150 because that service has not been restarted.
+
+## Expert Marketplace customer-facing copy reduction (2026-08-02)
+
+The Expert Marketplace now keeps its visual Hero as a concise first-use guide:
+one product headline plus the three steps “选择能力 / 开始试用 / 添加到组织”.
+The duplicate page subtitle, zero-value metric cards, English operator labels,
+implementation nouns, contract disclaimers, and demo-data statement were
+removed from the catalog surface. Classification, version pinning, trial
+isolation, and typed API behavior remain unchanged.
+
+Category browsing now starts with “选择能力类型”. Search and filter copy uses
+the customer-facing terms “搜索专家或能力”, “服务来源”, “使用方式”, and “可用状态”.
+The empty state distinguishes a genuinely empty directory from an active search
+or filter with no match. Catalog cards no longer repeat both the short
+description and capability purpose, repeat the Provider as a tag, or show a
+disabled trial button beside an unavailable badge and reason.
+
+Backend eligibility reason codes remain authoritative but are no longer exposed
+as customer prose. The observed `runtime_provider_not_configured` state is
+presented as “服务暂未配置完成，当前无法试用”; unknown codes use a generic
+unavailable message. The same presentation helper is used by the catalog and
+Expert detail pages.
+
+Chrome DevTools MCP verified `http://127.0.0.1:3168/experts` against backend
+`8150`. The real directory returned two Dify Experts and four operator
+categories. The catalog, category, search, conversation, and authentication
+reads completed with HTTP 200 after expected React StrictMode replacement
+aborts. Search rendered the distinct filtered-empty copy, and clearing it
+restored both real cards. Desktop `1440x900` and portrait `360x800`, `390x844`,
+`393x852`, `412x915`, and `430x932` all had
+`scrollWidth === clientWidth`, no off-viewport control, and no visible target
+below 44px. MCP captured the final desktop and `390x844` mobile views; light and
+dark Hero styles were both inspected. Console output contained only the two
+existing React Router future-flag warnings.
+
+Final `npm run typecheck`, `npm run lint`, `npm run build`, and
+`git diff --check` pass. The production build retains the existing non-fatal
+main-chunk warning (`918.49 kB` minified, `262.16 kB` gzip).
