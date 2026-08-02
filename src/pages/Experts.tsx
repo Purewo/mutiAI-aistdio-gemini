@@ -37,7 +37,7 @@ export default function Experts() {
   const navigate = useNavigate();
   const [query, setQuery] = useState('');
   const [debouncedQuery, setDebouncedQuery] = useState('');
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [provider, setProvider] = useState('all');
   const [interaction, setInteraction] = useState<InteractionFilter>('all');
   const [eligibility, setEligibility] = useState<EligibilityFilter>('all');
@@ -57,14 +57,14 @@ export default function Experts() {
         {
           query: debouncedQuery || undefined,
           provider: provider === 'all' ? undefined : provider,
-          category: selectedCategories.length > 0 ? selectedCategories : undefined,
+          category: selectedCategory ? [selectedCategory] : undefined,
           interaction_mode: interaction === 'all' ? undefined : interaction,
           eligible_only: eligibility === 'eligible' ? true : undefined,
           limit: 100,
         },
         signal,
       ),
-    [debouncedQuery, eligibility, interaction, provider, selectedCategories],
+    [debouncedQuery, eligibility, interaction, provider, selectedCategory],
   );
   const conversations = useApiResource((signal) => listExpertConversations(signal), []);
 
@@ -94,14 +94,6 @@ export default function Experts() {
     return map;
   }, [directoryItems]);
 
-  const toggleCategory = (categoryKey: string) => {
-    setSelectedCategories((current) =>
-      current.includes(categoryKey)
-        ? current.filter((item) => item !== categoryKey)
-        : [...current, categoryKey],
-    );
-  };
-
   const startTrial = async (item: ExpertCatalogItem) => {
     if (!item.eligible || startingVersionId) return;
     setStartingVersionId(item.expert_version_id);
@@ -124,7 +116,7 @@ export default function Experts() {
       />
       <div className="mobile-scroll-gutter flex-1 overflow-y-auto px-3 py-4 sm:px-8 sm:py-6">
         <div className="mx-auto max-w-7xl space-y-5">
-          <section className="relative overflow-hidden rounded-[1.75rem] bg-[#111827] px-5 py-6 text-white shadow-xl shadow-slate-900/10 sm:px-8 sm:py-8">
+          <section className="expert-marketplace-hero relative overflow-hidden rounded-[1.75rem] px-5 py-6 sm:px-8 sm:py-8">
             <div
               className="absolute -right-16 -top-24 h-64 w-64 rounded-full bg-cyan-400/20 blur-3xl"
               aria-hidden="true"
@@ -135,14 +127,14 @@ export default function Experts() {
             />
             <div className="relative grid gap-6 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
               <div className="max-w-3xl">
-                <p className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.16em] text-cyan-200">
+                <p className="expert-marketplace-hero-badge inline-flex items-center gap-2 rounded-full border px-3 py-1 text-[11px] font-bold uppercase tracking-[0.16em]">
                   <BadgeCheck className="h-3.5 w-3.5" aria-hidden="true" />
                   Operator-curated · Version pinned
                 </p>
                 <h2 className="mt-4 max-w-2xl text-2xl font-black tracking-tight sm:text-3xl">
                   先验证能力，再把专家放进真正的组织
                 </h2>
-                <p className="mt-3 max-w-2xl text-sm leading-7 text-slate-300">
+                <p className="expert-marketplace-hero-copy mt-3 max-w-2xl text-sm leading-7">
                   每次试用都属于您的私有 ExpertConversation。它不会创建 Task、正式岗位 Workspace 或发布 Artifact，成功试用也不会绕过组织确认与可行性校验。
                 </p>
               </div>
@@ -174,13 +166,13 @@ export default function Experts() {
                   按能力分类浏览
                 </h2>
                 <p className="mt-1 text-xs leading-5 text-slate-500">
-                  分类由运营侧维护，只读展示；可多选，分类之间按“或”匹配。
+                  分类由运营侧维护，只读展示；每次只查看一个分类，切换分类不会混合结果。
                 </p>
               </div>
-              {selectedCategories.length > 0 ? (
+              {selectedCategory ? (
                 <button
                   type="button"
-                  onClick={() => setSelectedCategories([])}
+                  onClick={() => setSelectedCategory(null)}
                   className="inline-flex min-h-10 items-center gap-2 self-start rounded-xl border border-slate-200 px-3 text-xs font-bold text-slate-600 transition hover:border-cyan-200 hover:bg-cyan-50 hover:text-cyan-800 focus:outline-none focus-visible:ring-4 focus-visible:ring-cyan-500/15 sm:self-auto"
                 >
                   <X className="h-3.5 w-3.5" aria-hidden="true" />
@@ -206,14 +198,18 @@ export default function Experts() {
               </div>
             ) : null}
             {categories.state.status === 'ready' ? (
-              <div className="grid gap-2 p-4 sm:grid-cols-2 lg:grid-cols-5 sm:p-5">
+              <div
+                className="grid gap-2 p-4 sm:grid-cols-2 lg:grid-cols-5 sm:p-5"
+                role="radiogroup"
+                aria-label="专家能力分类"
+              >
                 <CategoryButton
                   name="全部专家"
                   description="包括尚未归类的专家版本。"
                   count={directory.state.status === 'ready' ? directoryItems.length : null}
-                  selected={selectedCategories.length === 0}
+                  selected={selectedCategory === null}
                   icon={Layers3}
-                  onClick={() => setSelectedCategories([])}
+                  onClick={() => setSelectedCategory(null)}
                 />
                 {categories.state.data.map((category) => (
                   <CategoryButton
@@ -221,9 +217,9 @@ export default function Experts() {
                     name={category.display_name}
                     description={category.description ?? '运营侧专家分类'}
                     count={category.expert_count}
-                    selected={selectedCategories.includes(category.category_key)}
+                    selected={selectedCategory === category.category_key}
                     icon={categoryIcon(category.category_key)}
-                    onClick={() => toggleCategory(category.category_key)}
+                    onClick={() => setSelectedCategory(category.category_key)}
                   />
                 ))}
               </div>
@@ -236,6 +232,8 @@ export default function Experts() {
                 <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" aria-hidden="true" />
                 <span className="sr-only">搜索专家</span>
                 <input
+                  id="expert-search"
+                  name="expert-search"
                   value={query}
                   onChange={(event) => setQuery(event.target.value)}
                   maxLength={100}
@@ -254,13 +252,14 @@ export default function Experts() {
                 ) : null}
               </label>
               <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
-                <FilterSelect label="Provider" value={provider} onChange={setProvider}>
+                <FilterSelect name="provider" label="Provider" value={provider} onChange={setProvider}>
                   <option value="all">全部 Provider</option>
                   {providers.map((item) => (
                     <option key={item} value={item}>{providerLabel(item)}</option>
                   ))}
                 </FilterSelect>
                 <FilterSelect
+                  name="interaction-mode"
                   label="交互方式"
                   value={interaction}
                   onChange={(value) => setInteraction(value as InteractionFilter)}
@@ -270,6 +269,7 @@ export default function Experts() {
                   <option value="request_response">单次请求</option>
                 </FilterSelect>
                 <FilterSelect
+                  name="eligibility"
                   label="可用性"
                   value={eligibility}
                   onChange={(value) => setEligibility(value as EligibilityFilter)}
@@ -291,8 +291,8 @@ export default function Experts() {
             <EmptyState
               title="没有匹配的专家"
               description={
-                selectedCategories.length > 0
-                  ? '所选分类当前没有匹配版本；可返回“全部专家”查看未分类版本。'
+                selectedCategory
+                  ? '当前分类没有匹配版本；可返回“全部专家”查看未分类版本。'
                   : '调整搜索词或筛选条件；前端不会用演示数据替代真实目录。'
               }
             />
@@ -302,7 +302,9 @@ export default function Experts() {
               <div className="flex flex-wrap items-center justify-between gap-2 px-1">
                 <p className="text-xs font-semibold text-slate-500">
                   找到 <span className="font-black text-slate-900">{catalog.state.data.length}</span> 个固定版本
-                  {selectedCategories.length > 0 ? ` · 已选 ${selectedCategories.length} 个分类` : ' · 全部视图'}
+                  {selectedCategory
+                    ? ` · 当前分类：${categoryNameByKey.get(selectedCategory) ?? selectedCategory}`
+                    : ' · 全部视图'}
                 </p>
                 {debouncedQuery ? (
                   <p className="max-w-full truncate text-xs text-slate-400">搜索：{debouncedQuery}</p>
@@ -467,27 +469,28 @@ function CategoryButton({
     <button
       type="button"
       onClick={onClick}
-      aria-pressed={selected}
+      role="radio"
+      aria-checked={selected}
       className={`group relative min-h-28 overflow-hidden rounded-2xl border p-3.5 text-left transition duration-200 focus:outline-none focus-visible:ring-4 focus-visible:ring-cyan-500/15 ${
         selected
-          ? 'border-slate-900 bg-slate-950 text-white shadow-lg shadow-slate-900/15'
+          ? 'border-blue-500 bg-gradient-to-br from-blue-600 to-cyan-600 text-white shadow-lg shadow-blue-900/15'
           : 'border-slate-200 bg-slate-50/70 text-slate-800 hover:-translate-y-0.5 hover:border-cyan-200 hover:bg-cyan-50/60'
       }`}
     >
       <span
         className={`flex h-9 w-9 items-center justify-center rounded-xl ${
-          selected ? 'bg-cyan-300 text-slate-950' : 'bg-white text-cyan-800 shadow-sm'
+          selected ? 'bg-white/20 text-white' : 'bg-white text-cyan-800 shadow-sm'
         }`}
       >
         <Icon className="h-4 w-4" aria-hidden="true" />
       </span>
       <span className="mt-3 flex items-center justify-between gap-2">
         <span className="text-sm font-black">{name}</span>
-        <span className={`text-xs font-black ${selected ? 'text-cyan-200' : 'text-slate-400'}`}>
+        <span className={`text-xs font-black ${selected ? 'text-cyan-100' : 'text-slate-400'}`}>
           {count ?? '—'}
         </span>
       </span>
-      <span className={`mt-1 block line-clamp-2 text-[11px] leading-4 ${selected ? 'text-slate-300' : 'text-slate-500'}`}>
+      <span className={`mt-1 block line-clamp-2 text-[11px] leading-4 ${selected ? 'text-blue-50' : 'text-slate-500'}`}>
         {description}
       </span>
     </button>
@@ -517,29 +520,38 @@ function EligibilityDot({ item }: { item: ExpertCatalogItem }) {
 
 function HeroMetric({ label, value, className = '' }: { label: string; value: string | number; className?: string }) {
   return (
-    <div className={`rounded-2xl border border-white/10 bg-white/[0.06] px-3 py-3 backdrop-blur ${className}`}>
-      <p className="text-xl font-black text-white">{value}</p>
-      <p className="mt-1 text-[10px] uppercase tracking-[0.12em] text-slate-400">{label}</p>
+    <div className={`expert-marketplace-hero-metric rounded-2xl border px-3 py-3 backdrop-blur ${className}`}>
+      <p className="expert-marketplace-hero-metric-value text-xl font-black">{value}</p>
+      <p className="expert-marketplace-hero-metric-label mt-1 text-[10px] uppercase tracking-[0.12em]">{label}</p>
     </div>
   );
 }
 
 function FilterSelect({
+  name,
   label,
   value,
   onChange,
   children,
 }: {
+  name: string;
   label: string;
   value: string;
   onChange: (value: string) => void;
   children: React.ReactNode;
 }) {
+  const controlId = `expert-filter-${name}`;
   return (
-    <label className="relative block">
+    <label htmlFor={controlId} className="relative block">
       <Filter className="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-slate-400" aria-hidden="true" />
       <span className="sr-only">{label}</span>
-      <select value={value} onChange={(event) => onChange(event.target.value)} className="form-control min-w-0 pl-9 pr-8">
+      <select
+        id={controlId}
+        name={name}
+        value={value}
+        onChange={(event) => onChange(event.target.value)}
+        className="form-control min-w-0 pl-9 pr-8"
+      >
         {children}
       </select>
     </label>

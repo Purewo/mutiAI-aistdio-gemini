@@ -1678,3 +1678,35 @@ Post-merge screenshots are retained at
 `nexwork-main-task-desktop-1440x900.png`, and
 `nexwork-main-task-mobile-390x844.png`. The frontend remains served on port
 3168 against backend main on 8150 for the next deep-integration pressure pass.
+
+## Expert Marketplace theme and category selection correction (2026-08-02)
+
+The Expert Marketplace light theme no longer renders its introductory Hero as
+a hard-coded dark panel. It now uses the product's blue-white daytime palette,
+while the explicit night theme retains the navy treatment. Category browsing
+is a strict single-selection radio group: choosing a new operator category
+replaces the previous category and sends exactly one `category` query parameter;
+“全部专家” clears the category filter. The explanatory, empty-state, and result
+summary copy now describe the single-category behavior. Search and filter form
+controls also expose stable `id` and `name` attributes.
+
+Chrome DevTools MCP verified the real page at `http://127.0.0.1:3168/experts`
+against backend `8150`. Selecting 数据分析 and then 文档提取 produced separate
+successful requests ending in `category=data-analysis` and
+`category=document-extraction`; the second request did not retain the first
+category, and exactly one category remained checked. Desktop `1440x900` and
+portrait `390x844` had no horizontal overflow; the portrait view had no visible
+control below 44px. Light and dark Hero computed styles switched correctly.
+Console contained only the two existing React Router future-flag warnings, and
+the prior missing form-field identifier issue was cleared. Screenshots are
+retained at
+`C:\Users\28788\AppData\Local\Temp\nexwork-experts-single-category-light.png`
+and `nexwork-experts-single-category-mobile.png`.
+
+`npm run typecheck`, `npm run lint`, `npm run build`, and `git diff --check`
+pass. The production build retains the existing non-fatal main-chunk warning
+(`919.55 kB` minified, `262.51 kB` gzip). Backend commit `0129303` changes the
+web-conversation persistence rule without changing the public OpenAPI shape;
+the frontend, backend snapshot, and current 8150 OpenAPI remain semantically
+identical at 89 paths and 209 schemas. The singleton migration is not yet live
+on 8150 because that service has not been restarted.
