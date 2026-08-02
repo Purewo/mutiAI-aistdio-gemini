@@ -39,13 +39,16 @@ file is the current repository instruction and ownership boundary.
 
 ## Target platform
 
-- V1 targets desktop web browsers. Desktop interaction, layout, and browser
-  acceptance are the current frontend delivery gate.
-- Mobile and narrow-screen UX are explicitly out of scope for V1. Do not spend
-  current feature time on mobile adaptation or treat mobile screenshots,
-  responsive polish, or mobile-specific defects as release blockers.
-- Mobile support will be designed as a separate product pass later instead of
-  being inferred from the current desktop information architecture.
+- Desktop web remains a required regression target. The active responsive pass
+  also targets portrait iPhone and Samsung Galaxy viewports, with priority on
+  `360x800`, `390x844`, `393x852`, `412x915`, and `430x932`.
+- Mobile interaction targets are 44px minimum and 48px for primary controls;
+  use `100dvh` and safe-area insets where the layout touches the viewport.
+  Foldables, tablets, and landscape layouts are later follow-up scope.
+- Mobile information flow is a vertical enterprise console: status and main
+  actions come first, while diagnostics, capability details, and long payloads
+  may use disclosure or internal scrolling. Preserve the desktop information
+  architecture and all persisted topology semantics.
 
 ## Verification and delivery
 
@@ -59,9 +62,10 @@ npm run build
 
 Frontend work is not complete from fixture or static checks alone. Run the
 frontend through the local backend proxy and verify the changed flow in a real
-desktop browser, including Console, Network, desktop layout, and reconnect
-behavior when applicable. Record the verified URL, state, and any remaining
-risk in `docs/CURRENT_STATUS.md` or the relevant task document.
+browser at the affected desktop and portrait mobile viewports, including
+Console, Network, document overflow, control hit areas, and reconnect behavior
+when applicable. Record the verified URL, state, and any remaining risk in
+`docs/CURRENT_STATUS.md` or the relevant task document.
 
 The active branch at takeover is `feat/m3-frontend-foundation`, with the current
 frontend baseline recorded in `git log` and contract snapshot source recorded in
