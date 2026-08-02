@@ -23,6 +23,7 @@ import {
   cancelTask,
   decideTaskApproval,
   listTaskFeasibilityChecks,
+  listOrganizationVersions,
   planTask,
   retryTask,
   startTask,
@@ -32,15 +33,18 @@ import { apiErrorFromThrown, type ApiError } from '../api/errors';
 import type { Approval, Task } from '../api/types';
 import { useApiResource } from '../api/useApiResource';
 import { useLiveTask } from '../task/useLiveTask';
+import { useLiveTaskGraph } from '../task/useLiveTaskGraph';
 import ArtifactList from '../components/ArtifactList';
 import FeasibilityPanel from '../components/FeasibilityPanel';
 import PageHeader from '../components/PageHeader';
 import PlanGraph from '../components/PlanGraph';
+import TaskArtifactStreamsPanel from '../components/TaskArtifactStreamsPanel';
 import TaskEventLogView from '../components/TaskEventLogView';
 import TaskInputBindingStatus from '../components/TaskInputBindingStatus';
 import TaskReplayPanel from '../components/TaskReplayPanel';
 import TaskTimingPanel from '../components/TaskTimingPanel';
 import TaskUsagePanel from '../components/TaskUsagePanel';
+import RoleQueuePanel from '../components/RoleQueuePanel';
 import {
   ActivityPhaseBadge,
   AssignmentStatusBadge,
@@ -49,6 +53,7 @@ import {
   TaskStatusBadge,
 } from '../components/taskBadges';
 import { ErrorState, InlineError, LoadingState, ReconnectBanner } from '../components/states';
+import { costStatusLabel, formatRuntimeLimit, formatTokenCount, formatUsd } from '../lib/executionBudget';
 import { formatDateTime, formatDuration } from '../lib/format';
 
 /**
@@ -101,13 +106,15 @@ export default function TaskDetail() {
   }
 
   const task = live.task;
+  const revisionKey =
+    live.events.length > 0 ? live.events[live.events.length - 1].event_id : task.updated_at;
 
   return (
     <Shell
       status={<TaskStatusBadge status={task.status} activityPhase={task.activity_phase} />}
       organizationId={task.organization_id}
     >
-      <div className="mx-auto max-w-6xl space-y-8">
+      <div className="mx-auto max-w-6xl space-y-7 sm:space-y-8">
         {live.connection !== 'live' ? (
           <ReconnectBanner
             status={live.connection}
@@ -121,6 +128,8 @@ export default function TaskDetail() {
         {checks.state.status === 'ready' && checks.state.data.length > 0 ? (
           <FeasibilityPanel checks={checks.state.data} />
         ) : null}
+
+        <RoleQueuePanel task={task} onTaskUpdated={live.setTask} />
 
         <ControlsSection task={task} onTaskUpdated={live.setTask} onReload={live.refresh} />
 
@@ -141,7 +150,19 @@ export default function TaskDetail() {
           />
         ) : null}
 
-        <PlanSection task={task} onTaskUpdated={live.setTask} onReload={live.refresh} />
+        <PlanSection
+          task={task}
+          graphRevisionKey={revisionKey}
+          onTaskUpdated={live.setTask}
+          onReload={live.refresh}
+        />
+
+        <TaskArtifactStreamsPanel
+          task={task}
+          revisionKey={revisionKey}
+          onTaskRefresh={live.refresh}
+          onReconnect={live.reconnect}
+        />
 
         {task.execution_plan && task.execution_plan.initial_input_contracts.length > 0 ? (
           <InputsSection task={task} onUploaded={live.refresh} />
@@ -231,12 +252,12 @@ function Shell({
       <PageHeader
         title="任务详情"
         actions={
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center gap-2 sm:gap-3">
             {status}
             {organizationId ? (
               <Link
                 to={`/orgs/${organizationId}`}
-                className="inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900 focus:outline-none focus-visible:ring-4 focus-visible:ring-indigo-500/15"
+                className="inline-flex min-h-11 items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900 focus:outline-none focus-visible:ring-4 focus-visible:ring-indigo-500/15"
               >
                 <ArrowLeft className="h-4 w-4" aria-hidden="true" />
                 所属组织
@@ -245,7 +266,7 @@ function Shell({
           </div>
         }
       />
-      <div className="flex-1 overflow-y-auto p-6 sm:p-8">{children}</div>
+      <div className="mobile-scroll-gutter flex-1 overflow-y-auto px-4 py-5 sm:p-8">{children}</div>
     </div>
   );
 }
@@ -263,7 +284,7 @@ function Section({
 }) {
   return (
     <section>
-      <div className="mb-4 flex items-center gap-2">
+      <div className="mb-4 flex flex-wrap items-center gap-2">
         <span aria-hidden="true">{icon}</span>
         <h2 className="text-lg font-semibold text-slate-800">{title}</h2>
         {extra}
@@ -275,18 +296,18 @@ function Section({
 
 function TaskMetaCard({ task }: { task: Task }) {
   return (
-    <section className="rounded-2xl border border-slate-200/60 bg-white p-5 shadow-sm">
+    <section className="rounded-2xl border border-slate-200/60 bg-white p-4 shadow-sm sm:p-5">
       <p className="whitespace-pre-wrap break-words text-sm leading-relaxed text-slate-700">
         {task.request}
       </p>
-      <dl className="mt-4 flex flex-wrap gap-x-8 gap-y-1 border-t border-slate-100 pt-3 text-xs text-slate-500">
+      <dl className="mt-4 grid grid-cols-1 gap-x-8 gap-y-1.5 border-t border-slate-100 pt-3 text-xs text-slate-500 sm:flex sm:flex-wrap sm:gap-y-1">
         <div className="flex gap-1.5">
           <dt>编排模式</dt>
           <dd className="font-mono">{task.orchestration_mode}</dd>
         </div>
-        <div className="flex gap-1.5">
+        <div className="flex min-w-0 gap-1.5">
           <dt>任务 ID</dt>
-          <dd className="font-mono">{task.task_id}</dd>
+          <dd className="min-w-0 break-all font-mono">{task.task_id}</dd>
         </div>
         <div className="flex gap-1.5">
           <dt>创建于</dt>
@@ -353,12 +374,12 @@ function ControlsSection({
   };
 
   const button =
-    'inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold transition-all focus:outline-none focus-visible:ring-4 disabled:cursor-not-allowed disabled:opacity-60';
+    'inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold transition-all focus:outline-none focus-visible:ring-4 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto';
 
   return (
     <section className="rounded-2xl border border-slate-200/60 bg-white p-4 shadow-sm">
-      <div className="flex flex-wrap items-center gap-2">
-        <span className="mr-auto text-sm text-slate-600">
+      <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:gap-2">
+        <span className="text-sm leading-relaxed text-slate-600 sm:mr-auto">
           {retryable
             ? '可以重试失败的岗位任务，已完成的兄弟任务不会重跑。'
             : '任务正在执行，可以请求取消。'}
@@ -430,7 +451,7 @@ function ApprovalsSection({
   };
 
   const button =
-    'inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition-all focus:outline-none focus-visible:ring-4 disabled:cursor-not-allowed disabled:opacity-60';
+    'inline-flex min-h-11 flex-1 items-center justify-center gap-1.5 rounded-lg px-3 py-2 text-xs font-semibold transition-all focus:outline-none focus-visible:ring-4 disabled:cursor-not-allowed disabled:opacity-60 sm:flex-none';
 
   return (
     <Section icon={<ShieldQuestion className="h-5 w-5 text-amber-600" />} title="Runtime 审批">
@@ -446,7 +467,7 @@ function ApprovalsSection({
                 {approval.status}
               </span>
               {approval.status === 'pending' ? (
-                <div className="ml-auto flex items-center gap-1.5">
+                <div className="flex w-full items-center gap-1.5 sm:ml-auto sm:w-auto">
                   <button
                     type="button"
                     onClick={() => decide(approval.approval_id, 'decline')}
@@ -498,16 +519,34 @@ function ApprovalsSection({
 
 function PlanSection({
   task,
+  graphRevisionKey,
   onTaskUpdated,
   onReload,
 }: {
   task: Task;
+  graphRevisionKey: string;
   onTaskUpdated: (task: Task) => void;
   onReload: () => Promise<void>;
 }) {
   const [generating, setGenerating] = useState(false);
   const [error, setError] = useState<ApiError | null>(null);
   const plan = task.execution_plan;
+  const organizationVersions = useApiResource(
+    (signal) => listOrganizationVersions(task.organization_id, signal),
+    [task.organization_id],
+  );
+  const organizationSpec =
+    organizationVersions.state.status === 'ready'
+      ? organizationVersions.state.data.find(
+          (version) => version.spec_version_id === task.organization_spec_version_id,
+        )?.spec
+      : undefined;
+  const graphProjection = useLiveTaskGraph(task.task_id, graphRevisionKey);
+  const graphSteps = Array.from(
+    new Map(
+      [...(plan?.steps ?? []), ...(task.base_execution_plan?.steps ?? [])].map((step) => [step.plan_step_id, step]),
+    ).values(),
+  );
   const latestReplay = [...task.replay_runs].sort(
     (left, right) => right.replay_number - left.replay_number,
   )[0];
@@ -541,7 +580,7 @@ function PlanSection({
             type="button"
             onClick={generatePlan}
             disabled={generating}
-            className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-indigo-600 to-blue-600 px-5 py-2.5 text-sm font-semibold text-white shadow-md shadow-indigo-200 transition-all hover:from-indigo-700 hover:to-blue-700 focus:outline-none focus-visible:ring-4 focus-visible:ring-indigo-500/20 disabled:cursor-not-allowed disabled:opacity-60"
+            className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-indigo-600 to-blue-600 px-5 py-2.5 text-sm font-semibold text-white shadow-md shadow-indigo-200 transition-all hover:from-indigo-700 hover:to-blue-700 focus:outline-none focus-visible:ring-4 focus-visible:ring-indigo-500/20 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
           >
             {generating ? (
               <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
@@ -565,12 +604,27 @@ function PlanSection({
               {formatDateTime(plan.created_at)}
             </p>
           </div>
-          <PlanGraph steps={plan.steps} />
+          {graphProjection.status === 'loading' ? (
+            <p className="rounded-xl border border-cyan-200/70 bg-cyan-50/70 px-3 py-2 text-xs text-cyan-800">
+              正在读取任务图谱投影；当前先展示计划依赖，反馈与重试关系随后静默补齐。
+            </p>
+          ) : null}
+          {graphProjection.status === 'error' ? (
+            <p className="rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-800">
+              任务图谱投影暂时不可用，已降级为计划依赖预览。{graphProjection.error?.message}
+            </p>
+          ) : null}
+          <PlanGraph
+            steps={graphSteps}
+            organizationSpec={organizationSpec}
+            projection={graphProjection.status === 'ready' ? graphProjection.projection ?? undefined : undefined}
+            syncStatus={graphProjection.connection}
+          />
           {latestReplay &&
           task.base_execution_plan &&
           task.base_execution_plan.plan_id !== plan.plan_id ? (
             <details className="rounded-2xl border border-violet-200 bg-violet-50/30 p-4">
-              <summary className="cursor-pointer text-sm font-semibold text-violet-800">
+              <summary className="flex min-h-11 cursor-pointer items-center text-sm font-semibold leading-relaxed text-violet-800">
                 查看第 {latestReplay.replay_number} 次重放与基准计划的步骤血缘
               </summary>
               <p className="mb-3 mt-2 text-xs leading-relaxed text-slate-600">
@@ -578,6 +632,7 @@ function PlanSection({
               </p>
               <PlanGraph
                 steps={task.base_execution_plan.steps}
+                organizationSpec={organizationSpec}
                 replayExecutedStepKeys={latestReplay.executed_step_keys}
                 replayReusedStepKeys={latestReplay.reused_step_keys}
               />
@@ -613,6 +668,9 @@ function StartRow({
   );
   const planValidated = plan.status === 'validated';
   const startable = planValidated && missingInputs.length === 0;
+  const hasIncrementalContracts = plan.steps.some(
+    (step) => step.stream_output_contracts.length > 0 || step.stream_input_contracts.length > 0,
+  );
 
   const start = async () => {
     setStarting(true);
@@ -630,10 +688,12 @@ function StartRow({
 
   return (
     <div className="rounded-2xl border border-slate-200/60 bg-white p-4 shadow-sm">
-      <div className="flex flex-wrap items-center gap-3">
-        <div className="mr-auto text-sm text-slate-600">
+      <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
+        <div className="max-w-2xl text-sm leading-relaxed text-slate-600 sm:mr-auto">
           {startable
-            ? '计划已校验，所需输入齐备，可以开始执行。'
+            ? hasIncrementalContracts
+              ? '有限增量计划已就绪。启动后，Producer 通过受限工具提交分区交付；each 与 all 按持久化水位线自动推进，所有岗位执行仍需经过岗位队列准入。'
+              : '计划已校验，所需输入齐备，可以开始执行。'
             : !planValidated
               ? `计划当前状态为「${plan.status}」，尚不能开始执行。`
               : `还有 ${missingInputs.length} 项声明的初始输入未绑定或上传：${missingInputs.join('、')}`}
@@ -642,17 +702,34 @@ function StartRow({
           type="button"
           onClick={start}
           disabled={!startable || starting}
-          className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 px-5 py-2.5 text-sm font-semibold text-white shadow-md shadow-emerald-200 transition-all hover:from-emerald-700 hover:to-teal-700 focus:outline-none focus-visible:ring-4 focus-visible:ring-emerald-500/20 disabled:cursor-not-allowed disabled:opacity-50"
+          className={`inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold text-white shadow-md transition-all focus:outline-none focus-visible:ring-4 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto ${
+            hasIncrementalContracts
+              ? 'bg-gradient-to-r from-cyan-600 to-blue-600 shadow-cyan-200 hover:from-cyan-700 hover:to-blue-700 focus-visible:ring-cyan-500/20'
+              : 'bg-gradient-to-r from-emerald-600 to-teal-600 shadow-emerald-200 hover:from-emerald-700 hover:to-teal-700 focus-visible:ring-emerald-500/20'
+          }`}
         >
           {starting ? (
             <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
           ) : (
             <Play className="h-4 w-4" aria-hidden="true" />
           )}
-          开始执行
+          {hasIncrementalContracts ? '开始增量执行' : '开始执行'}
         </button>
       </div>
-      {error ? (
+      {error?.code === 'INCREMENTAL_EXECUTION_NOT_ENABLED' ? (
+        <div role="status" className="mt-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm leading-relaxed text-amber-900">
+          <div className="flex items-start gap-2">
+            <ShieldQuestion className="mt-0.5 h-4 w-4 flex-shrink-0" aria-hidden="true" />
+            <div>
+              <p className="font-semibold">当前后端尚未开放此增量计划</p>
+              <p className="mt-1">{error.message}</p>
+              <p className="mt-1 font-mono text-xs text-amber-700">
+                {error.code}{error.requestId ? ` · request ${error.requestId}` : ''}
+              </p>
+            </div>
+          </div>
+        </div>
+      ) : error ? (
         <div className="mt-3">
           <InlineError error={error} />
         </div>
@@ -751,8 +828,8 @@ function InputsSection({ task, onUploaded }: { task: Task; onUploaded: () => Pro
               key={contractKey}
               className="rounded-2xl border border-slate-200/60 bg-white p-4 shadow-sm"
             >
-              <div className="flex flex-wrap items-center gap-3">
-                <span className="font-mono text-sm font-semibold text-slate-800">{contractKey}</span>
+              <div className="flex flex-col items-stretch gap-3 sm:flex-row sm:flex-wrap sm:items-center">
+                <span className="break-all font-mono text-sm font-semibold text-slate-800">{contractKey}</span>
                 {artifact ? (
                   <span className="inline-flex items-center gap-1.5 text-sm font-medium text-emerald-700">
                     <CheckCircle2 className="h-4 w-4" aria-hidden="true" />
@@ -770,14 +847,14 @@ function InputsSection({ task, onUploaded }: { task: Task; onUploaded: () => Pro
                       name={`input-file-${contractKey}`}
                       type="file"
                       onChange={(event) => selectFile(contractKey, event.target.files?.[0] ?? null)}
-                      className="text-sm text-slate-600 file:mr-3 file:rounded-lg file:border file:border-slate-200 file:bg-slate-50 file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-slate-700 hover:file:bg-slate-100"
+                      className="min-w-0 w-full text-sm text-slate-600 file:mr-3 file:min-h-11 file:rounded-lg file:border file:border-slate-200 file:bg-slate-50 file:px-3 file:py-2 file:text-sm file:font-medium file:text-slate-700 hover:file:bg-slate-100 sm:w-auto"
                       aria-label={`选择 ${contractKey} 的输入文件`}
                     />
                     <button
                       type="button"
                       onClick={() => upload(contractKey)}
                       disabled={!entry || entry.uploading}
-                      className="ml-auto inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-indigo-600 to-blue-600 px-4 py-2 text-sm font-semibold text-white shadow-md shadow-indigo-200 transition-all hover:from-indigo-700 hover:to-blue-700 focus:outline-none focus-visible:ring-4 focus-visible:ring-indigo-500/20 disabled:cursor-not-allowed disabled:opacity-50"
+                      className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-indigo-600 to-blue-600 px-4 py-2 text-sm font-semibold text-white shadow-md shadow-indigo-200 transition-all hover:from-indigo-700 hover:to-blue-700 focus:outline-none focus-visible:ring-4 focus-visible:ring-indigo-500/20 disabled:cursor-not-allowed disabled:opacity-50 sm:ml-auto sm:w-auto"
                     >
                       {entry?.uploading ? (
                         <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
@@ -850,6 +927,61 @@ function TimingBreakdown({
   );
 }
 
+function ExecutionBudgetSnapshot({
+  execution,
+}: {
+  execution: NonNullable<Task['assignments'][number]['runtime_execution']>;
+}) {
+  const costTone =
+    execution.cost_status === 'estimated'
+      ? 'text-emerald-700'
+      : execution.cost_status === 'unavailable'
+        ? 'text-amber-700'
+        : 'text-slate-600';
+  return (
+    <div className="mt-3 rounded-xl border border-indigo-100 bg-indigo-50/50 p-3">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-indigo-700">
+          单次执行限制与成本快照
+        </p>
+        {execution.pricing_catalog_version ? (
+          <span className="break-all font-mono text-[10px] text-slate-400">
+            {execution.pricing_catalog_version}
+          </span>
+        ) : null}
+      </div>
+      <dl className="mt-2 grid gap-2 sm:grid-cols-3">
+        <div className="rounded-lg border border-indigo-100/80 bg-white/70 px-2.5 py-2">
+          <dt className="text-[10px] text-slate-400">Token</dt>
+          <dd className="mt-0.5 text-xs font-semibold text-slate-700">
+            {formatTokenCount(execution.max_tokens_per_attempt)}
+            <span className="ml-1 font-normal text-slate-400">
+              · 生效 {formatTokenCount(execution.effective_token_limit)}
+            </span>
+          </dd>
+        </div>
+        <div className="rounded-lg border border-indigo-100/80 bg-white/70 px-2.5 py-2">
+          <dt className="text-[10px] text-slate-400">费用</dt>
+          <dd className={`mt-0.5 text-xs font-semibold ${costTone}`}>
+            {formatUsd(execution.cost_usd)}
+            <span className="ml-1 font-normal text-slate-500">· {costStatusLabel(execution.cost_status)}</span>
+          </dd>
+          <p className="mt-0.5 text-[10px] text-slate-400">上限 {formatUsd(execution.max_cost_usd_per_attempt)}</p>
+        </div>
+        <div className="rounded-lg border border-indigo-100/80 bg-white/70 px-2.5 py-2">
+          <dt className="text-[10px] text-slate-400">运行时长</dt>
+          <dd className="mt-0.5 text-xs font-semibold text-slate-700">
+            {formatRuntimeLimit(execution.effective_runtime_seconds)}
+          </dd>
+          <p className="mt-0.5 text-[10px] text-slate-400">
+            岗位上限 {formatRuntimeLimit(execution.max_runtime_seconds_per_attempt)}
+          </p>
+        </div>
+      </dl>
+    </div>
+  );
+}
+
 function AssignmentsSection({ task }: { task: Task }) {
   const replayNumberById = new Map(
     task.replay_runs.map((replay) => [replay.replay_run_id, replay.replay_number]),
@@ -889,6 +1021,8 @@ function AssignmentsSection({ task }: { task: Task }) {
               {execution ? (
                 <TimingBreakdown assignmentSeconds={assignment.wall_duration_seconds} execution={execution} />
               ) : null}
+
+              {execution ? <ExecutionBudgetSnapshot execution={execution} /> : null}
 
               {/*
                 Product Runtime facts only: identities, policy snapshot, and compaction count. No
@@ -942,7 +1076,7 @@ function AssignmentsSection({ task }: { task: Task }) {
                   </div>
                   <div className="flex gap-1">
                     <dt>执行 ID</dt>
-                    <dd className="font-mono">{execution.execution_id}</dd>
+                    <dd className="break-all font-mono">{execution.execution_id}</dd>
                   </div>
                   {execution.wait_reason ? (
                     <div className="flex gap-1">

@@ -34,7 +34,7 @@ export default function OrgDetail() {
   const backLink = (
     <Link
       to="/orgs"
-      className="inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900 focus:outline-none focus-visible:ring-4 focus-visible:ring-indigo-500/15"
+      className="inline-flex min-h-11 items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900 focus:outline-none focus-visible:ring-4 focus-visible:ring-indigo-500/15"
     >
       <ArrowLeft className="h-4 w-4" aria-hidden="true" />
       组织列表
@@ -45,7 +45,7 @@ export default function OrgDetail() {
     return (
       <div className="flex h-full flex-col bg-slate-50/50">
         <PageHeader title="组织详情" actions={backLink} />
-        <div className="flex-1 overflow-y-auto p-6 sm:p-8">
+        <div className="mobile-scroll-gutter flex-1 overflow-y-auto px-4 py-5 sm:p-8">
           <LoadingState label="加载组织详情中..." />
         </div>
       </div>
@@ -57,7 +57,7 @@ export default function OrgDetail() {
     return (
       <div className="flex h-full flex-col bg-slate-50/50">
         <PageHeader title="组织详情" actions={backLink} />
-        <div className="flex-1 overflow-y-auto p-6 sm:p-8">
+        <div className="mobile-scroll-gutter flex-1 overflow-y-auto px-4 py-5 sm:p-8">
           <div className="mx-auto max-w-2xl">
             <ErrorState
               error={error}
@@ -94,8 +94,8 @@ export default function OrgDetail() {
         }
       />
 
-      <div className="flex-1 overflow-y-auto p-6 sm:p-8">
-        <div className="mx-auto max-w-6xl space-y-10">
+      <div className="mobile-scroll-gutter flex-1 overflow-y-auto px-4 py-5 sm:p-8">
+        <div className="mx-auto max-w-6xl space-y-8 sm:space-y-10">
           <section>
             <div className="mb-4 flex items-center gap-2">
               <Users className="h-5 w-5 text-indigo-600" aria-hidden="true" />
@@ -231,10 +231,10 @@ function TasksSection({
             onChange={(event) => setRequest(event.target.value)}
             rows={3}
             placeholder="描述要完成的工作。提交后由组织负责人生成执行计划，确认计划并补齐输入后才会开始执行。"
-            className="w-full resize-y rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm transition-all duration-200 focus:border-indigo-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 disabled:cursor-not-allowed disabled:opacity-60"
+            className="min-h-24 w-full resize-y rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-3 text-sm transition-all duration-200 focus:border-indigo-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 disabled:cursor-not-allowed disabled:opacity-60"
           />
           <details className="mt-3 rounded-xl border border-slate-200 bg-slate-50/60 px-3.5 py-2.5">
-            <summary className="cursor-pointer text-xs font-semibold text-slate-600">
+            <summary className="flex min-h-11 cursor-pointer items-center text-xs font-semibold leading-relaxed text-slate-600">
               业务重放策略 · {replayPolicy === 'manual' ? '仅手动确认' : '额度内自动重放'} · 最多 {maxReplayCount} 次
             </summary>
             <p className="mt-2 text-xs leading-relaxed text-slate-500">
@@ -249,7 +249,7 @@ function TasksSection({
                   value={replayPolicy}
                   onChange={(event) => setReplayPolicy(event.target.value as TaskReplayPolicy)}
                   disabled={submitting}
-                  className="mt-1.5 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-normal text-slate-700 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 disabled:opacity-60"
+                  className="mt-1.5 min-h-12 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-normal text-slate-700 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 disabled:opacity-60"
                 >
                   <option value="manual">仅手动确认</option>
                   <option value="auto_within_limit">负责人建议通过校验后自动重放</option>
@@ -269,7 +269,7 @@ function TasksSection({
                     if (Number.isFinite(value)) setMaxReplayCount(Math.min(10, Math.max(0, value)));
                   }}
                   disabled={submitting}
-                  className="mt-1.5 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-normal text-slate-700 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 disabled:opacity-60"
+                  className="mt-1.5 min-h-12 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-normal text-slate-700 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 disabled:opacity-60"
                 />
               </label>
             </div>
@@ -279,11 +279,11 @@ function TasksSection({
               <InlineError error={error} />
             </div>
           ) : null}
-          <div className="mt-3 flex justify-end">
+          <div className="mt-3 flex sm:justify-end">
             <button
               type="submit"
               disabled={submitting || request.trim().length === 0}
-              className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-indigo-600 to-blue-600 px-5 py-2.5 text-sm font-semibold text-white shadow-md shadow-indigo-200 transition-all hover:from-indigo-700 hover:to-blue-700 focus:outline-none focus-visible:ring-4 focus-visible:ring-indigo-500/20 disabled:cursor-not-allowed disabled:opacity-50"
+              className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-indigo-600 to-blue-600 px-5 py-2.5 text-sm font-semibold text-white shadow-md shadow-indigo-200 transition-all hover:from-indigo-700 hover:to-blue-700 focus:outline-none focus-visible:ring-4 focus-visible:ring-indigo-500/20 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
             >
               {submitting ? (
                 <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
@@ -310,10 +310,10 @@ function TasksSection({
               <li key={record.task_id}>
                 <Link
                   to={`/tasks/${record.task_id}`}
-                  className="flex items-center gap-3 rounded-xl px-3 py-2 text-sm text-slate-600 transition-colors hover:bg-slate-50 hover:text-slate-900 focus:outline-none focus-visible:ring-4 focus-visible:ring-indigo-500/15"
+                  className="flex min-h-11 flex-wrap items-center gap-x-3 gap-y-1 rounded-xl px-3 py-2 text-sm text-slate-600 transition-colors hover:bg-slate-50 hover:text-slate-900 focus:outline-none focus-visible:ring-4 focus-visible:ring-indigo-500/15"
                 >
-                  <span className="min-w-0 flex-1 truncate">{record.request_preview}</span>
-                  <span className="flex-shrink-0 text-xs text-slate-400">
+                  <span className="min-w-0 basis-full break-words sm:flex-1 sm:basis-auto sm:truncate">{record.request_preview}</span>
+                  <span className="text-xs text-slate-400">
                     {formatDateTime(record.submitted_at)}
                   </span>
                   <ArrowRight className="h-3.5 w-3.5 flex-shrink-0 text-slate-400" aria-hidden="true" />
@@ -377,7 +377,7 @@ function VersionRow({
   };
 
   const smallButton =
-    'inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold text-white shadow-sm transition-all focus:outline-none focus-visible:ring-4 disabled:cursor-not-allowed disabled:opacity-60';
+    'inline-flex min-h-11 items-center justify-center gap-1.5 rounded-lg px-4 py-2 text-xs font-semibold text-white shadow-sm transition-all focus:outline-none focus-visible:ring-4 disabled:cursor-not-allowed disabled:opacity-60';
 
   return (
     <li className="rounded-2xl border border-slate-200/60 bg-white p-4 shadow-sm">
@@ -386,7 +386,7 @@ function VersionRow({
           type="button"
           onClick={() => setExpanded((value) => !value)}
           aria-expanded={expanded}
-          className="inline-flex items-center gap-1.5 rounded-lg px-2 py-1.5 text-sm font-semibold text-slate-800 transition-colors hover:bg-slate-50 focus:outline-none focus-visible:ring-4 focus-visible:ring-indigo-500/15"
+          className="inline-flex min-h-11 items-center gap-1.5 rounded-lg px-2 py-2 text-sm font-semibold text-slate-800 transition-colors hover:bg-slate-50 focus:outline-none focus-visible:ring-4 focus-visible:ring-indigo-500/15"
         >
           {expanded ? (
             <ChevronDown className="h-4 w-4 text-slate-400" aria-hidden="true" />
@@ -401,7 +401,7 @@ function VersionRow({
           <span className="text-xs text-slate-400">发布于 {formatDateTime(version.published_at)}</span>
         ) : null}
 
-        <div className="ml-auto flex items-center gap-2">
+        <div className="flex w-full items-center justify-end gap-2 sm:ml-auto sm:w-auto">
           {version.status === 'proposal' ? (
             <button
               type="button"

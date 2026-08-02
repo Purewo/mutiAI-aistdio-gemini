@@ -8,9 +8,16 @@ import Login from './pages/Login';
 import NotFound from './pages/NotFound';
 import OrgDetail from './pages/OrgDetail';
 import OrgsList from './pages/OrgsList';
+import Channels from './pages/Channels';
+import Coordination from './pages/Coordination';
+import CoordinationCaseDetail from './pages/CoordinationCaseDetail';
+import ExpertConversation from './pages/ExpertConversation';
+import ExpertDetail from './pages/ExpertDetail';
+import Experts from './pages/Experts';
 import Profile from './pages/Profile';
 import RuntimeConfig from './pages/RuntimeConfig';
 import TaskDetail from './pages/TaskDetail';
+import { ThemeProvider } from './theme/ThemeProvider';
 
 /** Dev-only fixture preview; the lazy import keeps captured fixtures out of the production bundle. */
 const FixturePreview = import.meta.env.DEV ? lazy(() => import('./pages/FixturePreview')) : null;
@@ -18,8 +25,9 @@ const FixturePreview = import.meta.env.DEV ? lazy(() => import('./pages/FixtureP
 export default function App() {
   return (
     <BrowserRouter>
-      <AuthProvider>
-        <Routes>
+      <ThemeProvider>
+        <AuthProvider>
+          <Routes>
           <Route path="/login" element={<Login />} />
 
           {/* Everything below requires a backend-confirmed session. */}
@@ -31,6 +39,12 @@ export default function App() {
               <Route path="/orgs/:organizationId" element={<OrgDetail />} />
               <Route path="/tasks/:taskId" element={<TaskDetail />} />
               <Route path="/runtime" element={<RuntimeConfig />} />
+              <Route path="/channels" element={<Channels />} />
+              <Route path="/coordination" element={<Coordination />} />
+              <Route path="/coordination/cases/:caseId" element={<CoordinationCaseDetail />} />
+              <Route path="/experts/conversations/:conversationId" element={<ExpertConversation />} />
+              <Route path="/experts/:expertId" element={<ExpertDetail />} />
+              <Route path="/experts" element={<Experts />} />
               {FixturePreview ? (
                 <Route
                   path="/dev/fixtures"
@@ -49,8 +63,9 @@ export default function App() {
               <Route path="*" element={<NotFound />} />
             </Route>
           </Route>
-        </Routes>
-      </AuthProvider>
+          </Routes>
+        </AuthProvider>
+      </ThemeProvider>
     </BrowserRouter>
   );
 }

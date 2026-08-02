@@ -1,12 +1,12 @@
 {
-  "runtime_binding_id": "2ed18518-f0ed-4d49-bbcc-f3e6a08f95e9",
+  "runtime_binding_id": "5e764017-4b0e-446b-ad9d-0832da912f35",
   "binding_key": "linux-standard",
   "provider": "fake",
   "model": "fixture-model",
   "reasoning_effort": "medium",
   "security_mode": "demo_full_access",
   "capability_profile": {
-    "capability_profile_id": "7c1ef848-63c1-4778-b537-de3954380c9c",
+    "capability_profile_id": "28fde342-2e5c-47bc-bfe7-a57cf4c801ba",
     "revision": 1,
     "profile": {
       "schema_version": "1.0",
@@ -37,9 +37,9 @@
     "source": "user_declared",
     "trusted": true,
     "observed_at": null,
-    "created_at": "2026-07-28T17:37:15.023845Z"
+    "created_at": "2026-08-01T18:22:37.003567Z"
   },
   "is_active": true,
-  "created_at": "2026-07-28T17:37:15.019785Z",
-  "updated_at": "2026-07-28T17:37:15.019785Z"
+  "created_at": "2026-08-01T18:22:37.001565Z",
+  "updated_at": "2026-08-01T18:22:37.001565Z"
 }

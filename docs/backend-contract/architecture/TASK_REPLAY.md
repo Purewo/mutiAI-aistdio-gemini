@@ -8,8 +8,9 @@ traceable execution attempt without resetting or overwriting the original
 plan, Assignments, RuntimeExecutions, or Artifacts.
 
 V1 supports replay only for planned Tasks whose persisted state is
-`needs_revision`. Strict-linear and pure-parallel plans remain the only
-supported topologies.
+`needs_revision`. Strict-linear, pure-parallel, mixed serial-parallel, and the
+bounded D1-D downstream incremental `from_step` path share the same immutable
+replay boundary.
 
 ## Distinguish recovery operations
 
@@ -29,16 +30,16 @@ does not consume the limit twice.
 V1 exposes three fixed scopes:
 
 - `full`: Clone and execute every step from the base plan.
-- `from_step`: For a strict-linear base plan, execute the selected specialist
-  step, every downstream specialist step, and lead review. Pin the omitted
-  upstream outputs as immutable replay inputs.
+- `from_step`: Execute the selected specialist step and its complete downstream
+  descendant closure through lead review. Pin every required output from an
+  omitted predecessor as an immutable replay input.
 - `step_only`: Execute one selected specialist step and a bounded lead review.
   The result is a candidate delivery and cannot complete the Task or silently
   replace downstream output.
 
-For a pure-parallel plan, use `full` to replay every branch or `step_only` to
-replay one branch. `from_step` is rejected because a parallel plan has no
-single ordered suffix.
+For a pure-parallel plan, `from_step` on one branch executes that branch plus
+lead review while pinning the other terminal branch outputs. `step_only`
+remains the narrower candidate-only operation.
 
 The public request identifies the selected base `plan_step_id`, not only a role
 key. A role may own more than one step in future plan versions.
@@ -52,6 +53,7 @@ The product database owns every replay fact. `TaskReplayRun` records:
 - Scope, target base PlanStep, trigger, reason, feedback, and context policy.
 - Executed and reused base step keys.
 - Exact external input Artifact bindings.
+- Exact external input Delivery bindings for an incremental downstream Replay.
 - Effective Artifact set after the run.
 - Status, lead decision, issues, result summary, and timestamps.
 
@@ -70,6 +72,13 @@ Replay never selects an input by filename, Workspace contents, or "latest"
 guessing. At ReplayRun creation, the product resolves every external contract
 to one immutable Artifact ID and stores that mapping. Materialization uses the
 stored ID even when the Artifact was later superseded.
+
+For an incremental downstream `from_step` Replay, the product resolves every
+omitted upstream stream partition to one accepted final Delivery and persists
+its Stream ID, Delivery ID, partition key, sequence, and SHA-256. Starting the
+Replay copies those exact immutable bytes into a replay-owned Stream Delivery
+with `replay_run_id` and `source_delivery_id`. It never asks Runtime to discover
+an upstream file or substitutes a newer Delivery after the ReplayRun exists.
 
 For `full`, the external inputs are the original Task input Artifacts. For
 `from_step` and `step_only`, external inputs may also include outputs from an
@@ -127,8 +136,9 @@ The authoritative backend exposes:
 
 Replay creation requires a reason. `from_step` and `step_only` require a target
 base PlanStep. The backend expands the actual execution set, validates the
-topology, pins external Artifacts, checks the limit and active-run lock, and
-then starts the replay plan.
+topology, pins external Artifacts or Deliveries, checks the limit and active-run
+lock, and then starts the replay plan. The OpenAPI response uses typed Artifact
+and Delivery binding models rather than unstructured dictionaries.
 
 ## Events and visualization
 
@@ -151,6 +161,9 @@ Task and ReplayRun resources remain authoritative.
 
 ## Deferred boundaries
 
-V1 does not include arbitrary subsets of a graph, mixed serial-parallel replay,
-parallel replay branches inside one Task at the same time, clean Workspace
-snapshot replay, or autonomous changes to formal organization roles.
+V1 does not include arbitrary subsets that are not a descendant closure,
+multiple active ReplayRuns inside one Task, clean Workspace snapshot replay,
+or autonomous changes to formal organization roles. Full incremental Replay,
+incremental `step_only`, and any Replay that would require a producer Runtime to
+publish a stream remain disabled until the restricted producer tool boundary is
+implemented.

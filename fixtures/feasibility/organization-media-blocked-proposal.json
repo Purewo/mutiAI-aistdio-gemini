@@ -1,6 +1,6 @@
 {
-  "spec_version_id": "5a05ed9f-6118-4a2e-99e6-d3f84df94f40",
-  "organization_id": "eb9ff7c8-21d1-4d7d-aa7c-5bdefbc1c361",
+  "spec_version_id": "32135e15-02d9-43f0-b1b1-45654c498609",
+  "organization_id": "8a56333c-f847-4cd4-a5d8-3408b0cfd576",
   "version_number": 1,
   "status": "proposal",
   "spec": {
@@ -15,6 +15,7 @@
         "is_lead": true,
         "reports_to": null,
         "runtime_binding_key": "media-text-only",
+        "expert_version_id": null,
         "capability_requirements": {
           "schema_version": "1.0",
           "os_families": [],
@@ -33,6 +34,11 @@
           "estimated_duration_seconds": null,
           "estimated_input_size_bytes": null,
           "resource_intensive": false
+        },
+        "execution_limits": {
+          "max_tokens_per_attempt": null,
+          "max_cost_usd_per_attempt": null,
+          "max_runtime_seconds_per_attempt": null
         }
       },
       {
@@ -42,6 +48,7 @@
         "is_lead": false,
         "reports_to": "lead",
         "runtime_binding_key": "media-text-only",
+        "expert_version_id": null,
         "capability_requirements": {
           "schema_version": "1.0",
           "os_families": [],
@@ -62,12 +69,17 @@
           "estimated_duration_seconds": null,
           "estimated_input_size_bytes": null,
           "resource_intensive": false
+        },
+        "execution_limits": {
+          "max_tokens_per_attempt": null,
+          "max_cost_usd_per_attempt": null,
+          "max_runtime_seconds_per_attempt": null
         }
       }
     ]
   },
   "source_request": "创建一个主要处理 PDF 的数据分析团队",
-  "created_at": "2026-07-28T17:37:15.766821Z",
+  "created_at": "2026-08-01T18:22:38.825410Z",
   "confirmed_at": null,
   "published_at": null
 }

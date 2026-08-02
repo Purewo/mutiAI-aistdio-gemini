@@ -1,9 +1,9 @@
 {
   "code": "FEASIBILITY_CAPABILITY_UNKNOWN",
   "message": "运行环境能力信息不足，已阻止执行。",
-  "request_id": "24c879e9-4172-4be2-b152-12441338ac6b",
+  "request_id": "2b11e092-2561-432d-9291-f2c30cfffc3a",
   "details": {
-    "feasibility_check_id": "d1bb9cf1-e7a7-4bcb-8548-b42f14d38d18",
+    "feasibility_check_id": "0dff8f10-4648-4641-96ef-4fcbb9345613",
     "outcome": "capability_unknown"
   }
 }

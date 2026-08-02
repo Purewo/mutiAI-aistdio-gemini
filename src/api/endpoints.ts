@@ -5,21 +5,60 @@
  * Response types come from `types.ts`, which aliases the generated OpenAPI schema, so a contract
  * refresh surfaces as a type error rather than a silent runtime mismatch.
  */
-import { buildApiUrl, requestJson, requestVoid } from './http';
+import { buildApiUrl, requestBlob, requestJson, requestVoid } from './http';
 import type {
   Approval,
   ApprovalDecisionRequest,
   Artifact,
+  ArtifactStream,
   ChangePasswordRequest,
   UpdateUserRequest,
+  ChannelAuthorization,
+  ChannelAuthorizationPollRequest,
+  ChannelConnection,
+  ChannelConnectionCreateRequest,
+  ChannelIdentity,
+  ChannelIdentityUpsertRequest,
+  ChannelInboundDelivery,
+  ChannelOutboundDelivery,
+  ChannelProvider,
+  CoordinationCase,
+  CoordinationCaseStatus,
+  CoordinationCaseTransitionRequest,
+  CoordinationEvent,
+  CoordinationInboxDelivery,
+  CoordinationInboxDeliveryStatus,
+  CoordinationRoutingRun,
+  CoordinationSemanticObservationRequest,
+  CoordinationSemanticObservationResponse,
+  CoordinationSignalCreateRequest,
+  CoordinationSignalCreateResponse,
+  CoordinationWorkItem,
+  CoordinationWorkItemCreateRequest,
+  CoordinationWorkItemReportRequest,
+  CoordinationWorkItemReportResponse,
+  CoordinationWorkItemTransitionRequest,
   AssistantAction,
   AssistantActionDecisionRequest,
   AssistantAttachment,
   AssistantConversation,
+  AssistantInput,
   AssistantMessagePage,
   AssistantSubmission,
   AssistantTurn,
   AssistantUserMessageRequest,
+  ExpertAttachment,
+  ExpertCatalogItem,
+  ExpertCategory,
+  ExpertConversation,
+  ExpertConversationCreateRequest,
+  ExpertDetail,
+  ExpertInteractionMode,
+  ExpertMessagePage,
+  ExpertMessageRequest,
+  ExpertSubmission,
+  ExpertTurn,
+  ExpertVersion,
   FeasibilityCheck,
   LoginRequest,
   LoginResponse,
@@ -27,11 +66,16 @@ import type {
   OrganizationProposalRequest,
   OrganizationSummary,
   OrganizationVersion,
+  PlanStepExecution,
+  PlanStepExecutionCancelRequest,
+  PlanStepExecutionRetryRequest,
   RuntimeBinding,
   RuntimeBindingUpsertRequest,
   RuntimeControl,
+  RoleWorkItemCancelRequest,
   Task,
   TaskCreateRequest,
+  TaskGraphProjection,
   TaskInputArtifactRequest,
   TaskReplayPolicyRequest,
   TaskReplayRequest,
@@ -162,6 +206,138 @@ export function publishOrganizationVersion(
   );
 }
 
+/* --------------------------------------------------------- Expert Marketplace */
+
+export function listExperts(
+  query: {
+    query?: string;
+    provider?: string;
+    category?: readonly string[];
+    interaction_mode?: ExpertInteractionMode;
+    input_media_type?: string;
+    output_media_type?: string;
+    eligible_only?: boolean;
+    limit?: number;
+  } = {},
+  signal?: AbortSignal,
+): Promise<ExpertCatalogItem[]> {
+  return requestJson<ExpertCatalogItem[]>('/experts', { query, signal });
+}
+
+/** Operator-owned read-only marketplace categories, including currently empty categories. */
+export function listExpertCategories(signal?: AbortSignal): Promise<ExpertCategory[]> {
+  return requestJson<ExpertCategory[]>('/experts/categories', { signal });
+}
+
+export function getExpert(expertId: string, signal?: AbortSignal): Promise<ExpertDetail> {
+  return requestJson<ExpertDetail>(`/experts/${encode(expertId)}`, { signal });
+}
+
+export function getExpertVersion(
+  expertVersionId: string,
+  signal?: AbortSignal,
+): Promise<ExpertVersion> {
+  return requestJson<ExpertVersion>(`/experts/versions/${encode(expertVersionId)}`, { signal });
+}
+
+export function listExpertConversations(signal?: AbortSignal): Promise<ExpertConversation[]> {
+  return requestJson<ExpertConversation[]>('/experts/conversations', { signal });
+}
+
+export function createExpertConversation(
+  body: ExpertConversationCreateRequest,
+  signal?: AbortSignal,
+): Promise<ExpertConversation> {
+  return requestJson<ExpertConversation>('/experts/conversations', {
+    method: 'POST',
+    body,
+    signal,
+  });
+}
+
+export function getExpertConversation(
+  conversationId: string,
+  signal?: AbortSignal,
+): Promise<ExpertConversation> {
+  return requestJson<ExpertConversation>(
+    `/experts/conversations/${encode(conversationId)}`,
+    { signal },
+  );
+}
+
+export function archiveExpertConversation(
+  conversationId: string,
+  signal?: AbortSignal,
+): Promise<ExpertConversation> {
+  return requestJson<ExpertConversation>(
+    `/experts/conversations/${encode(conversationId)}/archive`,
+    { method: 'POST', signal },
+  );
+}
+
+export function uploadExpertAttachment(
+  conversationId: string,
+  file: File,
+  signal?: AbortSignal,
+): Promise<ExpertAttachment> {
+  const formData = new FormData();
+  formData.append('file', file, file.name);
+  return requestJson<ExpertAttachment>(
+    `/experts/conversations/${encode(conversationId)}/attachments`,
+    { method: 'POST', formData, signal },
+  );
+}
+
+export function revokeExpertAttachment(
+  conversationId: string,
+  attachmentId: string,
+  signal?: AbortSignal,
+): Promise<ExpertAttachment> {
+  return requestJson<ExpertAttachment>(
+    `/experts/conversations/${encode(conversationId)}/attachments/${encode(attachmentId)}`,
+    { method: 'DELETE', signal },
+  );
+}
+
+export function readExpertAttachmentContent(
+  conversationId: string,
+  attachmentId: string,
+  download = false,
+  signal?: AbortSignal,
+): Promise<Blob> {
+  return requestBlob(
+    `/experts/conversations/${encode(conversationId)}/attachments/${encode(attachmentId)}/content`,
+    { download: download || undefined },
+    signal,
+  );
+}
+
+export function listExpertMessages(
+  conversationId: string,
+  signal?: AbortSignal,
+): Promise<ExpertMessagePage> {
+  return requestJson<ExpertMessagePage>(
+    `/experts/conversations/${encode(conversationId)}/messages`,
+    { signal },
+  );
+}
+
+export function submitExpertMessage(
+  conversationId: string,
+  body: ExpertMessageRequest,
+  idempotencyKey: string,
+  signal?: AbortSignal,
+): Promise<ExpertSubmission> {
+  return requestJson<ExpertSubmission>(
+    `/experts/conversations/${encode(conversationId)}/messages`,
+    { method: 'POST', body, idempotencyKey, signal },
+  );
+}
+
+export function getExpertTurn(turnId: string, signal?: AbortSignal): Promise<ExpertTurn> {
+  return requestJson<ExpertTurn>(`/experts/turns/${encode(turnId)}`, { signal });
+}
+
 /* ------------------------------------------- platform assistant conversation */
 
 /**
@@ -225,6 +401,25 @@ export function submitAssistantMessage(
 ): Promise<AssistantSubmission> {
   return requestJson<AssistantSubmission>(
     `/assistant/conversations/${encode(conversationId)}/messages`,
+    { method: 'POST', body, idempotencyKey, signal },
+  );
+}
+
+/**
+ * Submit web composer input through the unified conversation boundary.
+ *
+ * The discriminated response either queues an assistant Turn, records an exact text Action
+ * decision, or persists a product acknowledgement explaining why no deterministic decision was
+ * possible. Only the `assistant_turn` branch creates Runtime work.
+ */
+export function submitAssistantInput(
+  conversationId: string,
+  body: AssistantUserMessageRequest,
+  idempotencyKey: string,
+  signal?: AbortSignal,
+): Promise<AssistantInput> {
+  return requestJson<AssistantInput>(
+    `/assistant/conversations/${encode(conversationId)}/inputs`,
     { method: 'POST', body, idempotencyKey, signal },
   );
 }
@@ -375,9 +570,290 @@ export function upsertRuntimeBinding(
   });
 }
 
-/** Product admission, capacity, and token-budget state, including the allowed control values. */
-export function getRuntimeControls(signal?: AbortSignal): Promise<RuntimeControl> {
-  return requestJson<RuntimeControl>('/runtime/controls', { signal });
+/** Product admission, capacity, and token-budget state for one registered provider. */
+export function getRuntimeControls(
+  provider?: string,
+  signal?: AbortSignal,
+): Promise<RuntimeControl> {
+  return requestJson<RuntimeControl>('/runtime/controls', {
+    query: provider ? { provider } : undefined,
+    signal,
+  });
+}
+
+/* ---------------------------------------------------------- external channels */
+
+export function listChannelProviders(signal?: AbortSignal): Promise<ChannelProvider[]> {
+  return requestJson<ChannelProvider[]>('/channels/providers', { signal });
+}
+
+export function listChannelConnections(signal?: AbortSignal): Promise<ChannelConnection[]> {
+  return requestJson<ChannelConnection[]>('/channels/connections', { signal });
+}
+
+export function createChannelConnection(
+  body: ChannelConnectionCreateRequest,
+  signal?: AbortSignal,
+): Promise<ChannelConnection> {
+  return requestJson<ChannelConnection>('/channels/connections', {
+    method: 'POST',
+    body,
+    signal,
+  });
+}
+
+export function getChannelConnection(
+  connectionId: string,
+  signal?: AbortSignal,
+): Promise<ChannelConnection> {
+  return requestJson<ChannelConnection>(
+    `/channels/connections/${encode(connectionId)}`,
+    { signal },
+  );
+}
+
+export function beginChannelAuthorization(
+  connectionId: string,
+  signal?: AbortSignal,
+): Promise<ChannelAuthorization> {
+  return requestJson<ChannelAuthorization>(
+    `/channels/connections/${encode(connectionId)}/authorization`,
+    { method: 'POST', signal },
+  );
+}
+
+export function pollChannelAuthorization(
+  connectionId: string,
+  authSessionId: string,
+  body?: ChannelAuthorizationPollRequest,
+  signal?: AbortSignal,
+): Promise<ChannelAuthorization> {
+  return requestJson<ChannelAuthorization>(
+    `/channels/connections/${encode(connectionId)}/authorization/${encode(authSessionId)}/poll`,
+    { method: 'POST', body, signal },
+  );
+}
+
+export function disconnectChannelConnection(
+  connectionId: string,
+  signal?: AbortSignal,
+): Promise<ChannelConnection> {
+  return requestJson<ChannelConnection>(
+    `/channels/connections/${encode(connectionId)}/disconnect`,
+    { method: 'POST', signal },
+  );
+}
+
+export function listChannelIdentities(
+  connectionId: string,
+  signal?: AbortSignal,
+): Promise<ChannelIdentity[]> {
+  return requestJson<ChannelIdentity[]>(
+    `/channels/connections/${encode(connectionId)}/identities`,
+    { signal },
+  );
+}
+
+export function upsertChannelIdentity(
+  connectionId: string,
+  body: ChannelIdentityUpsertRequest,
+  signal?: AbortSignal,
+): Promise<ChannelIdentity> {
+  return requestJson<ChannelIdentity>(
+    `/channels/connections/${encode(connectionId)}/identities`,
+    { method: 'POST', body, signal },
+  );
+}
+
+export function revokeChannelIdentity(
+  connectionId: string,
+  identityId: string,
+  signal?: AbortSignal,
+): Promise<ChannelIdentity> {
+  return requestJson<ChannelIdentity>(
+    `/channels/connections/${encode(connectionId)}/identities/${encode(identityId)}/revoke`,
+    { method: 'POST', signal },
+  );
+}
+
+export function listChannelInboundDeliveries(
+  connectionId: string,
+  limit = 50,
+  signal?: AbortSignal,
+): Promise<ChannelInboundDelivery[]> {
+  return requestJson<ChannelInboundDelivery[]>(
+    `/channels/connections/${encode(connectionId)}/inbound-deliveries`,
+    { query: { limit }, signal },
+  );
+}
+
+export function listChannelOutboundDeliveries(
+  connectionId: string,
+  limit = 50,
+  signal?: AbortSignal,
+): Promise<ChannelOutboundDelivery[]> {
+  return requestJson<ChannelOutboundDelivery[]>(
+    `/channels/connections/${encode(connectionId)}/outbound-deliveries`,
+    { query: { limit }, signal },
+  );
+}
+
+/* ----------------------------------------------- shared coordination plane */
+
+/**
+ * Submit a natural-language product observation to the restricted semantic router. The source
+ * role is selected from the published organization; target ownership remains a backend decision.
+ */
+export function createCoordinationSemanticObservation(
+  body: CoordinationSemanticObservationRequest,
+  idempotencyKey: string,
+  signal?: AbortSignal,
+): Promise<CoordinationSemanticObservationResponse> {
+  return requestJson<CoordinationSemanticObservationResponse>(
+    '/coordination/semantic-observations',
+    { method: 'POST', body, idempotencyKey, signal },
+  );
+}
+
+/** Read one owner-scoped safe routing projection; Runtime Thread, Turn and Workspace stay private. */
+export function getCoordinationRoutingRun(
+  routingRunId: string,
+  signal?: AbortSignal,
+): Promise<CoordinationRoutingRun> {
+  return requestJson<CoordinationRoutingRun>(
+    `/coordination/routing-runs/${encode(routingRunId)}`,
+    { signal },
+  );
+}
+
+/**
+ * Report the bounded result of the currently assigned WorkItem. The backend validates the
+ * reporting role, closes the WorkItem idempotently and decides whether another routing run starts.
+ */
+export function reportCoordinationWorkItem(
+  workItemId: string,
+  body: CoordinationWorkItemReportRequest,
+  idempotencyKey: string,
+  signal?: AbortSignal,
+): Promise<CoordinationWorkItemReportResponse> {
+  return requestJson<CoordinationWorkItemReportResponse>(
+    `/coordination/work-items/${encode(workItemId)}/reports`,
+    { method: 'POST', body, idempotencyKey, signal },
+  );
+}
+
+/**
+ * Record one owner-scoped Signal and open its durable Case. The same stable key returns the
+ * original records; a changed payload with that key is a conflict.
+ */
+export function createCoordinationSignal(
+  body: CoordinationSignalCreateRequest,
+  idempotencyKey: string,
+  signal?: AbortSignal,
+): Promise<CoordinationSignalCreateResponse> {
+  return requestJson<CoordinationSignalCreateResponse>('/coordination/signals', {
+    method: 'POST',
+    body,
+    idempotencyKey,
+    signal,
+  });
+}
+
+export function listCoordinationCases(
+  filters: { organizationId?: string; status?: CoordinationCaseStatus } = {},
+  signal?: AbortSignal,
+): Promise<CoordinationCase[]> {
+  return requestJson<CoordinationCase[]>('/coordination/cases', {
+    query: {
+      organization_id: filters.organizationId,
+      status: filters.status,
+    },
+    signal,
+  });
+}
+
+export function getCoordinationCase(
+  caseId: string,
+  signal?: AbortSignal,
+): Promise<CoordinationCase> {
+  return requestJson<CoordinationCase>(`/coordination/cases/${encode(caseId)}`, { signal });
+}
+
+export function createCoordinationWorkItem(
+  caseId: string,
+  body: CoordinationWorkItemCreateRequest,
+  idempotencyKey: string,
+  signal?: AbortSignal,
+): Promise<CoordinationWorkItem> {
+  return requestJson<CoordinationWorkItem>(
+    `/coordination/cases/${encode(caseId)}/work-items`,
+    { method: 'POST', body, idempotencyKey, signal },
+  );
+}
+
+export function transitionCoordinationCase(
+  caseId: string,
+  body: CoordinationCaseTransitionRequest,
+  idempotencyKey?: string,
+  signal?: AbortSignal,
+): Promise<CoordinationCase> {
+  return requestJson<CoordinationCase>(`/coordination/cases/${encode(caseId)}/transition`, {
+    method: 'POST',
+    body,
+    idempotencyKey,
+    signal,
+  });
+}
+
+export function transitionCoordinationWorkItem(
+  workItemId: string,
+  body: CoordinationWorkItemTransitionRequest,
+  idempotencyKey?: string,
+  signal?: AbortSignal,
+): Promise<CoordinationWorkItem> {
+  return requestJson<CoordinationWorkItem>(
+    `/coordination/work-items/${encode(workItemId)}/transition`,
+    { method: 'POST', body, idempotencyKey, signal },
+  );
+}
+
+export function listCoordinationInbox(
+  filters: {
+    organizationId?: string;
+    targetRoleKey?: string;
+    status?: CoordinationInboxDeliveryStatus;
+  } = {},
+  signal?: AbortSignal,
+): Promise<CoordinationInboxDelivery[]> {
+  return requestJson<CoordinationInboxDelivery[]>('/coordination/inbox', {
+    query: {
+      organization_id: filters.organizationId,
+      target_role_key: filters.targetRoleKey,
+      status: filters.status,
+    },
+    signal,
+  });
+}
+
+export function markCoordinationInboxRead(
+  deliveryId: string,
+  signal?: AbortSignal,
+): Promise<CoordinationInboxDelivery> {
+  return requestJson<CoordinationInboxDelivery>(
+    `/coordination/inbox/${encode(deliveryId)}/read`,
+    { method: 'POST', signal },
+  );
+}
+
+export function listCoordinationEventHistory(
+  caseId: string,
+  afterSequence = 0,
+  signal?: AbortSignal,
+): Promise<CoordinationEvent[]> {
+  return requestJson<CoordinationEvent[]>(
+    `/coordination/cases/${encode(caseId)}/events/history`,
+    { query: { after_sequence: afterSequence }, signal },
+  );
 }
 
 /* --------------------------------------------------------------- tasks */
@@ -404,6 +880,86 @@ export function createTask(
 
 export function getTask(taskId: string, signal?: AbortSignal): Promise<Task> {
   return requestJson<Task>(`/tasks/${encode(taskId)}`, { signal });
+}
+
+/** Read the persisted, owner-scoped Task Graph Projection used by the operational blueprint. */
+export function getTaskGraph(
+  taskId: string,
+  signal?: AbortSignal,
+): Promise<TaskGraphProjection> {
+  return requestJson<TaskGraphProjection>(`/tasks/${encode(taskId)}/graph`, { signal });
+}
+
+/** List every persisted finite Artifact stream for a Task. */
+export function listTaskArtifactStreams(
+  taskId: string,
+  signal?: AbortSignal,
+): Promise<ArtifactStream[]> {
+  return requestJson<ArtifactStream[]>(`/tasks/${encode(taskId)}/streams`, { signal });
+}
+
+/** Read one owner-scoped stream projection, including partitions, deliveries and finalization. */
+export function getTaskArtifactStream(
+  taskId: string,
+  streamId: string,
+  signal?: AbortSignal,
+): Promise<ArtifactStream> {
+  return requestJson<ArtifactStream>(
+    `/tasks/${encode(taskId)}/streams/${encode(streamId)}`,
+    { signal },
+  );
+}
+
+/** List persisted keyed `each` executions beneath the Task's frozen PlanSteps. */
+export function listTaskStreamExecutions(
+  taskId: string,
+  signal?: AbortSignal,
+): Promise<PlanStepExecution[]> {
+  return requestJson<PlanStepExecution[]>(`/tasks/${encode(taskId)}/stream-executions`, {
+    signal,
+  });
+}
+
+/** Read one keyed execution together with its exact immutable Delivery input bindings. */
+export function getTaskStreamExecution(
+  taskId: string,
+  planStepExecutionId: string,
+  signal?: AbortSignal,
+): Promise<PlanStepExecution> {
+  return requestJson<PlanStepExecution>(
+    `/tasks/${encode(taskId)}/stream-executions/${encode(planStepExecutionId)}`,
+    { signal },
+  );
+}
+
+/**
+ * Retry exactly one failed or cancelled keyed execution. The idempotency key belongs to this
+ * technical Retry and never consumes or impersonates a business ReplayRun.
+ */
+export function retryTaskStreamExecution(
+  taskId: string,
+  planStepExecutionId: string,
+  body: PlanStepExecutionRetryRequest,
+  idempotencyKey: string,
+  signal?: AbortSignal,
+): Promise<PlanStepExecution> {
+  return requestJson<PlanStepExecution>(
+    `/tasks/${encode(taskId)}/stream-executions/${encode(planStepExecutionId)}/retry`,
+    { method: 'POST', body, idempotencyKey, signal },
+  );
+}
+
+/** Cancel one keyed partition without cancelling or rewriting its successful siblings. */
+export function cancelTaskStreamExecution(
+  taskId: string,
+  planStepExecutionId: string,
+  body: PlanStepExecutionCancelRequest,
+  signal?: AbortSignal,
+): Promise<PlanStepExecution> {
+  return requestJson<PlanStepExecution>(
+    `/tasks/${encode(taskId)}/stream-executions/${encode(planStepExecutionId)}/cancel`,
+    { method: 'POST', body, signal },
+  );
 }
 
 /** Run the organization lead's planning boundary and persist the execution plan. */
@@ -483,6 +1039,19 @@ export function createTaskReplay(
  */
 export function cancelTask(taskId: string, signal?: AbortSignal): Promise<Task> {
   return requestJson<Task>(`/tasks/${encode(taskId)}/cancel`, { method: 'POST', signal });
+}
+
+/** Cancel one queued role work item without dispatching Runtime work or touching sibling work. */
+export function cancelRoleWorkItem(
+  taskId: string,
+  roleWorkItemId: string,
+  body: RoleWorkItemCancelRequest,
+  signal?: AbortSignal,
+): Promise<Task> {
+  return requestJson<Task>(
+    `/tasks/${encode(taskId)}/role-queue/${encode(roleWorkItemId)}/cancel`,
+    { method: 'POST', body, signal },
+  );
 }
 
 /** Task-level token totals and the per-Assignment breakdown. */

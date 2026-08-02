@@ -1,10 +1,10 @@
 {
-  "feasibility_check_id": "6ca46fb7-c23d-4c7f-900d-c683069a2cfe",
+  "feasibility_check_id": "463df1bb-a881-4d9f-8feb-f6d1faede5b8",
   "target_type": "organization_version",
-  "target_id": "14573fde-b04d-4e8c-b8a7-a553f2feecec",
+  "target_id": "a8e950a2-3d44-4d29-8f90-011e6938c2ac",
   "phase": "proposal",
-  "validator_version": "1.0",
-  "input_hash": "00ce2be01f58054093261f3d9c24d88dcc468b4e79c1534ac9d3d31646035c4e",
+  "validator_version": "1.2",
+  "input_hash": "802f73b29cc7298092ebd503b82557ba622a61c6bf8aefe7a2a87573ad0c7ee9",
   "requirements": [
     {
       "role_key": "lead",
@@ -27,7 +27,8 @@
         "estimated_duration_seconds": null,
         "estimated_input_size_bytes": null,
         "resource_intensive": false
-      }
+      },
+      "max_cost_usd_per_attempt": null
     },
     {
       "role_key": "specialist",
@@ -53,26 +54,27 @@
         "estimated_duration_seconds": null,
         "estimated_input_size_bytes": null,
         "resource_intensive": false
-      }
+      },
+      "max_cost_usd_per_attempt": null
     }
   ],
   "profile_revisions": [
     {
       "role_key": "lead",
       "binding_key": "media-standard",
-      "runtime_binding_id": "a6b8220e-e0f4-4ae7-9b2d-62290b64caf5",
-      "capability_profile_id": "17293609-ba13-4fe5-94c6-8d6c82a0c455",
+      "runtime_binding_id": "581fae41-b777-4ebb-8f8c-7f672585cac0",
+      "capability_profile_id": "fe7f3485-2526-47d5-9762-55eb7b88b8e2",
       "revision": 1
     },
     {
       "role_key": "specialist",
       "binding_key": "media-standard",
-      "runtime_binding_id": "a6b8220e-e0f4-4ae7-9b2d-62290b64caf5",
-      "capability_profile_id": "17293609-ba13-4fe5-94c6-8d6c82a0c455",
+      "runtime_binding_id": "581fae41-b777-4ebb-8f8c-7f672585cac0",
+      "capability_profile_id": "fe7f3485-2526-47d5-9762-55eb7b88b8e2",
       "revision": 1
     }
   ],
   "outcome": "feasible",
   "findings": [],
-  "created_at": "2026-07-28T17:37:15.682440Z"
+  "created_at": "2026-08-01T18:22:38.737759Z"
 }

@@ -1,11 +1,11 @@
 [
   {
-    "feasibility_check_id": "7d444603-2ff8-41a8-8518-a23cb9e60cd9",
+    "feasibility_check_id": "056b9063-98d6-43e7-a358-69fbc3d3e91d",
     "target_type": "task",
-    "target_id": "f57c80d8-ebb5-411a-9004-d924dc9cdf94",
+    "target_id": "951c1c78-ce80-4a92-af38-c273dd4d7db1",
     "phase": "task_submission",
-    "validator_version": "1.0",
-    "input_hash": "30bcc2b8b673955604725abae041bbbd7556b0401c1f0173e80333825131b401",
+    "validator_version": "1.2",
+    "input_hash": "2050c2a4efa43e0569a35677725ac8288d846791215fb7382c30ba06424b02e7",
     "requirements": [
       {
         "role_key": "lead",
@@ -28,7 +28,8 @@
           "estimated_duration_seconds": null,
           "estimated_input_size_bytes": null,
           "resource_intensive": false
-        }
+        },
+        "max_cost_usd_per_attempt": null
       },
       {
         "role_key": "specialist",
@@ -51,36 +52,37 @@
           "estimated_duration_seconds": null,
           "estimated_input_size_bytes": null,
           "resource_intensive": false
-        }
+        },
+        "max_cost_usd_per_attempt": null
       }
     ],
     "profile_revisions": [
       {
         "role_key": "lead",
         "binding_key": "linux-standard",
-        "runtime_binding_id": "2ed18518-f0ed-4d49-bbcc-f3e6a08f95e9",
-        "capability_profile_id": "7c1ef848-63c1-4778-b537-de3954380c9c",
+        "runtime_binding_id": "5e764017-4b0e-446b-ad9d-0832da912f35",
+        "capability_profile_id": "28fde342-2e5c-47bc-bfe7-a57cf4c801ba",
         "revision": 1
       },
       {
         "role_key": "specialist",
         "binding_key": "linux-standard",
-        "runtime_binding_id": "2ed18518-f0ed-4d49-bbcc-f3e6a08f95e9",
-        "capability_profile_id": "7c1ef848-63c1-4778-b537-de3954380c9c",
+        "runtime_binding_id": "5e764017-4b0e-446b-ad9d-0832da912f35",
+        "capability_profile_id": "28fde342-2e5c-47bc-bfe7-a57cf4c801ba",
         "revision": 1
       }
     ],
     "outcome": "feasible",
     "findings": [],
-    "created_at": "2026-07-28T17:37:15.333766Z"
+    "created_at": "2026-08-01T18:22:38.408769Z"
   },
   {
-    "feasibility_check_id": "035738de-0674-4955-a065-9d659eaa5755",
+    "feasibility_check_id": "85a460ec-0ab4-4adb-8697-91e4e948d36c",
     "target_type": "task",
-    "target_id": "f57c80d8-ebb5-411a-9004-d924dc9cdf94",
+    "target_id": "951c1c78-ce80-4a92-af38-c273dd4d7db1",
     "phase": "runtime_start",
-    "validator_version": "1.0",
-    "input_hash": "e32fbcf696d193ffbf2b57be8b56d0bab14a2c8a980cbb53539da0ebc4afcb72",
+    "validator_version": "1.2",
+    "input_hash": "363eb346ddd02c79aa7b18540658485f7c79edf2488eb2442eaf07fdcf5c2a95",
     "requirements": [
       {
         "role_key": "specialist",
@@ -103,29 +105,30 @@
           "estimated_duration_seconds": null,
           "estimated_input_size_bytes": null,
           "resource_intensive": false
-        }
+        },
+        "max_cost_usd_per_attempt": null
       }
     ],
     "profile_revisions": [
       {
         "role_key": "specialist",
         "binding_key": "linux-standard",
-        "runtime_binding_id": "2ed18518-f0ed-4d49-bbcc-f3e6a08f95e9",
-        "capability_profile_id": "7c1ef848-63c1-4778-b537-de3954380c9c",
+        "runtime_binding_id": "5e764017-4b0e-446b-ad9d-0832da912f35",
+        "capability_profile_id": "28fde342-2e5c-47bc-bfe7-a57cf4c801ba",
         "revision": 1
       }
     ],
     "outcome": "feasible",
     "findings": [],
-    "created_at": "2026-07-28T17:37:15.459067Z"
+    "created_at": "2026-08-01T18:22:38.507121Z"
   },
   {
-    "feasibility_check_id": "4013c942-6917-4569-a95e-8ffa8244097e",
+    "feasibility_check_id": "987ec6c2-7cae-4bfd-91b1-c15945ec6a54",
     "target_type": "task",
-    "target_id": "f57c80d8-ebb5-411a-9004-d924dc9cdf94",
+    "target_id": "951c1c78-ce80-4a92-af38-c273dd4d7db1",
     "phase": "runtime_start",
-    "validator_version": "1.0",
-    "input_hash": "13db650ddd09983a430db8e6d7efc4c68da0c10bd225306ed66979c7899e673c",
+    "validator_version": "1.2",
+    "input_hash": "9385bcc2fb906c625fb2e503020de523da752ba770a0cdc4f3158516ec6d9fb6",
     "requirements": [
       {
         "role_key": "lead",
@@ -148,20 +151,21 @@
           "estimated_duration_seconds": null,
           "estimated_input_size_bytes": null,
           "resource_intensive": false
-        }
+        },
+        "max_cost_usd_per_attempt": null
       }
     ],
     "profile_revisions": [
       {
         "role_key": "lead",
         "binding_key": "linux-standard",
-        "runtime_binding_id": "2ed18518-f0ed-4d49-bbcc-f3e6a08f95e9",
-        "capability_profile_id": "7c1ef848-63c1-4778-b537-de3954380c9c",
+        "runtime_binding_id": "5e764017-4b0e-446b-ad9d-0832da912f35",
+        "capability_profile_id": "28fde342-2e5c-47bc-bfe7-a57cf4c801ba",
         "revision": 1
       }
     ],
     "outcome": "feasible",
     "findings": [],
-    "created_at": "2026-07-28T17:37:15.522970Z"
+    "created_at": "2026-08-01T18:22:38.576473Z"
   }
 ]

@@ -211,14 +211,14 @@ function CodeBlock({
 
   return (
     <section className="overflow-hidden rounded-2xl border border-slate-700 bg-slate-950 shadow-sm">
-      <header className="flex items-center gap-2 border-b border-white/10 bg-white/[0.04] px-3 py-2 text-[11px] text-slate-300">
+      <header className="flex flex-wrap items-center gap-2 border-b border-white/10 bg-white/[0.04] px-3 py-2 text-[11px] text-slate-300">
         <FileCode2 className="h-3.5 w-3.5 text-sky-300" aria-hidden="true" />
         <span className="font-mono font-semibold text-sky-200">{block.language || 'text'}</span>
         {block.file_name ? <span className="min-w-0 truncate text-slate-400">{block.file_name}</span> : null}
         <button
           type="button"
           onClick={() => void copy()}
-          className="ml-auto inline-flex items-center gap-1 rounded-lg px-2 py-1 font-semibold text-slate-300 transition-colors hover:bg-white/10 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-300"
+          className="ml-auto inline-flex min-h-11 items-center gap-1 rounded-lg px-3 py-2 font-semibold text-slate-300 transition-colors hover:bg-white/10 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-300"
         >
           {copied ? <Check className="h-3.5 w-3.5" aria-hidden="true" /> : <Clipboard className="h-3.5 w-3.5" aria-hidden="true" />}
           {copied ? '已复制' : '复制'}
@@ -276,7 +276,7 @@ function AttachmentBlock({
         inverted ? 'border-white/20 bg-white/10 text-white' : 'border-slate-200 bg-slate-50/90 text-slate-700'
       }`}
     >
-      <div className="flex min-w-0 items-center gap-3">
+      <div className="flex min-w-0 flex-wrap items-center gap-3">
         <div
           className={`flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl border ${
             inverted ? 'border-white/20 bg-white/10' : 'border-slate-200 bg-white text-indigo-600'
@@ -285,8 +285,8 @@ function AttachmentBlock({
           <File className="h-5 w-5" aria-hidden="true" />
         </div>
         <div className="min-w-0 flex-1">
-          <p className="truncate text-sm font-semibold" title={block.file_name}>{block.file_name}</p>
-          <p className={`truncate text-[11px] ${inverted ? 'text-indigo-100' : 'text-slate-500'}`}>
+          <p className="break-all text-sm font-semibold sm:truncate" title={block.file_name}>{block.file_name}</p>
+          <p className={`break-all text-[11px] ${inverted ? 'text-indigo-100' : 'text-slate-500'} sm:truncate`}>
             {block.media_type} · {formatBytes(block.byte_size)} · SHA-256 {block.sha256.slice(0, 10)}…
           </p>
         </div>
@@ -294,14 +294,14 @@ function AttachmentBlock({
           href={previewUrl}
           target="_blank"
           rel="noreferrer"
-          className="inline-flex h-8 items-center gap-1 rounded-lg px-2 text-xs font-semibold transition-colors hover:bg-black/5 focus:outline-none focus-visible:ring-2 focus-visible:ring-current"
+          className="inline-flex min-h-11 flex-1 items-center justify-center gap-1 rounded-lg px-2 text-xs font-semibold transition-colors hover:bg-black/5 focus:outline-none focus-visible:ring-2 focus-visible:ring-current sm:min-h-8 sm:flex-none"
         >
           <ExternalLink className="h-3.5 w-3.5" aria-hidden="true" />
           预览
         </a>
         <a
           href={downloadUrl}
-          className="inline-flex h-8 items-center gap-1 rounded-lg px-2 text-xs font-semibold transition-colors hover:bg-black/5 focus:outline-none focus-visible:ring-2 focus-visible:ring-current"
+          className="inline-flex min-h-11 flex-1 items-center justify-center gap-1 rounded-lg px-2 text-xs font-semibold transition-colors hover:bg-black/5 focus:outline-none focus-visible:ring-2 focus-visible:ring-current sm:min-h-8 sm:flex-none"
         >
           <Download className="h-3.5 w-3.5" aria-hidden="true" />
           下载
@@ -328,20 +328,20 @@ function HtmlReportBlock({
           <FileText className="h-4 w-4" aria-hidden="true" />
         </div>
         <div className="min-w-0 flex-1">
-          <p className="truncate text-sm font-semibold text-slate-800">{block.title}</p>
+          <p className="break-words text-sm font-semibold text-slate-800 sm:truncate">{block.title}</p>
           <p className="mt-0.5 text-xs leading-relaxed text-slate-500">{block.text}</p>
         </div>
-        <div className="flex items-center gap-1.5">
+        <div className="flex w-full items-center gap-1.5 sm:w-auto">
           <Link
             to={`/tasks/${encodeURIComponent(block.source.task_id)}`}
-            className="inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-semibold text-indigo-700 transition-colors hover:bg-indigo-50 focus:outline-none focus-visible:ring-4 focus-visible:ring-indigo-500/15"
+            className="inline-flex min-h-11 flex-1 items-center justify-center gap-1.5 rounded-lg px-2.5 py-2 text-xs font-semibold text-indigo-700 transition-colors hover:bg-indigo-50 focus:outline-none focus-visible:ring-4 focus-visible:ring-indigo-500/15 sm:min-h-0 sm:flex-none sm:py-1.5"
           >
             查看任务
             <ExternalLink className="h-3.5 w-3.5" aria-hidden="true" />
           </Link>
           <a
             href={downloadUrl}
-            className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs font-semibold text-slate-600 transition-colors hover:bg-slate-100 focus:outline-none focus-visible:ring-4 focus-visible:ring-indigo-500/15"
+            className="inline-flex min-h-11 flex-1 items-center justify-center gap-1.5 rounded-lg border border-slate-200 bg-white px-2.5 py-2 text-xs font-semibold text-slate-600 transition-colors hover:bg-slate-100 focus:outline-none focus-visible:ring-4 focus-visible:ring-indigo-500/15 sm:min-h-0 sm:flex-none sm:py-1.5"
           >
             <Download className="h-3.5 w-3.5" aria-hidden="true" />
             下载报告
@@ -369,7 +369,7 @@ function HtmlReportBlock({
             referrerPolicy="no-referrer"
             loading="lazy"
             onError={() => setPreviewFailed(true)}
-            className="h-[420px] w-full rounded-xl border border-slate-200 bg-white shadow-inner"
+            className="h-[min(60dvh,420px)] min-h-64 w-full rounded-xl border border-slate-200 bg-white shadow-inner"
           />
           <p className="mt-2 text-[11px] leading-relaxed text-slate-400">
             这是后端校验后的静态报告预览，脚本、外部资源和交互能力均已禁用。

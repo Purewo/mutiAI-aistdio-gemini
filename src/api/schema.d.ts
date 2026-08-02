@@ -24,6 +24,229 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/experts/conversations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Conversations */
+        get: operations["list_conversations_api_v1_experts_conversations_get"];
+        put?: never;
+        /** Create Conversation */
+        post: operations["create_conversation_api_v1_experts_conversations_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/experts/conversations/{conversation_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Conversation */
+        get: operations["get_conversation_api_v1_experts_conversations__conversation_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/experts/conversations/{conversation_id}/archive": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Archive Conversation */
+        post: operations["archive_conversation_api_v1_experts_conversations__conversation_id__archive_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/experts/conversations/{conversation_id}/attachments": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Upload Attachment */
+        post: operations["upload_attachment_api_v1_experts_conversations__conversation_id__attachments_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/experts/conversations/{conversation_id}/attachments/{attachment_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Revoke Attachment */
+        delete: operations["revoke_attachment_api_v1_experts_conversations__conversation_id__attachments__attachment_id__delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/experts/conversations/{conversation_id}/attachments/{attachment_id}/content": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Read Attachment */
+        get: operations["read_attachment_api_v1_experts_conversations__conversation_id__attachments__attachment_id__content_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/experts/conversations/{conversation_id}/messages": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Messages */
+        get: operations["list_messages_api_v1_experts_conversations__conversation_id__messages_get"];
+        put?: never;
+        /** Submit Message */
+        post: operations["submit_message_api_v1_experts_conversations__conversation_id__messages_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/experts/turns/{turn_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Turn */
+        get: operations["get_turn_api_v1_experts_turns__turn_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/experts/conversations/{conversation_id}/events": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Stream Events */
+        get: operations["stream_events_api_v1_experts_conversations__conversation_id__events_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/experts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Experts */
+        get: operations["list_experts_api_v1_experts_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/experts/categories": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Expert Categories */
+        get: operations["list_expert_categories_api_v1_experts_categories_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/experts/{expert_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Expert */
+        get: operations["get_expert_api_v1_experts__expert_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/experts/versions/{expert_version_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Expert Version */
+        get: operations["get_expert_version_api_v1_experts_versions__expert_version_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/auth/login": {
         parameters: {
             query?: never;
@@ -208,6 +431,23 @@ export interface paths {
         put?: never;
         /** Submit Message */
         post: operations["submit_message_api_v1_assistant_conversations__conversation_id__messages_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/assistant/conversations/{conversation_id}/inputs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Submit Input */
+        post: operations["submit_input_api_v1_assistant_conversations__conversation_id__inputs_post"];
         delete?: never;
         options?: never;
         head?: never;
@@ -605,6 +845,40 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/tasks/{task_id}/role-queue/{role_work_item_id}/cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Cancel Role Work Item */
+        post: operations["cancel_role_work_item_api_v1_tasks__task_id__role_queue__role_work_item_id__cancel_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/tasks/{task_id}/graph": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Task Graph Projection */
+        get: operations["get_task_graph_projection_api_v1_tasks__task_id__graph_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/tasks/{task_id}/replay-policy": {
         parameters: {
             query?: never;
@@ -759,6 +1033,501 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/coordination/semantic-observations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Create Semantic Observation */
+        post: operations["create_semantic_observation_api_v1_coordination_semantic_observations_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/coordination/signals": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Create Coordination Signal */
+        post: operations["create_coordination_signal_api_v1_coordination_signals_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/coordination/cases": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Coordination Cases */
+        get: operations["list_coordination_cases_api_v1_coordination_cases_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/coordination/cases/{case_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Coordination Case */
+        get: operations["get_coordination_case_api_v1_coordination_cases__case_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/coordination/routing-runs/{routing_run_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Coordination Routing Run */
+        get: operations["get_coordination_routing_run_api_v1_coordination_routing_runs__routing_run_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/coordination/cases/{case_id}/work-items": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Create Coordination Work Item */
+        post: operations["create_coordination_work_item_api_v1_coordination_cases__case_id__work_items_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/coordination/cases/{case_id}/transition": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Transition Coordination Case */
+        post: operations["transition_coordination_case_api_v1_coordination_cases__case_id__transition_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/coordination/work-items/{work_item_id}/transition": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Transition Coordination Work Item */
+        post: operations["transition_coordination_work_item_api_v1_coordination_work_items__work_item_id__transition_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/coordination/work-items/{work_item_id}/reports": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Report Coordination Work Item */
+        post: operations["report_coordination_work_item_api_v1_coordination_work_items__work_item_id__reports_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/coordination/inbox": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Coordination Inbox */
+        get: operations["list_coordination_inbox_api_v1_coordination_inbox_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/coordination/inbox/{delivery_id}/read": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Mark Coordination Inbox Read */
+        post: operations["mark_coordination_inbox_read_api_v1_coordination_inbox__delivery_id__read_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/coordination/cases/{case_id}/events/history": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Coordination Event History */
+        get: operations["get_coordination_event_history_api_v1_coordination_cases__case_id__events_history_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/coordination/cases/{case_id}/events": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Stream Coordination Events */
+        get: operations["stream_coordination_events_api_v1_coordination_cases__case_id__events_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/channels/providers": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Channel Providers */
+        get: operations["list_channel_providers_api_v1_channels_providers_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/channels/connections": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Channel Connections */
+        get: operations["list_channel_connections_api_v1_channels_connections_get"];
+        put?: never;
+        /** Create Channel Connection */
+        post: operations["create_channel_connection_api_v1_channels_connections_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/channels/connections/{connection_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Channel Connection */
+        get: operations["get_channel_connection_api_v1_channels_connections__connection_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/channels/connections/{connection_id}/authorization": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Begin Channel Authorization */
+        post: operations["begin_channel_authorization_api_v1_channels_connections__connection_id__authorization_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/channels/connections/{connection_id}/authorization/{auth_session_id}/poll": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Poll Channel Authorization */
+        post: operations["poll_channel_authorization_api_v1_channels_connections__connection_id__authorization__auth_session_id__poll_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/channels/connections/{connection_id}/disconnect": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Disconnect Channel Connection */
+        post: operations["disconnect_channel_connection_api_v1_channels_connections__connection_id__disconnect_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/channels/connections/{connection_id}/identities": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Channel Identities */
+        get: operations["list_channel_identities_api_v1_channels_connections__connection_id__identities_get"];
+        put?: never;
+        /** Upsert Channel Identity */
+        post: operations["upsert_channel_identity_api_v1_channels_connections__connection_id__identities_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/channels/connections/{connection_id}/identities/{identity_id}/revoke": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Revoke Channel Identity */
+        post: operations["revoke_channel_identity_api_v1_channels_connections__connection_id__identities__identity_id__revoke_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/channels/connections/{connection_id}/inbound-deliveries": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Channel Inbound Deliveries */
+        get: operations["list_channel_inbound_deliveries_api_v1_channels_connections__connection_id__inbound_deliveries_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/channels/connections/{connection_id}/outbound-deliveries": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Channel Outbound Deliveries */
+        get: operations["list_channel_outbound_deliveries_api_v1_channels_connections__connection_id__outbound_deliveries_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/tasks/{task_id}/streams": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Task Artifact Streams */
+        get: operations["list_task_artifact_streams_api_v1_tasks__task_id__streams_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/tasks/{task_id}/streams/{stream_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Task Artifact Stream */
+        get: operations["get_task_artifact_stream_api_v1_tasks__task_id__streams__stream_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/tasks/{task_id}/stream-executions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Task Stream Executions */
+        get: operations["list_task_stream_executions_api_v1_tasks__task_id__stream_executions_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/tasks/{task_id}/stream-executions/{plan_step_execution_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Task Stream Execution */
+        get: operations["get_task_stream_execution_api_v1_tasks__task_id__stream_executions__plan_step_execution_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/tasks/{task_id}/stream-executions/{plan_step_execution_id}/retry": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Retry Task Stream Execution */
+        post: operations["retry_task_stream_execution_api_v1_tasks__task_id__stream_executions__plan_step_execution_id__retry_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/tasks/{task_id}/stream-executions/{plan_step_execution_id}/cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Cancel Task Stream Execution */
+        post: operations["cancel_task_stream_execution_api_v1_tasks__task_id__stream_executions__plan_step_execution_id__cancel_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -789,7 +1558,10 @@ export interface components {
             reports_to?: string | null;
             /** Runtime Binding Key */
             runtime_binding_key: string;
+            /** Expert Version Id */
+            expert_version_id?: string | null;
             capability_requirements?: components["schemas"]["WorkloadRequirements"];
+            execution_limits?: components["schemas"]["RoleExecutionLimits"];
         };
         /**
          * ApprovalDecision
@@ -947,6 +1719,8 @@ export interface components {
             execution_id: string;
             /** Plan Step Id */
             plan_step_id: string | null;
+            /** Plan Step Execution Id */
+            plan_step_execution_id?: string | null;
             /** Replay Run Id */
             replay_run_id: string | null;
             status: components["schemas"]["AssignmentStatus"];
@@ -954,6 +1728,7 @@ export interface components {
             /** Result Summary */
             result_summary: string | null;
             runtime_execution: components["schemas"]["RuntimeExecutionResponse"] | null;
+            role_work_item: components["schemas"]["RoleWorkItemResponse"] | null;
             /**
              * Created At
              * Format: date-time
@@ -994,6 +1769,16 @@ export interface components {
             usage_status: string;
             /** Reserved Tokens */
             reserved_tokens: number;
+            /** Max Tokens Per Attempt */
+            max_tokens_per_attempt: number | null;
+            /** Max Cost Usd Per Attempt */
+            max_cost_usd_per_attempt: string | null;
+            /** Max Runtime Seconds Per Attempt */
+            max_runtime_seconds_per_attempt: number | null;
+            /** Effective Token Limit */
+            effective_token_limit: number | null;
+            /** Effective Runtime Seconds */
+            effective_runtime_seconds: number | null;
             /** Charged Tokens */
             charged_tokens: number | null;
             /** Input Tokens */
@@ -1004,8 +1789,16 @@ export interface components {
             output_tokens: number | null;
             /** Reasoning Output Tokens */
             reasoning_output_tokens: number | null;
+            /** Cache Write Tokens */
+            cache_write_tokens: number | null;
             /** Total Tokens */
             total_tokens: number | null;
+            /** Cost Usd */
+            cost_usd: string | null;
+            /** Cost Status */
+            cost_status: string;
+            /** Pricing Catalog Version */
+            pricing_catalog_version: string | null;
         };
         /** AssistantActionDecisionRequest */
         AssistantActionDecisionRequest: {
@@ -1014,6 +1807,23 @@ export interface components {
              * @enum {string}
              */
             decision: "confirm" | "decline";
+        };
+        /** AssistantActionDecisionUnavailableInputResponse */
+        AssistantActionDecisionUnavailableInputResponse: {
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            kind: "action_decision_unavailable";
+            message: components["schemas"]["AssistantMessageResponse"];
+            acknowledgement: components["schemas"]["AssistantMessageResponse"];
+            /**
+             * Reason
+             * @enum {string}
+             */
+            reason: "no_pending_action" | "multiple_pending_actions";
+            /** Pending Action Count */
+            pending_action_count: number;
         };
         /** AssistantActionResponse */
         AssistantActionResponse: {
@@ -1056,6 +1866,24 @@ export interface components {
             /** Executed At */
             executed_at: string | null;
         };
+        /** AssistantActionDecisionInputResponse */
+        AssistantActionDecisionInputResponse: {
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            kind: "action_decision";
+            message: components["schemas"]["AssistantMessageResponse"];
+            acknowledgement: components["schemas"]["AssistantMessageResponse"];
+            action: components["schemas"]["AssistantActionResponse"];
+            /**
+             * Decision
+             * @enum {string}
+             */
+            decision: "confirm" | "decline";
+            /** Decision Source */
+            decision_source: string;
+        };
         /**
          * AssistantActionStatus
          * @enum {string}
@@ -1096,11 +1924,60 @@ export interface components {
          * @enum {string}
          */
         AssistantAttachmentStatus: "uploaded" | "attached" | "revoked";
+        /** AssistantConversationChannelBindingResponse */
+        AssistantConversationChannelBindingResponse: {
+            /** Binding Id */
+            binding_id: string;
+            /** Connection Id */
+            connection_id: string;
+            /** Provider Key */
+            provider_key: string;
+            /** Connection Display Name */
+            connection_display_name: string;
+            /** External Conversation Id */
+            external_conversation_id: string;
+            /** External Peer Id */
+            external_peer_id: string;
+            /** External Thread Id */
+            external_thread_id: string | null;
+            /** Peer Display Name */
+            peer_display_name: string | null;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "active" | "blocked";
+        };
+        /** AssistantConversationMessagePreviewResponse */
+        AssistantConversationMessagePreviewResponse: {
+            /** Message Id */
+            message_id: string;
+            /** Sequence */
+            sequence: number;
+            role: components["schemas"]["AssistantMessageRole"];
+            /** Text Preview */
+            text_preview: string;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+        };
         /** AssistantConversationResponse */
         AssistantConversationResponse: {
             /** Conversation Id */
             conversation_id: string;
             status: components["schemas"]["AssistantConversationStatus"];
+            /**
+             * Origin
+             * @enum {string}
+             */
+            origin: "web" | "channel";
+            /** Title */
+            title: string | null;
+            last_message: components["schemas"]["AssistantConversationMessagePreviewResponse"] | null;
+            /** Channel Bindings */
+            channel_bindings: components["schemas"]["AssistantConversationChannelBindingResponse"][];
             /** Runtime Provider */
             runtime_provider: string;
             /** Runtime Thread Generation */
@@ -1186,6 +2063,16 @@ export interface components {
         AssistantMessageStatus: "accepted" | "completed" | "failed";
         /** AssistantSubmissionResponse */
         AssistantSubmissionResponse: {
+            message: components["schemas"]["AssistantMessageResponse"];
+            turn: components["schemas"]["AssistantTurnResponse"];
+        };
+        /** AssistantTurnInputResponse */
+        AssistantTurnInputResponse: {
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            kind: "assistant_turn";
             message: components["schemas"]["AssistantMessageResponse"];
             turn: components["schemas"]["AssistantTurnResponse"];
         };
@@ -1279,6 +2166,11 @@ export interface components {
             /** File */
             file: string;
         };
+        /** Body_upload_attachment_api_v1_experts_conversations__conversation_id__attachments_post */
+        Body_upload_attachment_api_v1_experts_conversations__conversation_id__attachments_post: {
+            /** File */
+            file: string;
+        };
         /** ChangePasswordRequest */
         ChangePasswordRequest: {
             /**
@@ -1291,6 +2183,238 @@ export interface components {
              * Format: password
              */
             new_password: string;
+        };
+        /**
+         * ChannelAuthSessionStatus
+         * @enum {string}
+         */
+        ChannelAuthSessionStatus: "pending" | "scanned" | "confirmed" | "expired" | "failed";
+        /** ChannelAuthorizationPollRequest */
+        ChannelAuthorizationPollRequest: {
+            /** Verify Code */
+            verify_code?: string | null;
+        };
+        /** ChannelAuthorizationResponse */
+        ChannelAuthorizationResponse: {
+            /** Auth Session Id */
+            auth_session_id: string;
+            /** Connection Id */
+            connection_id: string;
+            status: components["schemas"]["ChannelAuthSessionStatus"];
+            /** Authorization Url */
+            authorization_url: string | null;
+            /** Needs Verify Code */
+            needs_verify_code: boolean;
+            /** External Account Id */
+            external_account_id: string | null;
+            /** External User Id */
+            external_user_id: string | null;
+            /** Error Code */
+            error_code: string | null;
+            /** Error Message */
+            error_message: string | null;
+            /**
+             * Expires At
+             * Format: date-time
+             */
+            expires_at: string;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+            /** Completed At */
+            completed_at: string | null;
+        };
+        /** ChannelCapabilityResponse */
+        ChannelCapabilityResponse: {
+            /** Chat Types */
+            chat_types: string[];
+            /** Inbound Content Types */
+            inbound_content_types: string[];
+            /** Outbound Content Types */
+            outbound_content_types: string[];
+            /** Features */
+            features: string[];
+            /** Max Text Length */
+            max_text_length: number | null;
+            /** Max Attachment Bytes */
+            max_attachment_bytes: number | null;
+        };
+        /** ChannelConnectionCreateRequest */
+        ChannelConnectionCreateRequest: {
+            /** Provider Key */
+            provider_key: string;
+            /**
+             * Display Name
+             * @default
+             */
+            display_name: string;
+            /** Configuration */
+            configuration?: {
+                [key: string]: unknown;
+            };
+        };
+        /** ChannelConnectionResponse */
+        ChannelConnectionResponse: {
+            /** Connection Id */
+            connection_id: string;
+            /** Provider Key */
+            provider_key: string;
+            /** Display Name */
+            display_name: string;
+            /** External Account Id */
+            external_account_id: string | null;
+            status: components["schemas"]["ChannelConnectionStatus"];
+            /** Configuration */
+            configuration: {
+                [key: string]: unknown;
+            };
+            capability_profile: components["schemas"]["ChannelCapabilityResponse"];
+            /** Last Error Code */
+            last_error_code: string | null;
+            /** Last Error Message */
+            last_error_message: string | null;
+            /** Last Inbound At */
+            last_inbound_at: string | null;
+            /** Last Outbound At */
+            last_outbound_at: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+            /** Disconnected At */
+            disconnected_at: string | null;
+        };
+        /**
+         * ChannelConnectionStatus
+         * @enum {string}
+         */
+        ChannelConnectionStatus: "pending" | "authenticating" | "connected" | "degraded" | "disconnected" | "error";
+        /** ChannelIdentityResponse */
+        ChannelIdentityResponse: {
+            /** Identity Id */
+            identity_id: string;
+            /** External User Id */
+            external_user_id: string;
+            /** Display Name */
+            display_name: string | null;
+            status: components["schemas"]["ChannelIdentityStatus"];
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Revoked At */
+            revoked_at: string | null;
+        };
+        /**
+         * ChannelIdentityStatus
+         * @enum {string}
+         */
+        ChannelIdentityStatus: "active" | "revoked";
+        /** ChannelIdentityUpsertRequest */
+        ChannelIdentityUpsertRequest: {
+            /** External User Id */
+            external_user_id: string;
+            /** Display Name */
+            display_name?: string | null;
+        };
+        /** ChannelInboundDeliveryResponse */
+        ChannelInboundDeliveryResponse: {
+            /** Delivery Id */
+            delivery_id: string;
+            /** Provider Event Id */
+            provider_event_id: string;
+            /** Event Kind */
+            event_kind: string;
+            /** External Conversation Key */
+            external_conversation_key: string;
+            /** External Sender Id */
+            external_sender_id: string;
+            /** Normalized Payload */
+            normalized_payload: {
+                [key: string]: unknown;
+            };
+            /** Assistant Message Id */
+            assistant_message_id: string | null;
+            status: components["schemas"]["ChannelInboundDeliveryStatus"];
+            /** Attempt Count */
+            attempt_count: number;
+            /** Last Error Code */
+            last_error_code: string | null;
+            /** Last Error Message */
+            last_error_message: string | null;
+            /**
+             * Occurred At
+             * Format: date-time
+             */
+            occurred_at: string;
+            /**
+             * Received At
+             * Format: date-time
+             */
+            received_at: string;
+            /** Completed At */
+            completed_at: string | null;
+        };
+        /**
+         * ChannelInboundDeliveryStatus
+         * @enum {string}
+         */
+        ChannelInboundDeliveryStatus: "accepted" | "processing" | "completed" | "ignored" | "retryable" | "failed";
+        /** ChannelOutboundDeliveryResponse */
+        ChannelOutboundDeliveryResponse: {
+            /** Delivery Id */
+            delivery_id: string;
+            /** Assistant Message Id */
+            assistant_message_id: string;
+            /** Provider Message Ids */
+            provider_message_ids: string[];
+            status: components["schemas"]["ChannelOutboundDeliveryStatus"];
+            /** Attempt Count */
+            attempt_count: number;
+            /** Last Error Code */
+            last_error_code: string | null;
+            /** Last Error Message */
+            last_error_message: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Sent At */
+            sent_at: string | null;
+            /** Completed At */
+            completed_at: string | null;
+        };
+        /**
+         * ChannelOutboundDeliveryStatus
+         * @enum {string}
+         */
+        ChannelOutboundDeliveryStatus: "queued" | "sending" | "sent" | "delivered" | "retryable" | "failed" | "cancelled";
+        /** ChannelProviderResponse */
+        ChannelProviderResponse: {
+            /** Provider Key */
+            provider_key: string;
+            /** Display Name */
+            display_name: string;
+            /** Connection Modes */
+            connection_modes: string[];
+            capabilities: components["schemas"]["ChannelCapabilityResponse"];
+            /** Protocol Version */
+            protocol_version: string;
         };
         /** CodeContentBlock */
         CodeContentBlock: {
@@ -1310,6 +2434,551 @@ export interface components {
              * @default false
              */
             truncated: boolean;
+        };
+        /**
+         * CoordinationAction
+         * @enum {string}
+         */
+        CoordinationAction: "retry" | "replay" | "assign" | "reroute" | "wait" | "escalate" | "human_required" | "resolve" | "abort";
+        /** CoordinationCaseResponse */
+        CoordinationCaseResponse: {
+            /** Case Id */
+            case_id: string;
+            /** Organization Id */
+            organization_id: string;
+            /** Organization Spec Version Id */
+            organization_spec_version_id: string;
+            /** Definition Hash */
+            definition_hash: string;
+            status: components["schemas"]["CoordinationCaseStatus"];
+            /** Title */
+            title: string;
+            /** Summary */
+            summary: string;
+            /** Policy Snapshot */
+            policy_snapshot: {
+                [key: string]: unknown;
+            };
+            /** Max Attempts */
+            max_attempts: number;
+            /** Attempt Count */
+            attempt_count: number;
+            /** Max Escalations */
+            max_escalations: number;
+            /** Escalation Count */
+            escalation_count: number;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+            /** Resolved At */
+            resolved_at: string | null;
+            /** Closed At */
+            closed_at: string | null;
+            /** Signals */
+            signals: components["schemas"]["CoordinationSignalResponse"][];
+            /** Work Items */
+            work_items: components["schemas"]["CoordinationWorkItemResponse"][];
+            /** Inbox Deliveries */
+            inbox_deliveries: components["schemas"]["CoordinationInboxDeliveryResponse"][];
+            /** Retry Attempts */
+            retry_attempts: components["schemas"]["CoordinationRetryAttemptResponse"][];
+            /** Routing Runs */
+            routing_runs: components["schemas"]["CoordinationRoutingRunResponse"][];
+            /** Events */
+            events: components["schemas"]["CoordinationEventResponse"][];
+        };
+        /**
+         * CoordinationCaseStatus
+         * @enum {string}
+         */
+        CoordinationCaseStatus: "open" | "triaging" | "assigned" | "in_progress" | "waiting_verification" | "resolved" | "escalated" | "human_required" | "abandoned";
+        /** CoordinationCaseTransitionRequest */
+        CoordinationCaseTransitionRequest: {
+            status: components["schemas"]["CoordinationCaseStatus"];
+            /**
+             * Reason
+             * @default
+             */
+            reason: string;
+        };
+        /** CoordinationEventResponse */
+        CoordinationEventResponse: {
+            /** Event Id */
+            event_id: string;
+            /** Case Id */
+            case_id: string;
+            /** Event Type */
+            event_type: string;
+            /** Schema Version */
+            schema_version: string;
+            /** Aggregate Type */
+            aggregate_type: string;
+            /** Aggregate Id */
+            aggregate_id: string;
+            /** Sequence */
+            sequence: number;
+            /** Source */
+            source: string;
+            /** Correlation Id */
+            correlation_id: string;
+            /** Payload */
+            payload: {
+                [key: string]: unknown;
+            };
+            /**
+             * Occurred At
+             * Format: date-time
+             */
+            occurred_at: string;
+        };
+        /** CoordinationEvidenceRef */
+        CoordinationEvidenceRef: {
+            /** Resource Type */
+            resource_type: string;
+            /** Resource Id */
+            resource_id: string;
+            /** Label */
+            label?: string | null;
+            /** Sha256 */
+            sha256?: string | null;
+        };
+        /** CoordinationInboxDeliveryResponse */
+        CoordinationInboxDeliveryResponse: {
+            /** Delivery Id */
+            delivery_id: string;
+            /** Case Id */
+            case_id: string;
+            /** Work Item Id */
+            work_item_id: string;
+            /** Organization Id */
+            organization_id: string;
+            /** Target Role Key */
+            target_role_key: string;
+            status: components["schemas"]["CoordinationInboxDeliveryStatus"];
+            /**
+             * Delivered At
+             * Format: date-time
+             */
+            delivered_at: string;
+            /** Read At */
+            read_at: string | null;
+            /** Withdrawn At */
+            withdrawn_at: string | null;
+            work_item?: components["schemas"]["CoordinationWorkItemResponse"] | null;
+        };
+        /**
+         * CoordinationInboxDeliveryStatus
+         * @enum {string}
+         */
+        CoordinationInboxDeliveryStatus: "delivered" | "read" | "withdrawn";
+        /** CoordinationInitialWorkItemRequest */
+        CoordinationInitialWorkItemRequest: {
+            /** Target Role Key */
+            target_role_key: string;
+            /** Work Item Kind */
+            work_item_kind: string;
+            /** Title */
+            title: string;
+            /** Brief */
+            brief: string;
+            /** Completion Condition */
+            completion_condition: string;
+            /** Evidence Refs */
+            evidence_refs?: components["schemas"]["CoordinationEvidenceRef"][];
+            /** Allowed Actions */
+            allowed_actions?: components["schemas"]["CoordinationAction"][];
+            policy?: components["schemas"]["CoordinationPolicyRequest"] | null;
+        };
+        /** CoordinationPolicyRequest */
+        CoordinationPolicyRequest: {
+            /**
+             * Max Attempts
+             * @default 3
+             */
+            max_attempts: number;
+            /**
+             * Max Escalations
+             * @default 2
+             */
+            max_escalations: number;
+            /** Attempt Timeout Seconds */
+            attempt_timeout_seconds?: number | null;
+            /** Token Budget */
+            token_budget?: number | null;
+        };
+        /** CoordinationRetryAttemptResponse */
+        CoordinationRetryAttemptResponse: {
+            /** Retry Attempt Id */
+            retry_attempt_id: string;
+            /** Case Id */
+            case_id: string;
+            /** Task Id */
+            task_id: string;
+            /** Plan Step Id */
+            plan_step_id: string;
+            /** Assignment Id */
+            assignment_id: string;
+            /** Retry Number */
+            retry_number: number;
+            trigger: components["schemas"]["CoordinationRetryTrigger"];
+            status: components["schemas"]["CoordinationRetryStatus"];
+            /** Failure Code */
+            failure_code: string | null;
+            /** Failure Summary */
+            failure_summary: string | null;
+            /** Task Replay Count Snapshot */
+            task_replay_count_snapshot: number;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Started At */
+            started_at: string | null;
+            /** Completed At */
+            completed_at: string | null;
+        };
+        /**
+         * CoordinationRetryStatus
+         * @enum {string}
+         */
+        CoordinationRetryStatus: "requested" | "running" | "succeeded" | "failed" | "exhausted" | "cancelled";
+        /**
+         * CoordinationRetryTrigger
+         * @enum {string}
+         */
+        CoordinationRetryTrigger: "automatic" | "user";
+        /**
+         * CoordinationRoutingConfidence
+         * @enum {string}
+         */
+        CoordinationRoutingConfidence: "low" | "medium" | "high";
+        /** CoordinationRoutingDecisionResponse */
+        CoordinationRoutingDecisionResponse: {
+            /** Routing Decision Id */
+            routing_decision_id: string;
+            /** Routing Run Id */
+            routing_run_id: string;
+            /** Case Id */
+            case_id: string;
+            /** Source Work Item Id */
+            source_work_item_id: string | null;
+            /**
+             * Action
+             * @enum {string}
+             */
+            action: "assign" | "wait" | "escalate" | "human_required" | "resolve" | "abort";
+            /** Target Role Key */
+            target_role_key: string | null;
+            /** Work Item Kind */
+            work_item_kind: string | null;
+            /** Reason */
+            reason: string;
+            /** Required Evidence */
+            required_evidence: string[];
+            /** Completion Condition */
+            completion_condition: string | null;
+            confidence: components["schemas"]["CoordinationRoutingConfidence"];
+            execution_tier: components["schemas"]["CoordinationRoutingExecutionTier"];
+            decision_source: components["schemas"]["CoordinationRoutingDecisionSource"];
+            /** Validation Errors */
+            validation_errors: string[];
+            /** Work Item Id */
+            work_item_id: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+        };
+        /**
+         * CoordinationRoutingDecisionSource
+         * @enum {string}
+         */
+        CoordinationRoutingDecisionSource: "runtime" | "fallback";
+        /**
+         * CoordinationRoutingExecutionTier
+         * @enum {string}
+         */
+        CoordinationRoutingExecutionTier: "standard" | "higher_model" | "lead" | "human";
+        /** CoordinationRoutingRunResponse */
+        CoordinationRoutingRunResponse: {
+            /** Routing Run Id */
+            routing_run_id: string;
+            /** Case Id */
+            case_id: string;
+            /** Organization Id */
+            organization_id: string;
+            /** Source Signal Id */
+            source_signal_id: string;
+            /** Source Work Item Id */
+            source_work_item_id: string | null;
+            /** Routing Number */
+            routing_number: number;
+            status: components["schemas"]["CoordinationRoutingRunStatus"];
+            execution_tier: components["schemas"]["CoordinationRoutingExecutionTier"];
+            /** Runtime Provider */
+            runtime_provider: string;
+            /** Requested Model */
+            requested_model: string | null;
+            /** Actual Model */
+            actual_model: string | null;
+            /** Reasoning Effort */
+            reasoning_effort: string | null;
+            /** Tool Contract Version */
+            tool_contract_version: string;
+            /** Failure Code */
+            failure_code: string | null;
+            /** Input Tokens */
+            input_tokens: number;
+            /** Cached Input Tokens */
+            cached_input_tokens: number;
+            /** Output Tokens */
+            output_tokens: number;
+            /** Reasoning Output Tokens */
+            reasoning_output_tokens: number;
+            /** Total Tokens */
+            total_tokens: number;
+            /** Context Compactions */
+            context_compactions: number;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Started At */
+            started_at: string | null;
+            /** Completed At */
+            completed_at: string | null;
+            decision: components["schemas"]["CoordinationRoutingDecisionResponse"] | null;
+        };
+        /**
+         * CoordinationRoutingRunStatus
+         * @enum {string}
+         */
+        CoordinationRoutingRunStatus: "queued" | "running" | "waiting" | "completed" | "failed" | "cancelled";
+        /** CoordinationSemanticObservationRequest */
+        CoordinationSemanticObservationRequest: {
+            /** Organization Id */
+            organization_id: string;
+            /** Source Role Key */
+            source_role_key: string;
+            /** Title */
+            title: string;
+            /** Observation */
+            observation: string;
+            /** Evidence Refs */
+            evidence_refs: components["schemas"]["CoordinationEvidenceRef"][];
+            /** @default warning */
+            severity: components["schemas"]["CoordinationSeverity"];
+            policy?: components["schemas"]["CoordinationPolicyRequest"] | null;
+        };
+        /** CoordinationSemanticObservationResponse */
+        CoordinationSemanticObservationResponse: {
+            /** Created */
+            created: boolean;
+            signal: components["schemas"]["CoordinationSignalResponse"];
+            case: components["schemas"]["CoordinationCaseResponse"];
+            routing_run: components["schemas"]["CoordinationRoutingRunResponse"];
+        };
+        /**
+         * CoordinationSeverity
+         * @enum {string}
+         */
+        CoordinationSeverity: "info" | "warning" | "error" | "critical";
+        /**
+         * CoordinationSignalClass
+         * @enum {string}
+         */
+        CoordinationSignalClass: "technical_recovery" | "delivery_quality" | "semantic_coordination" | "business_revision" | "approval_or_external_wait";
+        /** CoordinationSignalCreateRequest */
+        CoordinationSignalCreateRequest: {
+            /** Organization Id */
+            organization_id: string;
+            signal_class: components["schemas"]["CoordinationSignalClass"];
+            /** Kind */
+            kind: string;
+            severity: components["schemas"]["CoordinationSeverity"];
+            /** Title */
+            title: string;
+            /** Summary */
+            summary: string;
+            /** Evidence Refs */
+            evidence_refs?: components["schemas"]["CoordinationEvidenceRef"][];
+            /** Source Type */
+            source_type?: string | null;
+            /** Source Id */
+            source_id?: string | null;
+            /** Task Id */
+            task_id?: string | null;
+            /** Plan Step Id */
+            plan_step_id?: string | null;
+            /** Assignment Id */
+            assignment_id?: string | null;
+            /** Artifact Id */
+            artifact_id?: string | null;
+            /** Conversation Id */
+            conversation_id?: string | null;
+            policy?: components["schemas"]["CoordinationPolicyRequest"];
+            initial_work_item?: components["schemas"]["CoordinationInitialWorkItemRequest"] | null;
+        };
+        /** CoordinationSignalCreateResponse */
+        CoordinationSignalCreateResponse: {
+            /** Created */
+            created: boolean;
+            signal: components["schemas"]["CoordinationSignalResponse"];
+            case: components["schemas"]["CoordinationCaseResponse"];
+            work_item: components["schemas"]["CoordinationWorkItemResponse"] | null;
+            inbox_delivery: components["schemas"]["CoordinationInboxDeliveryResponse"] | null;
+        };
+        /** CoordinationSignalResponse */
+        CoordinationSignalResponse: {
+            /** Signal Id */
+            signal_id: string;
+            /** Case Id */
+            case_id: string;
+            /** Organization Id */
+            organization_id: string;
+            /** Organization Spec Version Id */
+            organization_spec_version_id: string;
+            /** Task Id */
+            task_id: string | null;
+            /** Plan Step Id */
+            plan_step_id: string | null;
+            /** Assignment Id */
+            assignment_id: string | null;
+            /** Artifact Id */
+            artifact_id: string | null;
+            /** Conversation Id */
+            conversation_id: string | null;
+            signal_class: components["schemas"]["CoordinationSignalClass"];
+            /** Kind */
+            kind: string;
+            severity: components["schemas"]["CoordinationSeverity"];
+            /** Title */
+            title: string;
+            /** Summary */
+            summary: string;
+            /** Evidence Refs */
+            evidence_refs: components["schemas"]["CoordinationEvidenceRef"][];
+            /** Source Type */
+            source_type: string | null;
+            /** Source Id */
+            source_id: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+        };
+        /** CoordinationWorkItemCreateRequest */
+        CoordinationWorkItemCreateRequest: {
+            /** Target Role Key */
+            target_role_key: string;
+            /** Work Item Kind */
+            work_item_kind: string;
+            /** Title */
+            title: string;
+            /** Brief */
+            brief: string;
+            /** Completion Condition */
+            completion_condition: string;
+            /** Evidence Refs */
+            evidence_refs?: components["schemas"]["CoordinationEvidenceRef"][];
+            /** Allowed Actions */
+            allowed_actions?: components["schemas"]["CoordinationAction"][];
+            policy?: components["schemas"]["CoordinationPolicyRequest"] | null;
+        };
+        /** CoordinationWorkItemReportRequest */
+        CoordinationWorkItemReportRequest: {
+            /** Reporting Role Key */
+            reporting_role_key: string;
+            /**
+             * Outcome
+             * @enum {string}
+             */
+            outcome: "completed" | "failed" | "waiting";
+            /** Summary */
+            summary: string;
+            /** Evidence Refs */
+            evidence_refs?: components["schemas"]["CoordinationEvidenceRef"][];
+        };
+        /** CoordinationWorkItemReportResponse */
+        CoordinationWorkItemReportResponse: {
+            /** Created */
+            created: boolean;
+            signal: components["schemas"]["CoordinationSignalResponse"];
+            case: components["schemas"]["CoordinationCaseResponse"];
+            work_item: components["schemas"]["CoordinationWorkItemResponse"];
+            routing_run: components["schemas"]["CoordinationRoutingRunResponse"] | null;
+        };
+        /** CoordinationWorkItemResponse */
+        CoordinationWorkItemResponse: {
+            /** Work Item Id */
+            work_item_id: string;
+            /** Case Id */
+            case_id: string;
+            /** Organization Id */
+            organization_id: string;
+            /** Target Role Key */
+            target_role_key: string;
+            /** Work Item Kind */
+            work_item_kind: string;
+            /** Title */
+            title: string;
+            /** Brief */
+            brief: string;
+            /** Completion Condition */
+            completion_condition: string;
+            /** Evidence Refs */
+            evidence_refs: components["schemas"]["CoordinationEvidenceRef"][];
+            /** Allowed Actions */
+            allowed_actions: components["schemas"]["CoordinationAction"][];
+            /** Policy Snapshot */
+            policy_snapshot: {
+                [key: string]: unknown;
+            };
+            /** Attempt Number */
+            attempt_number: number;
+            /** Definition Hash */
+            definition_hash: string;
+            status: components["schemas"]["CoordinationWorkItemStatus"];
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Delivered At */
+            delivered_at: string | null;
+            /** Acknowledged At */
+            acknowledged_at: string | null;
+            /** Started At */
+            started_at: string | null;
+            /** Submitted At */
+            submitted_at: string | null;
+            /** Completed At */
+            completed_at: string | null;
+        };
+        /**
+         * CoordinationWorkItemStatus
+         * @enum {string}
+         */
+        CoordinationWorkItemStatus: "created" | "delivered" | "acknowledged" | "in_progress" | "waiting" | "submitted" | "waiting_verification" | "completed" | "failed" | "cancelled";
+        /** CoordinationWorkItemTransitionRequest */
+        CoordinationWorkItemTransitionRequest: {
+            status: components["schemas"]["CoordinationWorkItemStatus"];
+            /**
+             * Reason
+             * @default
+             */
+            reason: string;
         };
         /** DiagramContentBlock */
         DiagramContentBlock: {
@@ -1354,6 +3023,413 @@ export interface components {
             request_id: string;
             /** Details */
             details?: unknown | null;
+        };
+        /** ExpertAttachmentResponse */
+        ExpertAttachmentResponse: {
+            /** Attachment Id */
+            attachment_id: string;
+            /** Conversation Id */
+            conversation_id: string;
+            /** File Name */
+            file_name: string;
+            /** Media Type */
+            media_type: string;
+            /** Byte Size */
+            byte_size: number;
+            /** Sha256 */
+            sha256: string;
+            status: components["schemas"]["ExpertAttachmentStatus"];
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Attached At */
+            attached_at: string | null;
+            /** Revoked At */
+            revoked_at: string | null;
+        };
+        /**
+         * ExpertAttachmentStatus
+         * @enum {string}
+         */
+        ExpertAttachmentStatus: "uploaded" | "attached" | "revoked";
+        /**
+         * ExpertAvailabilityStatus
+         * @description Latest product-owned availability state for one deployment.
+         * @enum {string}
+         */
+        ExpertAvailabilityStatus: "available" | "limited" | "unavailable" | "unknown";
+        /**
+         * ExpertCapabilitySummaryV1
+         * @description Versioned product-owned capability description for discovery and planning.
+         */
+        ExpertCapabilitySummary: {
+            /**
+             * Schema Version
+             * @default 1.0
+             * @constant
+             */
+            schema_version: "1.0";
+            /** Purpose */
+            purpose: string;
+            /** @default required */
+            text_input_mode: components["schemas"]["ExpertTextInputMode"];
+            /** Responsibilities */
+            responsibilities: string[];
+            /**
+             * Non Goals
+             * @default []
+             */
+            non_goals: string[];
+            /**
+             * Input Contracts
+             * @default []
+             */
+            input_contracts: components["schemas"]["ExpertContractSpec"][];
+            /**
+             * Output Contracts
+             * @default []
+             */
+            output_contracts: components["schemas"]["ExpertContractSpec"][];
+            workload_requirements?: components["schemas"]["WorkloadRequirements"];
+            limits?: components["schemas"]["ExpertLimits"];
+            data_handling: components["schemas"]["ExpertDataHandling"];
+        };
+        /**
+         * ExpertCatalogItemResponse
+         * @description One selectable current version returned by catalog search.
+         */
+        ExpertCatalogItemResponse: {
+            /** Expert Id */
+            expert_id: string;
+            /** Expert Key */
+            expert_key: string;
+            /** Display Name */
+            display_name: string;
+            /** Short Description */
+            short_description: string;
+            /** Category */
+            category: string | null;
+            /** Tags */
+            tags: string[];
+            /** Expert Version Id */
+            expert_version_id: string;
+            /** Version Number */
+            version_number: number;
+            lifecycle_status: components["schemas"]["ExpertLifecycleStatus"];
+            verification_status: components["schemas"]["ExpertVerificationStatus"];
+            interaction_mode: components["schemas"]["ExpertInteractionMode"];
+            capability: components["schemas"]["ExpertCapabilitySummary"];
+            /** Provider */
+            provider: string;
+            availability_status: components["schemas"]["ExpertAvailabilityStatus"];
+            /** Availability Reason */
+            availability_reason: string | null;
+            /** Verified At */
+            verified_at: string | null;
+            eligibility_status: components["schemas"]["ExpertEligibilityStatus"];
+            /** Eligible */
+            eligible: boolean;
+            /** Eligibility Reason Codes */
+            eligibility_reason_codes: string[];
+        };
+        /**
+         * ExpertCategoryResponse
+         * @description One operator-owned category available for read-only marketplace filters.
+         */
+        ExpertCategoryResponse: {
+            /** Category Key */
+            category_key: string;
+            /** Display Name */
+            display_name: string;
+            /** Description */
+            description: string | null;
+            /** Sort Order */
+            sort_order: number;
+            /** Expert Count */
+            expert_count: number;
+        };
+        /**
+         * ExpertContractSpec
+         * @description One semantic input or output accepted by an ExpertVersion.
+         */
+        ExpertContractSpec: {
+            /** Contract Key */
+            contract_key: string;
+            /** Description */
+            description: string;
+            /** Media Types */
+            media_types: string[];
+            /**
+             * Required
+             * @default true
+             */
+            required: boolean;
+        };
+        /** ExpertConversationCreateRequest */
+        ExpertConversationCreateRequest: {
+            /** Expert Version Id */
+            expert_version_id: string;
+        };
+        /** ExpertConversationResponse */
+        ExpertConversationResponse: {
+            /** Conversation Id */
+            conversation_id: string;
+            /** Expert Version Id */
+            expert_version_id: string;
+            /** Provider */
+            provider: string;
+            /** Interaction Mode */
+            interaction_mode: string;
+            status: components["schemas"]["ExpertConversationStatus"];
+            /** Runtime Thread Id */
+            runtime_thread_id: string | null;
+            /** Runtime Workspace Id */
+            runtime_workspace_id: string | null;
+            /** Last Message Sequence */
+            last_message_sequence: number;
+            /** Last Event Sequence */
+            last_event_sequence: number;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+            /** Archived At */
+            archived_at: string | null;
+        };
+        /**
+         * ExpertConversationStatus
+         * @enum {string}
+         */
+        ExpertConversationStatus: "active" | "archived";
+        /**
+         * ExpertDataHandling
+         * @description User-visible statement about where expert inputs and results may go.
+         */
+        ExpertDataHandling: {
+            /**
+             * Storage Scope
+             * @enum {string}
+             */
+            storage_scope: "product_only" | "provider_managed" | "mixed";
+            /** Sends To External Provider */
+            sends_to_external_provider: boolean;
+            /** Statement */
+            statement: string;
+        };
+        /** ExpertDetailResponse */
+        ExpertDetailResponse: {
+            /** Expert Id */
+            expert_id: string;
+            /** Expert Key */
+            expert_key: string;
+            /** Display Name */
+            display_name: string;
+            /** Short Description */
+            short_description: string;
+            /** Category */
+            category: string | null;
+            /** Tags */
+            tags: string[];
+            /** Versions */
+            versions: components["schemas"]["ExpertVersionResponse"][];
+        };
+        /**
+         * ExpertEligibilityStatus
+         * @description Owner-specific selection result derived from catalog and Runtime state.
+         * @enum {string}
+         */
+        ExpertEligibilityStatus: "eligible" | "unavailable" | "blocked";
+        /**
+         * ExpertInteractionMode
+         * @description Provider continuity semantics exposed honestly to the product.
+         * @enum {string}
+         */
+        ExpertInteractionMode: "conversational" | "request_response";
+        /**
+         * ExpertLifecycleStatus
+         * @description Whether an ExpertVersion may be selected for new product work.
+         * @enum {string}
+         */
+        ExpertLifecycleStatus: "active" | "verification_required" | "blocked" | "retired";
+        /**
+         * ExpertLimits
+         * @description Stable product limits advertised for one ExpertVersion.
+         */
+        ExpertLimits: {
+            /**
+             * Max Input Files
+             * @default 1
+             */
+            max_input_files: number;
+            /** Max Input Bytes */
+            max_input_bytes?: number | null;
+            /** Max Duration Seconds */
+            max_duration_seconds?: number | null;
+            /** Max Concurrent Turns */
+            max_concurrent_turns?: number | null;
+        };
+        /** ExpertMessagePage */
+        ExpertMessagePage: {
+            /** Items */
+            items: components["schemas"]["ExpertMessageResponse"][];
+        };
+        /** ExpertMessageRequest */
+        ExpertMessageRequest: {
+            /**
+             * Text
+             * @default
+             */
+            text: string;
+            /** Attachment Ids */
+            attachment_ids?: string[];
+        };
+        /** ExpertMessageResponse */
+        ExpertMessageResponse: {
+            /** Message Id */
+            message_id: string;
+            /** Conversation Id */
+            conversation_id: string;
+            /** Sequence */
+            sequence: number;
+            role: components["schemas"]["ExpertMessageRole"];
+            status: components["schemas"]["ExpertMessageStatus"];
+            /** Text */
+            text: string;
+            /** Content Blocks */
+            content_blocks: {
+                [key: string]: unknown;
+            }[];
+            /** Attachment Refs */
+            attachment_refs: {
+                [key: string]: unknown;
+            }[];
+            /** Reply To Message Id */
+            reply_to_message_id: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Completed At */
+            completed_at: string | null;
+        };
+        /**
+         * ExpertMessageRole
+         * @enum {string}
+         */
+        ExpertMessageRole: "user" | "expert" | "event";
+        /**
+         * ExpertMessageStatus
+         * @enum {string}
+         */
+        ExpertMessageStatus: "accepted" | "completed" | "failed";
+        /** ExpertSubmissionResponse */
+        ExpertSubmissionResponse: {
+            message: components["schemas"]["ExpertMessageResponse"];
+            turn: components["schemas"]["ExpertTurnResponse"];
+        };
+        /**
+         * ExpertTextInputMode
+         * @description Whether a trial provider consumes the user's free-form message text.
+         * @enum {string}
+         */
+        ExpertTextInputMode: "required" | "optional" | "unsupported";
+        /** ExpertTurnResponse */
+        ExpertTurnResponse: {
+            /** Turn Id */
+            turn_id: string;
+            /** Conversation Id */
+            conversation_id: string;
+            /** Source Message Id */
+            source_message_id: string;
+            status: components["schemas"]["ExpertTurnStatus"];
+            /** Runtime Job Id */
+            runtime_job_id: string | null;
+            /** Runtime Thread Id */
+            runtime_thread_id: string | null;
+            /** Runtime Turn Id */
+            runtime_turn_id: string | null;
+            /** Runtime Workspace Id */
+            runtime_workspace_id: string | null;
+            /** Requested Model */
+            requested_model: string | null;
+            /** Actual Model */
+            actual_model: string | null;
+            /** Input Tokens */
+            input_tokens: number | null;
+            /** Output Tokens */
+            output_tokens: number | null;
+            /** Total Tokens */
+            total_tokens: number | null;
+            /** Usage Status */
+            usage_status: string;
+            /** Failure Code */
+            failure_code: string | null;
+            /** Failure Message */
+            failure_message: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Started At */
+            started_at: string | null;
+            /** Completed At */
+            completed_at: string | null;
+        };
+        /**
+         * ExpertTurnStatus
+         * @enum {string}
+         */
+        ExpertTurnStatus: "queued" | "submitted" | "running" | "waiting" | "completed" | "failed" | "cancelled";
+        /**
+         * ExpertVerificationStatus
+         * @description Operator verification state for one immutable ExpertVersion.
+         * @enum {string}
+         */
+        ExpertVerificationStatus: "pending" | "verified" | "stale" | "failed";
+        /** ExpertVersionResponse */
+        ExpertVersionResponse: {
+            /** Expert Id */
+            expert_id: string;
+            /** Expert Key */
+            expert_key: string;
+            /** Display Name */
+            display_name: string;
+            /** Short Description */
+            short_description: string;
+            /** Category */
+            category: string | null;
+            /** Tags */
+            tags: string[];
+            /** Expert Version Id */
+            expert_version_id: string;
+            /** Version Number */
+            version_number: number;
+            lifecycle_status: components["schemas"]["ExpertLifecycleStatus"];
+            verification_status: components["schemas"]["ExpertVerificationStatus"];
+            interaction_mode: components["schemas"]["ExpertInteractionMode"];
+            capability: components["schemas"]["ExpertCapabilitySummary"];
+            /** Provider */
+            provider: string;
+            availability_status: components["schemas"]["ExpertAvailabilityStatus"];
+            /** Availability Reason */
+            availability_reason: string | null;
+            /** Verified At */
+            verified_at: string | null;
+            eligibility_status: components["schemas"]["ExpertEligibilityStatus"];
+            /** Eligible */
+            eligible: boolean;
+            /** Eligibility Reason Codes */
+            eligibility_reason_codes: string[];
         };
         /** FeasibilityCheckResponse */
         FeasibilityCheckResponse: {
@@ -1647,6 +3723,10 @@ export interface components {
             output_contracts: {
                 [key: string]: unknown;
             }[];
+            /** Stream Input Contracts */
+            stream_input_contracts: components["schemas"]["ArtifactStreamInputSpec"][];
+            /** Stream Output Contracts */
+            stream_output_contracts: components["schemas"]["ArtifactStreamContractSpec"][];
             /** Dependency Step Ids */
             dependency_step_ids: string[];
             status: components["schemas"]["PlanStepStatus"];
@@ -1706,6 +3786,107 @@ export interface components {
             /** Label */
             label: string;
             parent?: components["schemas"]["ResourceParentRef"] | null;
+        };
+        /** RoleExecutionLeaseResponse */
+        RoleExecutionLeaseResponse: {
+            /** Role Execution Lease Id */
+            role_execution_lease_id: string;
+            /** Status */
+            status: string;
+            /** Lease Generation */
+            lease_generation: number;
+            /**
+             * Acquired At
+             * Format: date-time
+             */
+            acquired_at: string;
+            /**
+             * Heartbeat At
+             * Format: date-time
+             */
+            heartbeat_at: string;
+            /**
+             * Expires At
+             * Format: date-time
+             */
+            expires_at: string;
+            /** Released At */
+            released_at: string | null;
+            /** Release Reason */
+            release_reason: string | null;
+        };
+        /** RoleQueueActiveWorkResponse */
+        RoleQueueActiveWorkResponse: {
+            /** Role Work Item Id */
+            role_work_item_id: string;
+            /** Task Id */
+            task_id: string | null;
+            /** Assignment Id */
+            assignment_id: string | null;
+            /** Coordination Work Item Id */
+            coordination_work_item_id: string | null;
+            /** Status */
+            status: string;
+            /** Started At */
+            started_at: string | null;
+        };
+        /** RoleWorkItemCancelRequest */
+        RoleWorkItemCancelRequest: {
+            /** Reason */
+            reason: string;
+        };
+        /** RoleWorkItemResponse */
+        RoleWorkItemResponse: {
+            /** Role Work Item Id */
+            role_work_item_id: string;
+            /** Organization Id */
+            organization_id: string;
+            /** Role Key */
+            role_key: string;
+            /** Source Type */
+            source_type: string;
+            /** Source Id */
+            source_id: string;
+            /** Task Id */
+            task_id: string | null;
+            /** Assignment Id */
+            assignment_id: string | null;
+            /** Coordination Work Item Id */
+            coordination_work_item_id: string | null;
+            /** Priority */
+            priority: number;
+            /** Status */
+            status: string;
+            /** Wait Reason */
+            wait_reason: string | null;
+            /** Attempt Count */
+            attempt_count: number;
+            /**
+             * Available At
+             * Format: date-time
+             */
+            available_at: string;
+            /**
+             * Enqueued At
+             * Format: date-time
+             */
+            enqueued_at: string;
+            /** Leased At */
+            leased_at: string | null;
+            /** Started At */
+            started_at: string | null;
+            /** Completed At */
+            completed_at: string | null;
+            /** Terminal Reason */
+            terminal_reason: string | null;
+            active_lease: components["schemas"]["RoleExecutionLeaseResponse"] | null;
+            /** Queue Position */
+            queue_position: number | null;
+            /** Queued Count */
+            queued_count: number;
+            /** Role Capacity */
+            role_capacity: number;
+            active_work: components["schemas"]["RoleQueueActiveWorkResponse"] | null;
         };
         /** RuntimeBindingResponse */
         RuntimeBindingResponse: {
@@ -1932,6 +4113,16 @@ export interface components {
             wait_reason: string | null;
             /** Reserved Tokens */
             reserved_tokens: number;
+            /** Max Tokens Per Attempt */
+            max_tokens_per_attempt: number | null;
+            /** Max Cost Usd Per Attempt */
+            max_cost_usd_per_attempt: string | null;
+            /** Max Runtime Seconds Per Attempt */
+            max_runtime_seconds_per_attempt: number | null;
+            /** Effective Token Limit */
+            effective_token_limit: number | null;
+            /** Effective Runtime Seconds */
+            effective_runtime_seconds: number | null;
             /** Charged Tokens */
             charged_tokens: number | null;
             /** Usage Status */
@@ -1944,8 +4135,16 @@ export interface components {
             output_tokens: number | null;
             /** Reasoning Output Tokens */
             reasoning_output_tokens: number | null;
+            /** Cache Write Tokens */
+            cache_write_tokens: number | null;
             /** Total Tokens */
             total_tokens: number | null;
+            /** Cost Usd */
+            cost_usd: string | null;
+            /** Cost Status */
+            cost_status: string;
+            /** Pricing Catalog Version */
+            pricing_catalog_version: string | null;
             /** Context Compactions */
             context_compactions: number;
             /**
@@ -1974,7 +4173,7 @@ export interface components {
          * @description Named product security profiles compiled into Runtime-specific policy.
          * @enum {string}
          */
-        RuntimeSecurityMode: "demo_full_access" | "workspace_restricted";
+        RuntimeSecurityMode: "demo_full_access" | "workspace_restricted" | "external_managed";
         /** TaskCreateRequest */
         TaskCreateRequest: {
             /** Request */
@@ -2026,6 +4225,200 @@ export interface components {
          * @enum {string}
          */
         TaskExecutionPlanStatus: "draft" | "validated" | "active" | "completed" | "needs_revision" | "failed" | "cancelled";
+        /**
+         * TaskGraphEdge
+         * @description A relation whose meaning is backed by explicit persisted records.
+         */
+        TaskGraphEdge: {
+            /** Edge Id */
+            edge_id: string;
+            source: components["schemas"]["TaskGraphResourceRef"];
+            target: components["schemas"]["TaskGraphResourceRef"];
+            relation: components["schemas"]["TaskGraphRelation"];
+            /** Status */
+            status: string;
+            /** Iteration Number */
+            iteration_number: number;
+            /** Reason Summary */
+            reason_summary: string;
+            /** Artifact Id */
+            artifact_id?: string | null;
+            /** Case Id */
+            case_id?: string | null;
+            /** Work Item Id */
+            work_item_id?: string | null;
+            /** Retry Attempt Id */
+            retry_attempt_id?: string | null;
+            /** Replay Run Id */
+            replay_run_id?: string | null;
+            /** Stream Id */
+            stream_id?: string | null;
+            /** Delivery Id */
+            delivery_id?: string | null;
+            /** Finalization Id */
+            finalization_id?: string | null;
+            /** Finalization Attempt Id */
+            finalization_attempt_id?: string | null;
+            /** Stream Subscription Id */
+            stream_subscription_id?: string | null;
+            /** Partition Key */
+            partition_key?: string | null;
+            /** Sequence */
+            sequence?: number | null;
+            /** Plan Step Execution Id */
+            plan_step_execution_id?: string | null;
+            /** Delivery Input Binding Id */
+            delivery_input_binding_id?: string | null;
+        };
+        /**
+         * TaskGraphNode
+         * @description A persisted graph resource with safe display metadata.
+         */
+        TaskGraphNode: {
+            /** Node Id */
+            node_id: string;
+            resource: components["schemas"]["TaskGraphResourceRef"];
+            /** Status */
+            status: string;
+            /** Iteration Number */
+            iteration_number: number;
+            /** Plan Id */
+            plan_id?: string | null;
+            /** Plan Version */
+            plan_version?: number | null;
+            /** Plan Step Id */
+            plan_step_id?: string | null;
+            /** Step Key */
+            step_key?: string | null;
+            /** Assignment Id */
+            assignment_id?: string | null;
+            /** Role Key */
+            role_key?: string | null;
+            /** Work Item Kind */
+            work_item_kind?: string | null;
+            /** Artifact Id */
+            artifact_id?: string | null;
+            /** Case Id */
+            case_id?: string | null;
+            /** Work Item Id */
+            work_item_id?: string | null;
+            /** Replay Run Id */
+            replay_run_id?: string | null;
+            /** Stream Id */
+            stream_id?: string | null;
+            /** Delivery Id */
+            delivery_id?: string | null;
+            /** Finalization Id */
+            finalization_id?: string | null;
+            /** Finalization Attempt Id */
+            finalization_attempt_id?: string | null;
+            /** Failure Code */
+            failure_code?: string | null;
+            /** Failure Summary */
+            failure_summary?: string | null;
+            /** Partition Key */
+            partition_key?: string | null;
+            /** Sequence */
+            sequence?: number | null;
+            /** Delivery Kind */
+            delivery_kind?: string | null;
+            /** Stream Subscription Id */
+            stream_subscription_id?: string | null;
+            /** Trigger Policy */
+            trigger_policy?: string | null;
+            /** Plan Step Execution Id */
+            plan_step_execution_id?: string | null;
+            /** Delivery Input Binding Id */
+            delivery_input_binding_id?: string | null;
+            /** Trigger Delivery Id */
+            trigger_delivery_id?: string | null;
+            /** Trigger Finalization Id */
+            trigger_finalization_id?: string | null;
+        };
+        /**
+         * TaskGraphPlan
+         * @description Persisted execution-plan version represented by this projection.
+         */
+        TaskGraphPlan: {
+            /** Plan Id */
+            plan_id: string;
+            /** Plan Version */
+            plan_version: number;
+            /** Status */
+            status: string;
+            /** Source */
+            source: string;
+            /** Summary */
+            summary: string;
+            /** Is Current */
+            is_current: boolean;
+        };
+        /**
+         * TaskGraphProjection
+         * @description Owner-scoped, read-only Operational Blueprint projection.
+         */
+        TaskGraphProjection: {
+            /**
+             * Projection Version
+             * @default 1.4
+             */
+            projection_version: string;
+            /** Task Id */
+            task_id: string;
+            /** Organization Id */
+            organization_id: string;
+            /** Organization Spec Version Id */
+            organization_spec_version_id: string;
+            /** Current Plan Id */
+            current_plan_id: string | null;
+            /** Roles */
+            roles: components["schemas"]["TaskGraphRole"][];
+            /** Plans */
+            plans: components["schemas"]["TaskGraphPlan"][];
+            /** Nodes */
+            nodes: components["schemas"]["TaskGraphNode"][];
+            /** Edges */
+            edges: components["schemas"]["TaskGraphEdge"][];
+        };
+        /**
+         * TaskGraphRelation
+         * @description Persisted, product-owned relation semantics exposed to the frontend.
+         * @enum {string}
+         */
+        TaskGraphRelation: "dependency" | "artifact_handoff" | "feedback" | "verification" | "retry" | "replay_reuse" | "incremental_handoff" | "finalization" | "stream_subscription" | "delivery_binding" | "keyed_execution" | "watermark_convergence" | "incremental_output";
+        /**
+         * TaskGraphResourceRef
+         * @description Stable reference to a product resource, never a Runtime resource.
+         */
+        TaskGraphResourceRef: {
+            resource_type: components["schemas"]["TaskGraphResourceType"];
+            /** Resource Id */
+            resource_id: string;
+            /** Label */
+            label?: string | null;
+        };
+        /**
+         * TaskGraphResourceType
+         * @description Product resources that may participate in a Task graph relation.
+         * @enum {string}
+         */
+        TaskGraphResourceType: "task" | "plan_step" | "assignment" | "artifact" | "case" | "work_item" | "artifact_stream" | "artifact_delivery" | "stream_finalization" | "stream_finalization_attempt" | "plan_step_execution" | "delivery_input_binding";
+        /**
+         * TaskGraphRole
+         * @description Frozen organization role context used to render a swimlane.
+         */
+        TaskGraphRole: {
+            /** Role Key */
+            role_key: string;
+            /** Name */
+            name: string;
+            /** Responsibility */
+            responsibility: string;
+            /** Is Lead */
+            is_lead: boolean;
+            /** Reports To */
+            reports_to?: string | null;
+        };
         /** TaskInputArtifactRequest */
         TaskInputArtifactRequest: {
             /** Contract Key */
@@ -2183,13 +4576,11 @@ export interface components {
             /** Reused Step Keys */
             reused_step_keys: string[];
             /** Input Artifact Bindings */
-            input_artifact_bindings: {
-                [key: string]: unknown;
-            }[];
+            input_artifact_bindings: components["schemas"]["TaskReplayArtifactBindingResponse"][];
+            /** Input Delivery Bindings */
+            input_delivery_bindings: components["schemas"]["TaskReplayDeliveryBindingResponse"][];
             /** Effective Artifact Bindings */
-            effective_artifact_bindings: {
-                [key: string]: unknown;
-            }[];
+            effective_artifact_bindings: components["schemas"]["TaskReplayArtifactBindingResponse"][];
             status: components["schemas"]["TaskReplayStatus"];
             /** Lead Decision */
             lead_decision: string | null;
@@ -2245,6 +4636,8 @@ export interface components {
             result_summary: string | null;
             /** Assignments */
             assignments: components["schemas"]["AssignmentResponse"][];
+            /** Role Queue */
+            role_queue: components["schemas"]["RoleWorkItemResponse"][];
             execution_plan: components["schemas"]["TaskExecutionPlanResponse"] | null;
             base_execution_plan: components["schemas"]["TaskExecutionPlanResponse"] | null;
             /** Replay Runs */
@@ -2297,6 +4690,12 @@ export interface components {
             reasoning_output_tokens: number;
             /** Observed Total Tokens */
             observed_total_tokens: number;
+            /** Reported Cost Execution Count */
+            reported_cost_execution_count: number;
+            /** Unavailable Cost Execution Count */
+            unavailable_cost_execution_count: number;
+            /** Estimated Cost Usd */
+            estimated_cost_usd: string | null;
             /** Assignments */
             assignments: components["schemas"]["AssignmentTokenUsageResponse"][];
         };
@@ -2418,6 +4817,562 @@ export interface components {
              */
             resource_intensive: boolean;
         };
+        /** ArtifactDeliveryResponse */
+        ArtifactDeliveryResponse: {
+            /** Artifact Delivery Id */
+            artifact_delivery_id: string;
+            /** Artifact Stream Id */
+            artifact_stream_id: string;
+            /** Producer Plan Step Id */
+            producer_plan_step_id: string;
+            /** Producer Assignment Id */
+            producer_assignment_id: string | null;
+            /** Replay Run Id */
+            replay_run_id: string | null;
+            /** Source Delivery Id */
+            source_delivery_id: string | null;
+            /** Partition Key */
+            partition_key: string;
+            /** Sequence */
+            sequence: number;
+            delivery_kind: components["schemas"]["ArtifactDeliveryKind"];
+            status: components["schemas"]["ArtifactDeliveryStatus"];
+            /** Schema Version */
+            schema_version: string;
+            /** Media Type */
+            media_type: string;
+            /** File Name */
+            file_name: string;
+            /** Sha256 */
+            sha256: string;
+            /** Byte Size */
+            byte_size: number;
+            /** Validation Summary */
+            validation_summary: string | null;
+            /** Supersedes Delivery Id */
+            supersedes_delivery_id: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Superseded At */
+            superseded_at: string | null;
+            /** Rejected At */
+            rejected_at: string | null;
+        };
+        /**
+         * ArtifactStreamInputSpec
+         * @description A consumer's explicit finite-stream join policy.
+         */
+        ArtifactStreamInputSpec: {
+            /** Contract Key */
+            contract_key: string;
+            /**
+             * Trigger Policy
+             * @enum {string}
+             */
+            trigger_policy: "each" | "all" | "any" | "quorum" | "window";
+            /**
+             * Delivery Kind
+             * @default final
+             * @enum {string}
+             */
+            delivery_kind: "final" | "provisional_or_final";
+            /**
+             * Max Concurrent Executions
+             * @default 1
+             */
+            max_concurrent_executions: number;
+            /**
+             * Max Retry Count
+             * @default 1
+             */
+            max_retry_count: number;
+            /**
+             * Max Execution Seconds
+             * @default 3600
+             */
+            max_execution_seconds: number;
+            /** Max Tokens Per Execution */
+            max_tokens_per_execution?: number | null;
+        };
+        /** StreamSubscriptionResponse */
+        StreamSubscriptionResponse: {
+            /** Stream Subscription Id */
+            stream_subscription_id: string;
+            /** Artifact Stream Id */
+            artifact_stream_id: string;
+            /** Consumer Plan Step Id */
+            consumer_plan_step_id: string;
+            /** Contract Key */
+            contract_key: string;
+            /**
+             * Trigger Policy
+             * @enum {string}
+             */
+            trigger_policy: "each" | "all";
+            /**
+             * Delivery Kind
+             * @enum {string}
+             */
+            delivery_kind: "final" | "provisional_or_final";
+            /** Max Concurrent Executions */
+            max_concurrent_executions: number;
+            /** Max Retry Count */
+            max_retry_count: number;
+            /** Max Execution Seconds */
+            max_execution_seconds: number;
+            /** Max Tokens Per Execution */
+            max_tokens_per_execution?: number | null;
+            status: components["schemas"]["StreamSubscriptionStatus"];
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+        };
+        /**
+         * ArtifactDeliveryKind
+         * @enum {string}
+         */
+        ArtifactDeliveryKind: "provisional" | "final";
+        /**
+         * StreamSubscriptionStatus
+         * @enum {string}
+         */
+        StreamSubscriptionStatus: "declared" | "active" | "disabled";
+        /**
+         * ArtifactStreamContractSpec
+         * @description Finite, explicitly partitioned output stream declaration.
+         *
+         *     A stream is intentionally separate from a whole Artifact contract.  The
+         *     scheduler does not reinterpret either contract implicitly; a plan must
+         *     opt in by declaring this structure.
+         */
+        ArtifactStreamContractSpec: {
+            /** Contract Key */
+            contract_key: string;
+            /**
+             * Schema Version
+             * @default 1.0
+             */
+            schema_version: string;
+            /** Media Type */
+            media_type: string;
+            /** Partition Key Name */
+            partition_key_name: string;
+            /** Expected Partition Keys */
+            expected_partition_keys: string[];
+            /**
+             * Max Deliveries Per Partition
+             * @default 100
+             */
+            max_deliveries_per_partition: number;
+            /**
+             * Ordering Policy
+             * @default strict_contiguous
+             * @constant
+             */
+            ordering_policy: "strict_contiguous";
+        };
+        /**
+         * ArtifactDeliveryStatus
+         * @enum {string}
+         */
+        ArtifactDeliveryStatus: "accepted" | "superseded" | "rejected";
+        /**
+         * StreamFinalizationStatus
+         * @enum {string}
+         */
+        StreamFinalizationStatus: "accepted";
+        /**
+         * ArtifactStreamStatus
+         * @enum {string}
+         */
+        ArtifactStreamStatus: "declared" | "open" | "finalizing" | "finalized" | "failed" | "cancelled";
+        /** ArtifactStreamPartitionResponse */
+        ArtifactStreamPartitionResponse: {
+            /** Partition Key */
+            partition_key: string;
+            /** Accepted Delivery Count */
+            accepted_delivery_count: number;
+            /** Latest Sequence */
+            latest_sequence?: number | null;
+            /** Latest Delivery Id */
+            latest_delivery_id: string | null;
+            latest_delivery_kind: components["schemas"]["ArtifactDeliveryKind"] | null;
+            /** Has Final Delivery */
+            has_final_delivery: boolean;
+        };
+        /** StreamFinalizationResponse */
+        StreamFinalizationResponse: {
+            /** Stream Finalization Id */
+            stream_finalization_id: string;
+            /** Artifact Stream Id */
+            artifact_stream_id: string;
+            status: components["schemas"]["StreamFinalizationStatus"];
+            /** Expected Partition Keys */
+            expected_partition_keys: string[];
+            /** Expected Partition Count */
+            expected_partition_count: number;
+            /** Partition Watermarks */
+            partition_watermarks: {
+                [key: string]: {
+                    [key: string]: string | number;
+                };
+            };
+            /** Delivery Count */
+            delivery_count: number;
+            /** Definition Hash */
+            definition_hash: string;
+            /** Summary */
+            summary: string;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Finalized At
+             * Format: date-time
+             */
+            finalized_at: string;
+        };
+        /** ArtifactStreamResponse */
+        ArtifactStreamResponse: {
+            /** Artifact Stream Id */
+            artifact_stream_id: string;
+            /** Task Id */
+            task_id: string;
+            /** Plan Id */
+            plan_id: string;
+            /** Producer Plan Step Id */
+            producer_plan_step_id: string;
+            /** Contract Key */
+            contract_key: string;
+            /** Schema Version */
+            schema_version: string;
+            /** Media Type */
+            media_type: string;
+            /** Partition Key Name */
+            partition_key_name: string;
+            /** Expected Partition Keys */
+            expected_partition_keys: string[];
+            /** Expected Partition Count */
+            expected_partition_count: number;
+            /** Max Deliveries Per Partition */
+            max_deliveries_per_partition: number;
+            /**
+             * Ordering Policy
+             * @constant
+             */
+            ordering_policy: "strict_contiguous";
+            status: components["schemas"]["ArtifactStreamStatus"];
+            /** Delivery Count */
+            delivery_count: number;
+            /** Final Partition Count */
+            final_partition_count: number;
+            /** Failure Summary */
+            failure_summary: string | null;
+            /** Partitions */
+            partitions: components["schemas"]["ArtifactStreamPartitionResponse"][];
+            /** Deliveries */
+            deliveries: components["schemas"]["ArtifactDeliveryResponse"][];
+            /** Delivery Attempts */
+            delivery_attempts: components["schemas"]["ArtifactDeliveryAttemptResponse"][];
+            /** Subscriptions */
+            subscriptions: components["schemas"]["StreamSubscriptionResponse"][];
+            /** Finalization Attempts */
+            finalization_attempts: components["schemas"]["StreamFinalizationAttemptResponse"][];
+            finalization: components["schemas"]["StreamFinalizationResponse"] | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Opened At */
+            opened_at: string | null;
+            /** Finalizing At */
+            finalizing_at: string | null;
+            /** Finalized At */
+            finalized_at: string | null;
+            /** Failed At */
+            failed_at: string | null;
+            /** Cancelled At */
+            cancelled_at: string | null;
+        };
+        /** DeliveryInputBindingResponse */
+        DeliveryInputBindingResponse: {
+            /** Delivery Input Binding Id */
+            delivery_input_binding_id: string;
+            /** Plan Step Execution Id */
+            plan_step_execution_id: string;
+            /** Artifact Delivery Id */
+            artifact_delivery_id: string;
+            /** Delivery Sha256 */
+            delivery_sha256: string;
+            status: components["schemas"]["DeliveryInputBindingStatus"];
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Materialized At */
+            materialized_at: string | null;
+            /** Revoked At */
+            revoked_at: string | null;
+        };
+        /**
+         * DeliveryInputBindingStatus
+         * @enum {string}
+         */
+        DeliveryInputBindingStatus: "declared" | "materialized" | "revoked";
+        /** PlanStepExecutionResponse */
+        PlanStepExecutionResponse: {
+            /** Plan Step Execution Id */
+            plan_step_execution_id: string;
+            /** Task Id */
+            task_id: string;
+            /** Plan Id */
+            plan_id: string;
+            /** Plan Step Id */
+            plan_step_id: string;
+            /** Stream Subscription Id */
+            stream_subscription_id: string;
+            /** Artifact Stream Id */
+            artifact_stream_id: string;
+            /**
+             * Trigger Policy
+             * @enum {string}
+             */
+            trigger_policy: "each" | "all";
+            /** Trigger Delivery Id */
+            trigger_delivery_id: string | null;
+            /** Trigger Finalization Id */
+            trigger_finalization_id: string | null;
+            /** Execution Key */
+            execution_key: string;
+            /** Partition Key */
+            partition_key: string | null;
+            status: components["schemas"]["PlanStepExecutionStatus"];
+            /** Assignment Id */
+            assignment_id: string | null;
+            /** Failure Summary */
+            failure_summary: string | null;
+            /** Retry Count */
+            retry_count: number;
+            /** Max Retry Count */
+            max_retry_count: number;
+            /** Attempts */
+            attempts: components["schemas"]["PlanStepExecutionAttemptResponse"][];
+            /** Input Bindings */
+            input_bindings: components["schemas"]["DeliveryInputBindingResponse"][];
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Ready At */
+            ready_at: string | null;
+            /** Submitted At */
+            submitted_at: string | null;
+            /** Started At */
+            started_at: string | null;
+            /** Completed At */
+            completed_at: string | null;
+        };
+        /**
+         * PlanStepExecutionStatus
+         * @enum {string}
+         */
+        PlanStepExecutionStatus: "pending_input" | "ready" | "submitted" | "running" | "waiting" | "completed" | "failed" | "cancelled";
+        /** StreamFinalizationAttemptResponse */
+        StreamFinalizationAttemptResponse: {
+            /** Stream Finalization Attempt Id */
+            stream_finalization_attempt_id: string;
+            /** Artifact Stream Id */
+            artifact_stream_id: string;
+            /** Task Id */
+            task_id: string;
+            /** Stream Finalization Id */
+            stream_finalization_id: string | null;
+            /** Attempt Number */
+            attempt_number: number;
+            status: components["schemas"]["StreamFinalizationAttemptStatus"];
+            /** Failure Code */
+            failure_code: string | null;
+            /** Failure Summary */
+            failure_summary: string | null;
+            /** Failed Partition Key */
+            failed_partition_key: string | null;
+            /** Expected Partition Count */
+            expected_partition_count: number;
+            /** Observed Partition Count */
+            observed_partition_count: number;
+            /** Verified Partition Watermarks */
+            verified_partition_watermarks: {
+                [key: string]: {
+                    [key: string]: string | number;
+                };
+            };
+            /** Definition Hash */
+            definition_hash: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Completed At
+             * Format: date-time
+             */
+            completed_at: string;
+        };
+        /**
+         * StreamFinalizationAttemptStatus
+         * @enum {string}
+         */
+        StreamFinalizationAttemptStatus: "accepted" | "rejected";
+        /** ArtifactDeliveryAttemptResponse */
+        ArtifactDeliveryAttemptResponse: {
+            /** Artifact Delivery Attempt Id */
+            artifact_delivery_attempt_id: string;
+            /** Artifact Stream Id */
+            artifact_stream_id: string;
+            /** Artifact Delivery Id */
+            artifact_delivery_id: string | null;
+            /** Producer Assignment Id */
+            producer_assignment_id: string | null;
+            /** Partition Key */
+            partition_key: string;
+            /** Sequence */
+            sequence: number;
+            delivery_kind: components["schemas"]["ArtifactDeliveryKind"];
+            /** Idempotency Key */
+            idempotency_key: string;
+            /** Sha256 */
+            sha256: string;
+            /** Byte Size */
+            byte_size: number;
+            status: components["schemas"]["ArtifactDeliveryAttemptStatus"];
+            /** Failure Code */
+            failure_code: string | null;
+            /** Failure Summary */
+            failure_summary: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+        };
+        /**
+         * ArtifactDeliveryAttemptStatus
+         * @enum {string}
+         */
+        ArtifactDeliveryAttemptStatus: "accepted" | "duplicate" | "rejected" | "conflict";
+        /** PlanStepExecutionAttemptResponse */
+        PlanStepExecutionAttemptResponse: {
+            /** Plan Step Execution Attempt Id */
+            plan_step_execution_attempt_id: string;
+            /** Plan Step Execution Id */
+            plan_step_execution_id: string;
+            /** Assignment Id */
+            assignment_id: string;
+            /** Runtime Execution Id */
+            runtime_execution_id: string;
+            /** Attempt Number */
+            attempt_number: number;
+            /**
+             * Trigger
+             * @enum {string}
+             */
+            trigger: "initial" | "retry" | "recovery";
+            status: components["schemas"]["PlanStepExecutionAttemptStatus"];
+            /** Failure Code */
+            failure_code: string | null;
+            /** Failure Summary */
+            failure_summary: string | null;
+            /** Runtime Event Id */
+            runtime_event_id: string | null;
+            /** Reserved Tokens */
+            reserved_tokens: number;
+            /** Charged Tokens */
+            charged_tokens: number;
+            /**
+             * Usage Status
+             * @enum {string}
+             */
+            usage_status: "pending" | "reported" | "unavailable";
+            /** Input Tokens */
+            input_tokens: number | null;
+            /** Cached Input Tokens */
+            cached_input_tokens: number | null;
+            /** Output Tokens */
+            output_tokens: number | null;
+            /** Reasoning Output Tokens */
+            reasoning_output_tokens: number | null;
+            /** Total Tokens */
+            total_tokens: number | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Started At */
+            started_at: string | null;
+            /** Completed At */
+            completed_at: string | null;
+        };
+        /**
+         * PlanStepExecutionAttemptStatus
+         * @enum {string}
+         */
+        PlanStepExecutionAttemptStatus: "requested" | "submitted" | "running" | "waiting" | "completed" | "failed" | "cancelled" | "exhausted";
+        /** PlanStepExecutionCancelRequest */
+        PlanStepExecutionCancelRequest: {
+            /** Reason */
+            reason: string;
+        };
+        /** PlanStepExecutionRetryRequest */
+        PlanStepExecutionRetryRequest: {
+            /** Reason */
+            reason: string;
+        };
+        /** TaskReplayArtifactBindingResponse */
+        TaskReplayArtifactBindingResponse: {
+            /** Contract Key */
+            contract_key: string;
+            /** Artifact Id */
+            artifact_id: string;
+        };
+        /** TaskReplayDeliveryBindingResponse */
+        TaskReplayDeliveryBindingResponse: {
+            /** Contract Key */
+            contract_key: string;
+            /** Artifact Stream Id */
+            artifact_stream_id: string;
+            /** Artifact Delivery Id */
+            artifact_delivery_id: string;
+            /** Partition Key */
+            partition_key: string;
+            /** Sequence */
+            sequence: number;
+            /** Sha256 */
+            sha256: string;
+        };
+        /**
+         * RoleExecutionLimits
+         * @description Optional product-owned fuses for one role execution attempt.
+         */
+        RoleExecutionLimits: {
+            /** Max Tokens Per Attempt */
+            max_tokens_per_attempt?: number | null;
+            /** Max Cost Usd Per Attempt */
+            max_cost_usd_per_attempt?: string | null;
+            /** Max Runtime Seconds Per Attempt */
+            max_runtime_seconds_per_attempt?: number | null;
+        };
     };
     responses: never;
     parameters: never;
@@ -2443,6 +5398,1095 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HealthResponse"];
+                };
+            };
+        };
+    };
+    list_conversations_api_v1_experts_conversations_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ExpertConversationResponse"][];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Request Entity Too Large */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unsupported Media Type */
+            415: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    create_conversation_api_v1_experts_conversations_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ExpertConversationCreateRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ExpertConversationResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Request Entity Too Large */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unsupported Media Type */
+            415: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    get_conversation_api_v1_experts_conversations__conversation_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                conversation_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ExpertConversationResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Request Entity Too Large */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unsupported Media Type */
+            415: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    archive_conversation_api_v1_experts_conversations__conversation_id__archive_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                conversation_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ExpertConversationResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Request Entity Too Large */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unsupported Media Type */
+            415: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    upload_attachment_api_v1_experts_conversations__conversation_id__attachments_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                conversation_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": components["schemas"]["Body_upload_attachment_api_v1_experts_conversations__conversation_id__attachments_post"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ExpertAttachmentResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Request Entity Too Large */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unsupported Media Type */
+            415: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    revoke_attachment_api_v1_experts_conversations__conversation_id__attachments__attachment_id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                conversation_id: string;
+                attachment_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ExpertAttachmentResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Request Entity Too Large */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unsupported Media Type */
+            415: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    read_attachment_api_v1_experts_conversations__conversation_id__attachments__attachment_id__content_get: {
+        parameters: {
+            query?: {
+                download?: boolean;
+            };
+            header?: never;
+            path: {
+                conversation_id: string;
+                attachment_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Request Entity Too Large */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unsupported Media Type */
+            415: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    list_messages_api_v1_experts_conversations__conversation_id__messages_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                conversation_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ExpertMessagePage"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Request Entity Too Large */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unsupported Media Type */
+            415: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    submit_message_api_v1_experts_conversations__conversation_id__messages_post: {
+        parameters: {
+            query?: never;
+            header: {
+                "Idempotency-Key": string;
+            };
+            path: {
+                conversation_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ExpertMessageRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ExpertSubmissionResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Request Entity Too Large */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unsupported Media Type */
+            415: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    get_turn_api_v1_experts_turns__turn_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                turn_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ExpertTurnResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Request Entity Too Large */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unsupported Media Type */
+            415: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    stream_events_api_v1_experts_conversations__conversation_id__events_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                "Last-Event-ID"?: string | null;
+            };
+            path: {
+                conversation_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Request Entity Too Large */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unsupported Media Type */
+            415: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    list_experts_api_v1_experts_get: {
+        parameters: {
+            query?: {
+                query?: string | null;
+                provider?: string | null;
+                category?: string[] | null;
+                interaction_mode?: components["schemas"]["ExpertInteractionMode"] | null;
+                input_media_type?: string | null;
+                output_media_type?: string | null;
+                eligible_only?: boolean;
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ExpertCatalogItemResponse"][];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    list_expert_categories_api_v1_experts_categories_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ExpertCategoryResponse"][];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    get_expert_api_v1_experts__expert_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                expert_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ExpertDetailResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    get_expert_version_api_v1_experts_versions__expert_version_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                expert_version_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ExpertVersionResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
                 };
             };
         };
@@ -3230,6 +7274,97 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["AssistantSubmissionResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Request Entity Too Large */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unsupported Media Type */
+            415: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    submit_input_api_v1_assistant_conversations__conversation_id__inputs_post: {
+        parameters: {
+            query?: never;
+            header: {
+                "Idempotency-Key": string;
+            };
+            path: {
+                conversation_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AssistantUserMessageRequest"];
+            };
+        };
+        responses: {
+            /** @description Action decision or idempotent replay */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AssistantTurnInputResponse"] | components["schemas"]["AssistantActionDecisionInputResponse"] | components["schemas"]["AssistantActionDecisionUnavailableInputResponse"];
+                };
+            };
+            /** @description Successful Response */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AssistantTurnInputResponse"] | components["schemas"]["AssistantActionDecisionInputResponse"] | components["schemas"]["AssistantActionDecisionUnavailableInputResponse"];
                 };
             };
             /** @description Unauthorized */
@@ -4323,7 +8458,9 @@ export interface operations {
     };
     get_runtime_controls_api_v1_runtime_controls_get: {
         parameters: {
-            query?: never;
+            query?: {
+                provider?: string | null;
+            };
             header?: never;
             path?: never;
             cookie?: never;
@@ -4337,6 +8474,15 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["RuntimeControlResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };
@@ -4637,6 +8783,145 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["TaskResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Too Many Requests */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    cancel_role_work_item_api_v1_tasks__task_id__role_queue__role_work_item_id__cancel_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                task_id: string;
+                role_work_item_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RoleWorkItemCancelRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TaskResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Too Many Requests */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    get_task_graph_projection_api_v1_tasks__task_id__graph_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                task_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TaskGraphProjection"];
                 };
             };
             /** @description Unauthorized */
@@ -5336,6 +9621,2049 @@ export interface operations {
                 };
                 content: {
                     "application/json": unknown;
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Too Many Requests */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    create_semantic_observation_api_v1_coordination_semantic_observations_post: {
+        parameters: {
+            query?: never;
+            header: {
+                "Idempotency-Key": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CoordinationSemanticObservationRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CoordinationSemanticObservationResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    create_coordination_signal_api_v1_coordination_signals_post: {
+        parameters: {
+            query?: never;
+            header: {
+                "Idempotency-Key": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CoordinationSignalCreateRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CoordinationSignalCreateResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    list_coordination_cases_api_v1_coordination_cases_get: {
+        parameters: {
+            query?: {
+                organization_id?: string | null;
+                status?: components["schemas"]["CoordinationCaseStatus"] | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CoordinationCaseResponse"][];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    get_coordination_case_api_v1_coordination_cases__case_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                case_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CoordinationCaseResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    get_coordination_routing_run_api_v1_coordination_routing_runs__routing_run_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                routing_run_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CoordinationRoutingRunResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    create_coordination_work_item_api_v1_coordination_cases__case_id__work_items_post: {
+        parameters: {
+            query?: never;
+            header: {
+                "Idempotency-Key": string;
+            };
+            path: {
+                case_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CoordinationWorkItemCreateRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CoordinationWorkItemResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    transition_coordination_case_api_v1_coordination_cases__case_id__transition_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "Idempotency-Key"?: string | null;
+            };
+            path: {
+                case_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CoordinationCaseTransitionRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CoordinationCaseResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    transition_coordination_work_item_api_v1_coordination_work_items__work_item_id__transition_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "Idempotency-Key"?: string | null;
+            };
+            path: {
+                work_item_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CoordinationWorkItemTransitionRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CoordinationWorkItemResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    report_coordination_work_item_api_v1_coordination_work_items__work_item_id__reports_post: {
+        parameters: {
+            query?: never;
+            header: {
+                "Idempotency-Key": string;
+            };
+            path: {
+                work_item_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CoordinationWorkItemReportRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CoordinationWorkItemReportResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    list_coordination_inbox_api_v1_coordination_inbox_get: {
+        parameters: {
+            query?: {
+                organization_id?: string | null;
+                target_role_key?: string | null;
+                status?: components["schemas"]["CoordinationInboxDeliveryStatus"] | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CoordinationInboxDeliveryResponse"][];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    mark_coordination_inbox_read_api_v1_coordination_inbox__delivery_id__read_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                delivery_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CoordinationInboxDeliveryResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    get_coordination_event_history_api_v1_coordination_cases__case_id__events_history_get: {
+        parameters: {
+            query?: {
+                after_sequence?: number;
+            };
+            header?: never;
+            path: {
+                case_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CoordinationEventResponse"][];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    stream_coordination_events_api_v1_coordination_cases__case_id__events_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                "Last-Event-ID"?: string | null;
+            };
+            path: {
+                case_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    list_channel_providers_api_v1_channels_providers_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ChannelProviderResponse"][];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    list_channel_connections_api_v1_channels_connections_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ChannelConnectionResponse"][];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    create_channel_connection_api_v1_channels_connections_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ChannelConnectionCreateRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ChannelConnectionResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Internal Server Error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Service Unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    get_channel_connection_api_v1_channels_connections__connection_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                connection_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ChannelConnectionResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Internal Server Error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Service Unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    begin_channel_authorization_api_v1_channels_connections__connection_id__authorization_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                connection_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ChannelAuthorizationResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Internal Server Error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Service Unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    poll_channel_authorization_api_v1_channels_connections__connection_id__authorization__auth_session_id__poll_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                connection_id: string;
+                auth_session_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["ChannelAuthorizationPollRequest"] | null;
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ChannelAuthorizationResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Internal Server Error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Service Unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    disconnect_channel_connection_api_v1_channels_connections__connection_id__disconnect_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                connection_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ChannelConnectionResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Internal Server Error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Service Unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    list_channel_identities_api_v1_channels_connections__connection_id__identities_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                connection_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ChannelIdentityResponse"][];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Internal Server Error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Service Unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    upsert_channel_identity_api_v1_channels_connections__connection_id__identities_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                connection_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ChannelIdentityUpsertRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ChannelIdentityResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Internal Server Error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Service Unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    revoke_channel_identity_api_v1_channels_connections__connection_id__identities__identity_id__revoke_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                connection_id: string;
+                identity_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ChannelIdentityResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Internal Server Error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Service Unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    list_channel_inbound_deliveries_api_v1_channels_connections__connection_id__inbound_deliveries_get: {
+        parameters: {
+            query?: {
+                limit?: number;
+            };
+            header?: never;
+            path: {
+                connection_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ChannelInboundDeliveryResponse"][];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Internal Server Error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Service Unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    list_channel_outbound_deliveries_api_v1_channels_connections__connection_id__outbound_deliveries_get: {
+        parameters: {
+            query?: {
+                limit?: number;
+            };
+            header?: never;
+            path: {
+                connection_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ChannelOutboundDeliveryResponse"][];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Internal Server Error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Service Unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    list_task_artifact_streams_api_v1_tasks__task_id__streams_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                task_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ArtifactStreamResponse"][];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Too Many Requests */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    get_task_artifact_stream_api_v1_tasks__task_id__streams__stream_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                task_id: string;
+                stream_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ArtifactStreamResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Too Many Requests */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    list_task_stream_executions_api_v1_tasks__task_id__stream_executions_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                task_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PlanStepExecutionResponse"][];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Too Many Requests */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    get_task_stream_execution_api_v1_tasks__task_id__stream_executions__plan_step_execution_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                task_id: string;
+                plan_step_execution_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PlanStepExecutionResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Too Many Requests */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    retry_task_stream_execution_api_v1_tasks__task_id__stream_executions__plan_step_execution_id__retry_post: {
+        parameters: {
+            query?: never;
+            header: {
+                "Idempotency-Key": string;
+            };
+            path: {
+                task_id: string;
+                plan_step_execution_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PlanStepExecutionRetryRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PlanStepExecutionResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Too Many Requests */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    cancel_task_stream_execution_api_v1_tasks__task_id__stream_executions__plan_step_execution_id__cancel_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                task_id: string;
+                plan_step_execution_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PlanStepExecutionCancelRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PlanStepExecutionResponse"];
                 };
             };
             /** @description Unauthorized */

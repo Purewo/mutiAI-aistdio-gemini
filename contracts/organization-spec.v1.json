@@ -45,8 +45,25 @@
           "title": "Runtime Binding Key",
           "type": "string"
         },
+        "expert_version_id": {
+          "anyOf": [
+            {
+              "maxLength": 36,
+              "minLength": 36,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Expert Version Id"
+        },
         "capability_requirements": {
           "$ref": "#/$defs/WorkloadRequirements"
+        },
+        "execution_limits": {
+          "$ref": "#/$defs/RoleExecutionLimits"
         }
       },
       "required": [
@@ -56,6 +73,56 @@
         "runtime_binding_key"
       ],
       "title": "AgentRoleSpec",
+      "type": "object"
+    },
+    "RoleExecutionLimits": {
+      "additionalProperties": false,
+      "description": "Optional product-owned fuses for one role execution attempt.",
+      "properties": {
+        "max_tokens_per_attempt": {
+          "anyOf": [
+            {
+              "maximum": 100000000,
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Max Tokens Per Attempt"
+        },
+        "max_cost_usd_per_attempt": {
+          "anyOf": [
+            {
+              "maxLength": 24,
+              "pattern": "^(?:0|[1-9]\\d*)(?:\\.\\d{1,6})?$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Max Cost Usd Per Attempt"
+        },
+        "max_runtime_seconds_per_attempt": {
+          "anyOf": [
+            {
+              "maximum": 2592000,
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Max Runtime Seconds Per Attempt"
+        }
+      },
+      "title": "RoleExecutionLimits",
       "type": "object"
     },
     "WorkloadRequirements": {

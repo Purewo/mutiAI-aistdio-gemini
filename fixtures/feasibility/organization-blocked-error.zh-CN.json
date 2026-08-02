@@ -1,9 +1,9 @@
 {
   "code": "FEASIBILITY_BLOCKED",
   "message": "运行环境不满足当前组织或任务要求。",
-  "request_id": "aeee4452-64c9-47f6-98ff-00a4c5231939",
+  "request_id": "c9802c88-6026-41b5-89eb-07fc68c5799b",
   "details": {
-    "feasibility_check_id": "dcd5744f-ca17-4c3f-ab9b-c59a6d65c412",
+    "feasibility_check_id": "5c879659-8abd-43ff-a07b-fd98523ca971",
     "outcome": "blocked"
   }
 }

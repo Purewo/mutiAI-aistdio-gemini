@@ -36,6 +36,49 @@ const OUTCOME_PRESENTATION: Record<
   },
 };
 
+const OUTCOME_PRIORITY: Record<FeasibilityOutcome, number> = {
+  feasible: 0,
+  conditional: 1,
+  capability_unknown: 2,
+  blocked: 3,
+};
+
+function summarizeOutcome(checks: FeasibilityCheck[]): FeasibilityOutcome {
+  return checks.reduce<FeasibilityOutcome>(
+    (summary, check) =>
+      OUTCOME_PRIORITY[check.outcome] > OUTCOME_PRIORITY[summary] ? check.outcome : summary,
+    'feasible',
+  );
+}
+
+function summarizeFindings(checks: FeasibilityCheck[]): FeasibilityFinding[] {
+  const findings = new Map<string, FeasibilityFinding>();
+  checks.forEach((check) => {
+    check.findings.forEach((finding) => {
+      const key = [
+        finding.reason_code,
+        finding.role_key,
+        finding.binding_key,
+        finding.capability,
+        finding.message,
+      ].join(':');
+      if (!findings.has(key)) findings.set(key, finding);
+    });
+  });
+  return [...findings.values()];
+}
+
+function formatCheckTime(value: string): string {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return value;
+  return new Intl.DateTimeFormat('zh-CN', {
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+  }).format(date);
+}
+
 export function FeasibilityOutcomeBadge({ outcome }: { outcome: FeasibilityOutcome }) {
   const presentation = OUTCOME_PRESENTATION[outcome] ?? {
     // An outcome value this build does not know yet must not crash the view.
@@ -120,30 +163,66 @@ function FindingRow({ finding }: { finding: FeasibilityFinding }) {
 export default function FeasibilityPanel({ checks }: { checks: FeasibilityCheck[] }) {
   if (checks.length === 0) return null;
 
-  return (
-    <div className="space-y-3">
-      {checks.map((check) => (
-        <section
-          key={check.feasibility_check_id}
-          className="rounded-2xl border border-slate-200/60 bg-slate-50/60 p-3"
-        >
-          <div className="flex flex-wrap items-center gap-2">
-            <h4 className="text-xs font-semibold text-slate-700">Runtime 可行性</h4>
-            <FeasibilityOutcomeBadge outcome={check.outcome} />
-            <span className="text-[11px] text-slate-400">
-              阶段 {check.phase} · 校验器 {check.validator_version}
-            </span>
-          </div>
+  const summaryOutcome = summarizeOutcome(checks);
+  const findings = summarizeFindings(checks);
+  const phases = [...new Set(checks.map((check) => check.phase))];
+  const validators = [...new Set(checks.map((check) => check.validator_version))];
+  const outcomeCounts = checks.reduce<Partial<Record<FeasibilityOutcome, number>>>((counts, check) => {
+    counts[check.outcome] = (counts[check.outcome] ?? 0) + 1;
+    return counts;
+  }, {});
+  const outcomeSummary = (Object.entries(outcomeCounts) as [FeasibilityOutcome, number][])
+    .sort(([left], [right]) => OUTCOME_PRIORITY[right] - OUTCOME_PRIORITY[left])
+    .map(([outcome, count]) => `${OUTCOME_PRESENTATION[outcome].label} ${count}`)
+    .join(' · ');
 
-          {check.findings.length > 0 ? (
-            <ul className="mt-2 space-y-2">
-              {check.findings.map((finding, index) => (
-                <FindingRow key={`${check.feasibility_check_id}-${index}`} finding={finding} />
-              ))}
-            </ul>
-          ) : null}
-        </section>
-      ))}
-    </div>
+  return (
+    <section className="rounded-2xl border border-slate-200/60 bg-slate-50/60 p-3">
+      <div className="flex flex-wrap items-center gap-2">
+        <h4 className="text-xs font-semibold text-slate-700">Runtime 可行性</h4>
+        <FeasibilityOutcomeBadge outcome={summaryOutcome} />
+        <span className="rounded-full border border-slate-200 bg-white px-2 py-0.5 text-[11px] font-medium text-slate-500">
+          {checks.length} 次检查
+        </span>
+        <span className="text-[11px] text-slate-400">{outcomeSummary}</span>
+      </div>
+
+      {findings.length > 0 ? (
+        <ul className="mt-3 space-y-2">
+          {findings.map((finding) => (
+            <FindingRow
+              key={[finding.reason_code, finding.role_key, finding.binding_key, finding.capability].join('-')}
+              finding={finding}
+            />
+          ))}
+        </ul>
+      ) : null}
+
+      <details className="group mt-2 border-t border-slate-200/70 pt-2">
+        <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-3 rounded-xl px-2 text-xs font-medium text-slate-500 transition hover:bg-white hover:text-slate-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/30 [&::-webkit-details-marker]:hidden">
+          <span>技术校验记录</span>
+          <span className="text-[11px] text-slate-400 group-open:hidden">查看 {checks.length} 条</span>
+          <span className="hidden text-[11px] text-slate-400 group-open:inline">收起</span>
+        </summary>
+        <div className="mt-1 space-y-1.5 px-2 pb-1">
+          <p className="text-[11px] leading-relaxed text-slate-400">
+            阶段 {phases.join('、')} · 校验器 {validators.join('、')}
+          </p>
+          {[...checks]
+            .sort((left, right) => right.created_at.localeCompare(left.created_at))
+            .map((check) => (
+              <div
+                key={check.feasibility_check_id}
+                className="flex flex-wrap items-center gap-x-2 gap-y-1 rounded-lg border border-slate-200/70 bg-white/80 px-2.5 py-2 text-[11px] text-slate-500"
+              >
+                <FeasibilityOutcomeBadge outcome={check.outcome} />
+                <span>{check.phase}</span>
+                <time dateTime={check.created_at}>{formatCheckTime(check.created_at)}</time>
+                {check.findings.length > 0 ? <span>{check.findings.length} 项发现</span> : null}
+              </div>
+            ))}
+        </div>
+      </details>
+    </section>
   );
 }

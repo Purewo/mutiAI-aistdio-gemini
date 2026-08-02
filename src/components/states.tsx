@@ -14,7 +14,7 @@ export function LoadingState({ label = '加载中...' }: { label?: string }) {
     <div
       role="status"
       aria-live="polite"
-      className="flex flex-col items-center justify-center gap-4 py-16 px-6 text-center"
+      className="flex flex-col items-center justify-center gap-4 px-4 py-12 text-center sm:px-6 sm:py-16"
     >
       <Loader2 className="h-8 w-8 animate-spin text-indigo-600" aria-hidden="true" />
       <p className="font-medium text-slate-500">{label}</p>
@@ -32,7 +32,7 @@ export function EmptyState({
   action?: React.ReactNode;
 }) {
   return (
-    <div className="flex flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-slate-200 bg-slate-100/50 py-16 px-6 text-center">
+    <div className="flex flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-slate-200 bg-slate-100/50 px-4 py-12 text-center sm:px-6 sm:py-16">
       <Inbox className="h-10 w-10 text-slate-400" aria-hidden="true" />
       <p className="font-medium text-slate-600">{title}</p>
       {description ? <p className="max-w-md text-sm text-slate-500">{description}</p> : null}
@@ -62,7 +62,7 @@ export function ErrorState({
   return (
     <div
       role="alert"
-      className="flex flex-col items-center justify-center gap-3 rounded-2xl border border-red-100 bg-red-50/50 py-12 px-6 text-center"
+      className="flex flex-col items-center justify-center gap-3 rounded-2xl border border-red-100 bg-red-50/50 px-4 py-10 text-center sm:px-6 sm:py-12"
     >
       {offline ? (
         <WifiOff className="h-8 w-8 text-red-500" aria-hidden="true" />
@@ -72,7 +72,7 @@ export function ErrorState({
       <p className="font-semibold text-red-800">{title}</p>
       <p className="max-w-lg text-sm leading-relaxed text-red-700">{describeApiError(error)}</p>
       {apiError?.code || apiError?.requestId ? (
-        <p className="font-mono text-xs text-red-500/80">
+        <p className="break-all font-mono text-xs text-red-500/80">
           {apiError.code ? <span>{apiError.code}</span> : null}
           {apiError.code && apiError.requestId ? <span> · </span> : null}
           {apiError.requestId ? <span>request {apiError.requestId}</span> : null}
@@ -82,7 +82,7 @@ export function ErrorState({
         <button
           type="button"
           onClick={onRetry}
-          className="mt-2 inline-flex items-center gap-2 rounded-xl border border-red-200 bg-white px-4 py-2 text-sm font-semibold text-red-700 transition-colors hover:bg-red-50 focus:outline-none focus-visible:ring-4 focus-visible:ring-red-500/20"
+          className="mt-2 inline-flex min-h-11 items-center gap-2 rounded-xl border border-red-200 bg-white px-4 py-2 text-sm font-semibold text-red-700 transition-colors hover:bg-red-50 focus:outline-none focus-visible:ring-4 focus-visible:ring-red-500/20"
         >
           <RefreshCw className="h-4 w-4" aria-hidden="true" />
           重试
@@ -161,9 +161,9 @@ export function ReconnectBanner({
     <div
       role="status"
       aria-live="polite"
-      className={`flex items-center justify-between gap-3 rounded-xl border px-4 py-2.5 text-sm ${tone}`}
+      className={`flex flex-col items-stretch gap-2.5 rounded-xl border px-4 py-3 text-sm sm:flex-row sm:items-center sm:justify-between sm:gap-3 sm:py-2.5 ${tone}`}
     >
-      <span className="flex items-center gap-2">
+      <span className="flex min-w-0 items-start gap-2 leading-relaxed sm:items-center">
         {status === 'reconnecting' ? (
           <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
         ) : null}
@@ -173,7 +173,7 @@ export function ReconnectBanner({
         <button
           type="button"
           onClick={onReconnect}
-          className="shrink-0 rounded-lg px-2.5 py-1 text-xs font-semibold underline-offset-2 hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-current"
+          className="min-h-11 shrink-0 rounded-lg border border-current/15 px-3 py-2 text-xs font-semibold underline-offset-2 hover:bg-white/50 hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-current"
         >
           重新连接
         </button>

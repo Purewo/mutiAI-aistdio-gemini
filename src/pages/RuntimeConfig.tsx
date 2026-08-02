@@ -13,6 +13,11 @@ import PageHeader from '../components/PageHeader';
 import { EmptyState, ErrorState, InlineError, LoadingState } from '../components/states';
 import { formatDateTime } from '../lib/format';
 
+type RuntimeOverview = {
+  bindings: RuntimeBinding[];
+  controls: RuntimeControl[];
+};
+
 /**
  * Owner-scoped Runtime configuration.
  *
@@ -30,7 +35,11 @@ import { formatDateTime } from '../lib/format';
  * The contracted security modes, checked against the generated contract type so a contract change
  * fails the build instead of leaving a stale hard-coded list.
  */
-const SECURITY_MODES = ['demo_full_access', 'workspace_restricted'] as const satisfies readonly RuntimeSecurityMode[];
+const SECURITY_MODES = [
+  'demo_full_access',
+  'workspace_restricted',
+  'external_managed',
+] as const satisfies readonly RuntimeSecurityMode[];
 
 const SECURITY_MODE_PRESENTATION: Record<RuntimeSecurityMode, { label: string; tone: string }> = {
   demo_full_access: {
@@ -41,28 +50,46 @@ const SECURITY_MODE_PRESENTATION: Record<RuntimeSecurityMode, { label: string; t
     label: '工作区受限（支持审批）',
     tone: 'border-emerald-200/60 bg-emerald-50 text-emerald-700',
   },
+  external_managed: {
+    label: '外部托管（由 Provider 负责隔离）',
+    tone: 'border-violet-200 bg-violet-50 text-violet-700',
+  },
 };
 
 export default function RuntimeConfig() {
-  const controls = useApiResource((signal) => getRuntimeControls(signal), []);
-  const bindings = useApiResource((signal) => listRuntimeBindings(signal), []);
+  const runtime = useApiResource<RuntimeOverview>(async (signal) => {
+    const bindings = await listRuntimeBindings(signal);
+    const providers = [...new Set(bindings.map((binding) => binding.provider))];
+    const controls = await Promise.all(
+      (providers.length > 0 ? providers : [undefined]).map((provider) =>
+        getRuntimeControls(provider, signal),
+      ),
+    );
+    return { bindings, controls };
+  }, []);
 
   return (
     <div className="flex h-full flex-col bg-slate-50/50">
       <PageHeader title="Runtime 配置" description="岗位 Runtime 绑定与产品准入状态" />
 
-      <div className="flex-1 overflow-y-auto p-6 sm:p-8">
-        <div className="mx-auto max-w-5xl space-y-8">
+      <div className="mobile-scroll-gutter flex-1 overflow-y-auto px-4 py-5 sm:p-8">
+        <div className="mx-auto max-w-5xl space-y-7 sm:space-y-8">
           <section>
             <div className="mb-4 flex items-center gap-2">
               <Gauge className="h-5 w-5 text-indigo-600" aria-hidden="true" />
               <h2 className="text-lg font-semibold text-slate-800">准入与预算</h2>
             </div>
-            {controls.state.status === 'loading' ? <LoadingState label="加载 Runtime 状态中..." /> : null}
-            {controls.state.status === 'error' ? (
-              <ErrorState error={controls.state.error} title="加载 Runtime 状态失败" onRetry={controls.reload} />
+            {runtime.state.status === 'loading' ? <LoadingState label="加载 Runtime 状态中..." /> : null}
+            {runtime.state.status === 'error' ? (
+              <ErrorState error={runtime.state.error} title="加载 Runtime 状态失败" onRetry={runtime.reload} />
             ) : null}
-            {controls.state.status === 'ready' ? <ControlsCard controls={controls.state.data} /> : null}
+            {runtime.state.status === 'ready' ? (
+              <div className="space-y-3">
+                {runtime.state.data.controls.map((controls) => (
+                  <ControlsCard key={controls.provider} controls={controls} />
+                ))}
+              </div>
+            ) : null}
           </section>
 
           <section>
@@ -70,23 +97,23 @@ export default function RuntimeConfig() {
               <Cpu className="h-5 w-5 text-blue-600" aria-hidden="true" />
               <h2 className="text-lg font-semibold text-slate-800">Runtime 绑定</h2>
             </div>
-            {bindings.state.status === 'loading' ? <LoadingState label="加载绑定中..." /> : null}
-            {bindings.state.status === 'error' ? (
-              <ErrorState error={bindings.state.error} title="加载绑定失败" onRetry={bindings.reload} />
+            {runtime.state.status === 'loading' ? <LoadingState label="加载绑定中..." /> : null}
+            {runtime.state.status === 'error' ? (
+              <ErrorState error={runtime.state.error} title="加载绑定失败" onRetry={runtime.reload} />
             ) : null}
-            {bindings.state.status === 'ready' && bindings.state.data.length === 0 ? (
+            {runtime.state.status === 'ready' && runtime.state.data.bindings.length === 0 ? (
               <EmptyState
                 title="还没有 Runtime 绑定"
                 description="绑定会在组织岗位首次引用时由后端按需创建。"
               />
             ) : null}
-            {bindings.state.status === 'ready' && bindings.state.data.length > 0 ? (
+            {runtime.state.status === 'ready' && runtime.state.data.bindings.length > 0 ? (
               <ul className="space-y-4">
-                {bindings.state.data.map((binding) => (
+                {runtime.state.data.bindings.map((binding) => (
                   <BindingCard
                     key={binding.runtime_binding_id}
                     binding={binding}
-                    onSaved={bindings.reload}
+                    onSaved={runtime.reload}
                   />
                 ))}
               </ul>
@@ -100,9 +127,9 @@ export default function RuntimeConfig() {
 
 function StatItem({ label, value }: { label: string; value: React.ReactNode }) {
   return (
-    <div>
-      <dt className="text-xs font-medium text-slate-500">{label}</dt>
-      <dd className="mt-0.5 text-sm font-semibold text-slate-800">{value}</dd>
+    <div className="flex min-w-0 items-start justify-between gap-4 border-b border-slate-100 py-2 last:border-b-0 sm:block sm:border-0 sm:py-0">
+      <dt className="shrink-0 text-xs font-medium text-slate-500">{label}</dt>
+      <dd className="min-w-0 break-words text-right text-sm font-semibold text-slate-800 sm:mt-0.5 sm:text-left">{value}</dd>
     </div>
   );
 }
@@ -112,8 +139,8 @@ function ControlsCard({ controls }: { controls: RuntimeControl }) {
     controls.token_budget_limit !== null && controls.token_reservation_per_execution !== null;
 
   return (
-    <div className="rounded-2xl border border-slate-200/60 bg-white p-5 shadow-sm">
-      <dl className="grid grid-cols-2 gap-x-8 gap-y-4 sm:grid-cols-3 lg:grid-cols-4">
+    <div className="rounded-2xl border border-slate-200/60 bg-white p-4 shadow-sm sm:p-5">
+      <dl className="grid grid-cols-1 gap-x-8 sm:grid-cols-3 sm:gap-y-4 lg:grid-cols-4">
         <StatItem label="Runtime 提供方" value={<span className="font-mono">{controls.provider}</span>} />
         <StatItem
           label="并发执行"
@@ -122,10 +149,12 @@ function ControlsCard({ controls }: { controls: RuntimeControl }) {
         <StatItem
           label="Provider 容量信号"
           value={
-            <span className="inline-flex items-center gap-1.5">
-              <Activity className="h-3.5 w-3.5 text-slate-400" aria-hidden="true" />
-              {controls.provider_capacity_status}
-              {controls.provider_capacity_reason ? `（${controls.provider_capacity_reason}）` : null}
+            <span className="inline-flex min-w-0 max-w-full items-start justify-end gap-1.5 sm:justify-start">
+              <Activity className="h-3.5 w-3.5 shrink-0 text-slate-400" aria-hidden="true" />
+              <span className="min-w-0 break-all">
+                {controls.provider_capacity_status}
+                {controls.provider_capacity_reason ? `（${controls.provider_capacity_reason}）` : null}
+              </span>
             </span>
           }
         />
@@ -163,24 +192,47 @@ function CapabilityProfileSummary({ profile }: { profile: RuntimeCapabilityProfi
     ['网络', unknownable(spec.network_access, (v) => (v ? '允许' : '禁止'))],
   ];
 
+  const title = (
+    <>
+      <ShieldCheck className="h-3.5 w-3.5 text-slate-400" aria-hidden="true" />
+      <span>能力画像</span>
+      <span className="font-normal text-slate-400">
+        第 {profile.revision} 版 · {profile.trusted ? '可信' : '未信任'}
+      </span>
+    </>
+  );
+
   return (
     <div className="rounded-xl border border-slate-200 bg-slate-50/60 p-3">
-      <p className="mb-2 flex flex-wrap items-center gap-2 text-xs font-semibold text-slate-600">
-        <ShieldCheck className="h-3.5 w-3.5 text-slate-400" aria-hidden="true" />
-        能力画像
-        <span className="font-normal text-slate-400">
-          第 {profile.revision} 版 · 来源 {profile.source} · {profile.trusted ? '可信' : '未信任'}
-        </span>
-      </p>
-      <dl className="grid grid-cols-2 gap-x-6 gap-y-1.5 sm:grid-cols-3 lg:grid-cols-4">
-        {entries.map(([label, value]) => (
-          <div key={label} className="text-xs">
-            <dt className="inline text-slate-400">{label}：</dt>
-            <dd className="inline text-slate-600">{value}</dd>
-          </div>
-        ))}
-      </dl>
+      <details className="group sm:hidden">
+        <summary className="flex min-h-11 cursor-pointer list-none flex-wrap items-center gap-2 text-xs font-semibold text-slate-600 marker:content-none">
+          {title}
+          <span className="ml-auto text-[11px] font-medium text-indigo-600 group-open:hidden">展开</span>
+          <span className="ml-auto hidden text-[11px] font-medium text-indigo-600 group-open:inline">收起</span>
+        </summary>
+        <CapabilityEntries entries={entries} />
+      </details>
+      <div className="hidden sm:block">
+        <p className="mb-2 flex flex-wrap items-center gap-2 text-xs font-semibold text-slate-600">
+          {title}
+          <span className="font-normal text-slate-400">来源 {profile.source}</span>
+        </p>
+        <CapabilityEntries entries={entries} />
+      </div>
     </div>
+  );
+}
+
+function CapabilityEntries({ entries }: { entries: Array<[string, string]> }) {
+  return (
+    <dl className="grid grid-cols-1 gap-x-6 gap-y-1.5 pt-2 sm:grid-cols-3 sm:pt-0 lg:grid-cols-4">
+      {entries.map(([label, value]) => (
+        <div key={label} className="flex items-start justify-between gap-4 text-xs sm:block">
+          <dt className="shrink-0 text-slate-400">{label}：</dt>
+          <dd className="min-w-0 break-words text-right text-slate-600 sm:inline sm:text-left">{value}</dd>
+        </div>
+      ))}
+    </dl>
   );
 }
 
@@ -228,12 +280,14 @@ function BindingCard({ binding, onSaved }: { binding: RuntimeBinding; onSaved: (
   };
 
   const fieldClass =
-    'w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm transition-all duration-200 focus:border-indigo-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 disabled:cursor-not-allowed disabled:opacity-60';
+    'min-h-12 w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm transition-all duration-200 focus:border-indigo-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 disabled:cursor-not-allowed disabled:opacity-60';
 
   return (
-    <li className="rounded-2xl border border-slate-200/60 bg-white p-5 shadow-sm">
-      <div className="flex flex-wrap items-center gap-2">
-        <h3 className="font-mono text-sm font-bold text-slate-900">{binding.binding_key}</h3>
+    <li className="rounded-2xl border border-slate-200/60 bg-white p-4 shadow-sm sm:p-5">
+      <div className="flex flex-wrap items-start gap-2">
+        <h3 className="min-w-0 break-all py-1 font-mono text-sm font-bold text-slate-900">
+          {binding.binding_key}
+        </h3>
         <span className={`rounded-full border px-2 py-0.5 text-[11px] font-semibold ${modeBadge.tone}`}>
           {modeBadge.label}
         </span>
@@ -246,7 +300,7 @@ function BindingCard({ binding, onSaved }: { binding: RuntimeBinding; onSaved: (
           <button
             type="button"
             onClick={startEditing}
-            className="ml-auto inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900 focus:outline-none focus-visible:ring-4 focus-visible:ring-indigo-500/15"
+            className="ml-auto inline-flex min-h-11 items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900 focus:outline-none focus-visible:ring-4 focus-visible:ring-indigo-500/15"
           >
             <Pencil className="h-3.5 w-3.5" aria-hidden="true" />
             编辑
@@ -255,7 +309,7 @@ function BindingCard({ binding, onSaved }: { binding: RuntimeBinding; onSaved: (
       </div>
 
       {!editing ? (
-        <dl className="mt-3 grid grid-cols-2 gap-x-8 gap-y-2 sm:grid-cols-4">
+        <dl className="mt-3 grid grid-cols-1 gap-x-8 sm:grid-cols-4 sm:gap-y-2">
           <StatItem label="提供方" value={<span className="font-mono">{binding.provider}</span>} />
           <StatItem label="模型" value={binding.model ?? '未指定（Provider 默认）'} />
           <StatItem label="推理力度" value={binding.reasoning_effort ?? '未指定'} />
@@ -326,12 +380,12 @@ function BindingCard({ binding, onSaved }: { binding: RuntimeBinding; onSaved: (
 
           {error ? <InlineError error={error} /> : null}
 
-          <div className="flex items-center justify-end gap-2">
+          <div className="grid grid-cols-2 gap-2 sm:flex sm:items-center sm:justify-end">
             <button
               type="button"
               onClick={() => setEditing(false)}
               disabled={saving}
-              className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 px-4 py-2 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-50 focus:outline-none focus-visible:ring-4 focus-visible:ring-indigo-500/15 disabled:cursor-not-allowed disabled:opacity-60"
+              className="inline-flex min-h-11 items-center justify-center gap-1.5 rounded-xl border border-slate-200 px-4 py-2 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-50 focus:outline-none focus-visible:ring-4 focus-visible:ring-indigo-500/15 disabled:cursor-not-allowed disabled:opacity-60"
             >
               <X className="h-3.5 w-3.5" aria-hidden="true" />
               取消
@@ -339,7 +393,7 @@ function BindingCard({ binding, onSaved }: { binding: RuntimeBinding; onSaved: (
             <button
               type="submit"
               disabled={saving}
-              className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-indigo-600 to-blue-600 px-4 py-2 text-sm font-semibold text-white shadow-md shadow-indigo-200 transition-all hover:from-indigo-700 hover:to-blue-700 focus:outline-none focus-visible:ring-4 focus-visible:ring-indigo-500/20 disabled:cursor-not-allowed disabled:opacity-60"
+              className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-indigo-600 to-blue-600 px-4 py-2 text-sm font-semibold text-white shadow-md shadow-indigo-200 transition-all hover:from-indigo-700 hover:to-blue-700 focus:outline-none focus-visible:ring-4 focus-visible:ring-indigo-500/20 disabled:cursor-not-allowed disabled:opacity-60"
             >
               {saving ? '保存中...' : '保存'}
             </button>

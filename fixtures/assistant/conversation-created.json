@@ -1,6 +1,10 @@
 {
   "conversation_id": "8739e8d5-093a-4a48-921c-d2e3504273b3",
   "status": "active",
+  "origin": "web",
+  "title": null,
+  "last_message": null,
+  "channel_bindings": [],
   "runtime_provider": "fake",
   "runtime_thread_generation": 0,
   "observed_compactions": 0,

@@ -1,6 +1,6 @@
 {
-  "spec_version_id": "14573fde-b04d-4e8c-b8a7-a553f2feecec",
-  "organization_id": "ff84804f-3df3-49c7-be4d-ab87b88d8683",
+  "spec_version_id": "a8e950a2-3d44-4d29-8f90-011e6938c2ac",
+  "organization_id": "f8fa2c1e-c61d-49ff-beed-5a8d38e4d75c",
   "version_number": 1,
   "status": "proposal",
   "spec": {
@@ -15,6 +15,7 @@
         "is_lead": true,
         "reports_to": null,
         "runtime_binding_key": "media-standard",
+        "expert_version_id": null,
         "capability_requirements": {
           "schema_version": "1.0",
           "os_families": [],
@@ -33,6 +34,11 @@
           "estimated_duration_seconds": null,
           "estimated_input_size_bytes": null,
           "resource_intensive": false
+        },
+        "execution_limits": {
+          "max_tokens_per_attempt": null,
+          "max_cost_usd_per_attempt": null,
+          "max_runtime_seconds_per_attempt": null
         }
       },
       {
@@ -42,6 +48,7 @@
         "is_lead": false,
         "reports_to": "lead",
         "runtime_binding_key": "media-standard",
+        "expert_version_id": null,
         "capability_requirements": {
           "schema_version": "1.0",
           "os_families": [],
@@ -63,12 +70,17 @@
           "estimated_duration_seconds": null,
           "estimated_input_size_bytes": null,
           "resource_intensive": false
+        },
+        "execution_limits": {
+          "max_tokens_per_attempt": null,
+          "max_cost_usd_per_attempt": null,
+          "max_runtime_seconds_per_attempt": null
         }
       }
     ]
   },
   "source_request": "创建一个主要处理 Excel 和 CSV 的数据分析团队",
-  "created_at": "2026-07-28T17:37:15.671248Z",
+  "created_at": "2026-08-01T18:22:38.724978Z",
   "confirmed_at": null,
   "published_at": null
 }

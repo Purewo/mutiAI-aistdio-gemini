@@ -12,7 +12,7 @@ export default function OrgsList() {
     <div className="flex h-full flex-col bg-slate-50/50">
       <PageHeader title="组织管理" description="您拥有的 AI 组织" />
 
-      <div className="flex-1 overflow-y-auto p-6 sm:p-8">
+      <div className="mobile-scroll-gutter flex-1 overflow-y-auto px-4 py-5 sm:p-8">
         <div className="mx-auto max-w-6xl">
           {state.status === 'loading' ? <LoadingState label="加载组织中..." /> : null}
 
@@ -44,7 +44,7 @@ export default function OrgsList() {
                   <li key={organization.organization_id}>
                     <Link
                       to={`/orgs/${organization.organization_id}`}
-                      className="group relative flex min-h-[14rem] flex-col overflow-hidden rounded-2xl border border-slate-200/60 bg-white p-6 shadow-sm transition-all duration-300 hover:border-indigo-200 hover:shadow-xl hover:shadow-indigo-100/50 focus:outline-none focus-visible:ring-4 focus-visible:ring-indigo-500/20"
+                      className="group relative flex min-h-[13rem] flex-col overflow-hidden rounded-2xl border border-slate-200/60 bg-white p-5 shadow-sm transition-all duration-300 hover:border-indigo-200 hover:shadow-xl hover:shadow-indigo-100/50 focus:outline-none focus-visible:ring-4 focus-visible:ring-indigo-500/20 sm:min-h-[14rem] sm:p-6"
                     >
                       <div
                         aria-hidden="true"
@@ -66,7 +66,7 @@ export default function OrgsList() {
                         </span>
                       </div>
 
-                      <h2 className="relative z-10 mb-2 truncate text-lg font-bold text-slate-900">
+                      <h2 className="relative z-10 mb-2 line-clamp-2 text-lg font-bold leading-snug text-slate-900">
                         {organization.name}
                       </h2>
                       {/*

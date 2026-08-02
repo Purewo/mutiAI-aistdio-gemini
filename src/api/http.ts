@@ -45,13 +45,20 @@ export function resolveBackendUrl(backendUrl: string): string {
 
 export function buildApiUrl(
   path: string,
-  query?: Record<string, string | number | boolean | undefined>,
+  query?: Record<
+    string,
+    string | number | boolean | readonly (string | number | boolean)[] | undefined
+  >,
 ): string {
   const base = `${API_BASE_URL}${path}`;
   if (!query) return base;
   const search = new URLSearchParams();
   for (const [key, value] of Object.entries(query)) {
-    if (value !== undefined) search.set(key, String(value));
+    if (Array.isArray(value)) {
+      for (const item of value) search.append(key, String(item));
+    } else if (value !== undefined) {
+      search.set(key, String(value));
+    }
   }
   const serialized = search.toString();
   return serialized ? `${base}?${serialized}` : base;
@@ -78,7 +85,10 @@ export interface RequestOptions {
   body?: unknown;
   /** Multipart request body. The browser supplies its boundary header. */
   formData?: FormData;
-  query?: Record<string, string | number | boolean | undefined>;
+  query?: Record<
+    string,
+    string | number | boolean | readonly (string | number | boolean)[] | undefined
+  >;
   /**
    * Suppress the global unauthenticated transition for this request. Set it on sign-in, where a 401
    * means "wrong credentials" for a session that never existed, not "the current session lapsed".
@@ -150,6 +160,17 @@ export async function requestJson<T>(path: string, options: RequestOptions = {})
 export async function requestVoid(path: string, options: RequestOptions = {}): Promise<void> {
   const response = await performRequest(path, options);
   if (!response.ok) throw await apiErrorFromResponse(response);
+}
+
+/** Issue a typed authenticated request whose response is binary content. */
+export async function requestBlob(
+  path: string,
+  query?: Record<string, string | number | boolean | undefined>,
+  signal?: AbortSignal,
+): Promise<Blob> {
+  const response = await performRequest(path, { query, signal });
+  if (!response.ok) throw await apiErrorFromResponse(response);
+  return response.blob();
 }
 
 export interface ArtifactContent {

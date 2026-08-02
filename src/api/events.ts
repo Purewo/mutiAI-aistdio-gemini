@@ -11,6 +11,7 @@
  */
 import { ApiError, apiErrorFromResponse, apiErrorFromThrown } from './errors';
 import { API_BASE_URL } from './http';
+import type { CoordinationEvent } from './types';
 
 /**
  * Product event envelope, matching `contracts/task-event.v1.json`.
@@ -35,6 +36,8 @@ export interface TaskEvent {
 }
 
 export interface EventStreamHandlers<T> {
+  /** Called after the server accepted the SSE request and before frames are read. */
+  onOpen?: () => void;
   onEvent: (event: T) => void;
   /** Called once the server closed the stream normally. */
   onClose?: () => void;
@@ -107,6 +110,8 @@ export async function streamEvents<T>(
     return;
   }
 
+  options.onOpen?.();
+
   const reader = response.body.pipeThrough(new TextDecoderStream()).getReader();
   let buffer = '';
 
@@ -172,6 +177,42 @@ export function streamAssistantEvents(
   );
 }
 
+/** Expert private-trial event envelope, matching `contracts/events/expert-event.v1.json`. */
+export interface ExpertEvent {
+  event_id: string;
+  event_type: string;
+  schema_version: string;
+  aggregate_type: string;
+  aggregate_id: string;
+  conversation_id: string;
+  sequence: number;
+  occurred_at: string;
+  source: string;
+  correlation_id: string;
+  payload: Record<string, unknown>;
+}
+
+export function streamExpertEvents(
+  conversationId: string,
+  options: EventStreamOptions<ExpertEvent>,
+): Promise<void> {
+  return streamEvents(
+    `/experts/conversations/${encodeURIComponent(conversationId)}/events`,
+    options,
+  );
+}
+
+/** Durable Case event replay. Persisted Case resources remain the display source of truth. */
+export function streamCoordinationEvents(
+  caseId: string,
+  options: EventStreamOptions<CoordinationEvent>,
+): Promise<void> {
+  return streamEvents(
+    `/coordination/cases/${encodeURIComponent(caseId)}/events`,
+    options,
+  );
+}
+
 /**
  * Ordered event log that tolerates the contract's duplicate delivery.
  *
@@ -214,3 +255,5 @@ export class EventLog<T extends { event_id: string; sequence: number }> {
 
 export class TaskEventLog extends EventLog<TaskEvent> {}
 export class AssistantEventLog extends EventLog<AssistantEvent> {}
+export class CoordinationEventLog extends EventLog<CoordinationEvent> {}
+export class ExpertEventLog extends EventLog<ExpertEvent> {}

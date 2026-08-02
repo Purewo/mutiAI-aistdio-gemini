@@ -1,10 +1,10 @@
 {
-  "feasibility_check_id": "2994af4b-efac-4403-9c23-e7e4a2af94f6",
+  "feasibility_check_id": "29373915-59cd-4e50-84f6-d772077c735d",
   "target_type": "organization_version",
-  "target_id": "06f99b69-b984-4406-8da4-2f630a3247d8",
+  "target_id": "49880c4c-ecea-45b5-9f9f-a097f35bf062",
   "phase": "proposal",
-  "validator_version": "1.0",
-  "input_hash": "9a4ebd175cccdfa9523426f36e9526c871b81de3c4b0300c0c017dc2a14bbbfc",
+  "validator_version": "1.2",
+  "input_hash": "c8a46b2879db8129d25aed09b5a7781299cce82989afd1f19a8a6c4d61d38601",
   "requirements": [
     {
       "role_key": "lead",
@@ -27,7 +27,8 @@
         "estimated_duration_seconds": null,
         "estimated_input_size_bytes": null,
         "resource_intensive": false
-      }
+      },
+      "max_cost_usd_per_attempt": null
     },
     {
       "role_key": "specialist",
@@ -50,26 +51,27 @@
         "estimated_duration_seconds": null,
         "estimated_input_size_bytes": null,
         "resource_intensive": false
-      }
+      },
+      "max_cost_usd_per_attempt": null
     }
   ],
   "profile_revisions": [
     {
       "role_key": "lead",
       "binding_key": "codex-local-default",
-      "runtime_binding_id": "e3c8a77e-d9be-43d4-8911-85e8bbc6936f",
-      "capability_profile_id": "94d0551f-02f9-4fe2-963a-680fd55a7058",
+      "runtime_binding_id": "05e58ee6-3743-4ca6-9f91-02058ca4e325",
+      "capability_profile_id": "03becbc2-f260-47f0-8f80-7ca53ef43c9c",
       "revision": 1
     },
     {
       "role_key": "specialist",
       "binding_key": "codex-local-default",
-      "runtime_binding_id": "e3c8a77e-d9be-43d4-8911-85e8bbc6936f",
-      "capability_profile_id": "94d0551f-02f9-4fe2-963a-680fd55a7058",
+      "runtime_binding_id": "05e58ee6-3743-4ca6-9f91-02058ca4e325",
+      "capability_profile_id": "03becbc2-f260-47f0-8f80-7ca53ef43c9c",
       "revision": 1
     }
   ],
   "outcome": "feasible",
   "findings": [],
-  "created_at": "2026-07-28T17:37:15.636774Z"
+  "created_at": "2026-08-01T18:22:38.687907Z"
 }

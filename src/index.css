@@ -2,8 +2,362 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  color-scheme: light;
+  --nexwork-page: #f4f8ff;
+  --nexwork-surface: #ffffff;
+  --nexwork-surface-muted: #edf4ff;
+  --nexwork-surface-raised: #ffffff;
+  --nexwork-border: #d7e3f3;
+  --nexwork-border-strong: #bdd0ea;
+  --nexwork-text: #10233f;
+  --nexwork-text-muted: #5b6f8a;
+  --nexwork-text-subtle: #7d91aa;
+  --nexwork-accent-soft: #e8f0ff;
+  --blueprint-shell-bg: #edf5ff;
+  --blueprint-header-bg: rgba(255, 255, 255, 0.82);
+  --blueprint-panel-bg: rgba(255, 255, 255, 0.88);
+  --blueprint-node-bg: #ffffff;
+  --blueprint-node-lead-bg: linear-gradient(135deg, #f0f4ff 0%, #ffffff 100%);
+  --blueprint-node-orphan-bg: linear-gradient(135deg, #fff8eb 0%, #ffffff 100%);
+  --blueprint-grid: rgba(82, 116, 161, 0.17);
+  --blueprint-lane-a: rgba(231, 241, 255, 0.86);
+  --blueprint-lane-b: rgba(248, 251, 255, 0.94);
+  --blueprint-lane-border: rgba(100, 133, 173, 0.24);
+  --blueprint-divider: rgba(100, 133, 173, 0.3);
+  --blueprint-edge: #4f46e5;
+  --blueprint-edge-soft: #818cf8;
+  --blueprint-lead: #6366f1;
+  --blueprint-node-accent: #0284c7;
+  --blueprint-minimap-frame: #475569;
+  --graph-relation-dependency: #0284c7;
+  --graph-relation-artifact: #059669;
+  --graph-relation-feedback: #d97706;
+  --graph-relation-verification: #0891b2;
+  --graph-relation-retry: #9333ea;
+  --graph-relation-replay: #7c3aed;
+  --graph-relation-incremental: #0e7490;
+  --graph-relation-finalization: #047857;
+  --graph-relation-subscription: #4f46e5;
+  --graph-relation-binding: #7c3aed;
+  --graph-relation-keyed: #2563eb;
+  --graph-relation-watermark: #0f766e;
+  --graph-relation-output: #16a34a;
+}
+
+html[data-theme='dark'] {
+  color-scheme: dark;
+  --nexwork-page: #07111f;
+  --nexwork-surface: #0d1a2a;
+  --nexwork-surface-muted: #0a1727;
+  --nexwork-surface-raised: #12243a;
+  --nexwork-border: rgba(148, 163, 184, 0.2);
+  --nexwork-border-strong: rgba(125, 211, 252, 0.35);
+  --nexwork-text: #e6f0ff;
+  --nexwork-text-muted: #9eb1c8;
+  --nexwork-text-subtle: #7f94ae;
+  --nexwork-accent-soft: rgba(99, 102, 241, 0.16);
+  --blueprint-shell-bg: #07111e;
+  --blueprint-header-bg: rgba(3, 11, 22, 0.72);
+  --blueprint-panel-bg: rgba(3, 11, 22, 0.94);
+  --blueprint-node-bg: linear-gradient(145deg, #172a42 0%, #0d1b2d 100%);
+  --blueprint-node-lead-bg: linear-gradient(145deg, #272653 0%, #111d31 100%);
+  --blueprint-node-orphan-bg: linear-gradient(145deg, #3a2b1d 0%, #142032 100%);
+  --blueprint-grid: rgba(100, 116, 139, 0.28);
+  --blueprint-lane-a: rgba(15, 30, 48, 0.72);
+  --blueprint-lane-b: rgba(11, 23, 38, 0.72);
+  --blueprint-lane-border: rgba(148, 163, 184, 0.1);
+  --blueprint-divider: rgba(148, 163, 184, 0.16);
+  --blueprint-edge: #4f46e5;
+  --blueprint-edge-soft: #818cf8;
+  --blueprint-lead: #818cf8;
+  --blueprint-node-accent: #38bdf8;
+  --blueprint-minimap-frame: #f8fafc;
+  --graph-relation-dependency: #38bdf8;
+  --graph-relation-artifact: #34d399;
+  --graph-relation-feedback: #fbbf24;
+  --graph-relation-verification: #67e8f9;
+  --graph-relation-retry: #c084fc;
+  --graph-relation-replay: #a78bfa;
+  --graph-relation-incremental: #22d3ee;
+  --graph-relation-finalization: #2dd4bf;
+  --graph-relation-subscription: #818cf8;
+  --graph-relation-binding: #c084fc;
+  --graph-relation-keyed: #60a5fa;
+  --graph-relation-watermark: #5eead4;
+  --graph-relation-output: #86efac;
+}
+
 @layer base {
+  html,
+  body,
+  #root {
+    width: 100%;
+    height: 100%;
+  }
+
   body {
-    @apply bg-slate-50 text-slate-900 font-sans;
+    @apply overflow-hidden bg-slate-50 font-sans text-slate-900;
+    background-color: var(--nexwork-page);
+    color: var(--nexwork-text);
+    text-rendering: optimizeLegibility;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  button,
+  a,
+  input,
+  select,
+  textarea {
+    touch-action: manipulation;
+  }
+
+  :focus-visible {
+    scroll-margin-block: 5rem;
+  }
+}
+
+/* The existing product surfaces use Tailwind's neutral utilities. These small semantic
+   remaps let the user switch the whole console without duplicating every view. */
+html[data-theme='dark'] :where(
+  [class~='bg-white'], [class~='bg-white/50'], [class~='bg-white/60'], [class~='bg-white/70'],
+  [class~='bg-white/80'], [class~='bg-white/90'], [class~='bg-white/95'], [class~='bg-white/[0.04]'],
+  [class~='bg-white/[0.07]'], [class~='bg-white/5'], [class~='bg-white/10'], [class~='bg-white/15']
+) {
+  background-color: var(--nexwork-surface) !important;
+}
+
+html[data-theme='dark'] :where(
+  [class~='bg-slate-50'], [class~='bg-slate-50/50'], [class~='bg-slate-50/60'], [class~='bg-slate-50/70'],
+  [class~='bg-slate-50/80'], [class~='bg-slate-50/90'], [class~='bg-slate-100'], [class~='bg-slate-100/50'],
+  [class~='bg-slate-100/70']
+) {
+  background-color: var(--nexwork-surface-muted) !important;
+}
+
+html[data-theme='dark'] :where(
+  [class~='border-slate-100'], [class~='border-slate-200'], [class~='border-slate-200/60'],
+  [class~='border-slate-200/70'], [class~='border-slate-200/80'], [class~='border-slate-300'],
+  [class~='divide-slate-100'], [class~='divide-slate-200/80']
+) {
+  border-color: var(--nexwork-border) !important;
+}
+
+html[data-theme='dark'] :where(
+  [class~='text-slate-900'], [class~='text-slate-800'], [class~='text-slate-700'], [class~='text-slate-600']
+) {
+  color: var(--nexwork-text) !important;
+}
+
+html[data-theme='dark'] :where(
+  [class~='text-slate-500'], [class~='text-slate-400'], [class~='placeholder-slate-400']
+) {
+  color: var(--nexwork-text-muted) !important;
+}
+
+html[data-theme='dark'] :where(
+  [class~='bg-indigo-50'], [class~='bg-indigo-50/30'], [class~='bg-indigo-50/50'], [class~='bg-indigo-50/60'],
+  [class~='bg-indigo-50/70'], [class~='bg-indigo-50/80'], [class~='bg-blue-50'], [class~='bg-blue-50/60'],
+  [class~='bg-cyan-50'], [class~='bg-cyan-50/70'], [class~='bg-emerald-50'], [class~='bg-emerald-50/70'],
+  [class~='bg-emerald-50/80'], [class~='bg-amber-50'], [class~='bg-amber-50/80'], [class~='bg-red-50'],
+  [class~='bg-red-50/50'], [class~='bg-red-50/90'], [class~='bg-rose-50'], [class~='bg-orange-50'],
+  [class~='bg-orange-50/40'], [class~='bg-orange-50/60'], [class~='bg-violet-50'], [class~='bg-sky-50']
+) {
+  background-color: color-mix(in srgb, currentColor 12%, var(--nexwork-surface)) !important;
+}
+
+html[data-theme='dark'] :where(
+  [class~='hover:bg-slate-50']:hover, [class~='hover:bg-slate-900']:hover, [class~='focus-visible:bg-indigo-50']:focus-visible
+) {
+  background-color: var(--nexwork-accent-soft) !important;
+}
+
+html[data-theme='dark'] .expert-semantics-card--cyan {
+  border-color: rgba(34, 211, 238, 0.38) !important;
+  background-color: rgba(8, 145, 178, 0.12) !important;
+  color: #cffafe !important;
+}
+
+html[data-theme='dark'] .expert-semantics-card--cyan :where(p, svg) {
+  color: #a5f3fc !important;
+}
+
+html[data-theme='dark'] .expert-semantics-card--amber {
+  border-color: rgba(251, 191, 36, 0.38) !important;
+  background-color: rgba(217, 119, 6, 0.12) !important;
+  color: #fef3c7 !important;
+}
+
+html[data-theme='dark'] .expert-semantics-card--amber :where(p, svg) {
+  color: #fde68a !important;
+}
+
+html[data-theme='dark'] .expert-trial-textarea:disabled {
+  background-color: rgba(217, 119, 6, 0.1) !important;
+  color: #fde68a !important;
+}
+
+html[data-theme='dark'] .expert-trial-submit:disabled {
+  background-color: #334155 !important;
+  color: #94a3b8 !important;
+}
+
+.task-usage-header {
+  background: linear-gradient(90deg, #eef2ff 0%, #ffffff 48%, #ecfeff 100%);
+}
+
+html[data-theme='dark'] .task-usage-header {
+  background: linear-gradient(90deg, rgba(79, 70, 229, 0.18) 0%, rgba(13, 26, 42, 0.96) 48%, rgba(8, 145, 178, 0.14) 100%);
+}
+
+html[data-theme='dark'] .form-control {
+  border-color: var(--nexwork-border);
+  background-color: var(--nexwork-surface);
+  color: var(--nexwork-text);
+}
+
+.theme-toggle {
+  border-color: var(--nexwork-border);
+  background: var(--nexwork-surface);
+  color: var(--nexwork-text-muted);
+}
+
+.theme-toggle:hover {
+  border-color: var(--nexwork-border-strong);
+  background: var(--nexwork-accent-soft);
+  color: var(--nexwork-text);
+}
+
+.theme-toggle-icon {
+  background: var(--nexwork-accent-soft);
+  color: #4f46e5;
+}
+
+html[data-theme='dark'] .theme-toggle-icon {
+  color: #a5b4fc;
+}
+
+.theme-toggle-action {
+  color: var(--nexwork-text-subtle);
+}
+
+.nexwork-app-shell,
+.nexwork-main-surface {
+  background: var(--nexwork-page) !important;
+  color: var(--nexwork-text) !important;
+}
+
+.nexwork-sidebar,
+.nexwork-mobile-nav {
+  border-color: var(--nexwork-border) !important;
+  background: color-mix(in srgb, var(--nexwork-surface) 95%, transparent) !important;
+}
+
+.nexwork-sidebar-footer {
+  border-color: var(--nexwork-border) !important;
+  background: var(--nexwork-surface-muted) !important;
+}
+
+.nexwork-brand {
+  background-image: linear-gradient(90deg, var(--nexwork-text), var(--nexwork-text-muted)) !important;
+}
+
+html[data-theme='dark'] .nexwork-sidebar a[aria-current='page'] {
+  border-color: rgba(129, 140, 248, 0.28) !important;
+  background: linear-gradient(90deg, rgba(79, 70, 229, 0.22), rgba(14, 116, 144, 0.14)) !important;
+  color: #c7d2fe !important;
+  box-shadow: inset 0 0 0 1px rgba(165, 180, 252, 0.04), 0 8px 24px rgba(2, 8, 23, 0.16) !important;
+}
+
+html[data-theme='dark'] .nexwork-mobile-nav a[aria-current='page'] {
+  background: rgba(79, 70, 229, 0.18) !important;
+  color: #c7d2fe !important;
+}
+
+.nexwork-login-surface {
+  background: radial-gradient(ellipse at top, #e7efff 0%, var(--nexwork-page) 52%, #ffffff 100%) !important;
+}
+
+.nexwork-login-card {
+  border-color: color-mix(in srgb, var(--nexwork-surface) 70%, var(--nexwork-border)) !important;
+  background: color-mix(in srgb, var(--nexwork-surface) 84%, transparent) !important;
+  box-shadow: 0 24px 70px rgba(46, 83, 130, 0.16) !important;
+}
+
+.nexwork-login-title {
+  background-image: linear-gradient(90deg, var(--nexwork-text), var(--nexwork-text-muted)) !important;
+}
+
+html[data-theme='dark'] .nexwork-login-surface {
+  background: radial-gradient(ellipse at top, #142b49 0%, var(--nexwork-page) 58%, #030912 100%) !important;
+}
+
+/* Shared read-only blueprint surface. Both organization and task projections use these tokens. */
+.blueprint-shell {
+  border-color: var(--nexwork-border-strong) !important;
+  background: var(--blueprint-shell-bg) !important;
+  color: var(--nexwork-text) !important;
+  box-shadow: 0 22px 60px rgba(30, 75, 130, 0.12) !important;
+}
+
+.blueprint-header {
+  border-color: var(--blueprint-divider) !important;
+  background: var(--blueprint-header-bg) !important;
+}
+
+.blueprint-viewport {
+  background: var(--blueprint-shell-bg);
+}
+
+.blueprint-grid {
+  background-color: var(--blueprint-shell-bg) !important;
+  background-image: radial-gradient(circle at 1px 1px, var(--blueprint-grid) 1px, transparent 0) !important;
+}
+
+.blueprint-node {
+  border-color: var(--nexwork-border-strong) !important;
+  background: var(--blueprint-node-bg) !important;
+  color: var(--nexwork-text) !important;
+  box-shadow: 0 18px 38px rgba(17, 54, 94, 0.14) !important;
+}
+
+.blueprint-node--lead { background: var(--blueprint-node-lead-bg) !important; }
+.blueprint-node--orphan { background: var(--blueprint-node-orphan-bg) !important; }
+.blueprint-node--selected { border-color: var(--blueprint-node-accent) !important; }
+
+.blueprint-inspector,
+.blueprint-minimap {
+  border-color: var(--nexwork-border-strong) !important;
+  background: var(--blueprint-panel-bg) !important;
+  color: var(--nexwork-text) !important;
+}
+
+.blueprint-footer { border-color: var(--blueprint-divider) !important; background: var(--blueprint-header-bg) !important; }
+.blueprint-control { border-color: var(--nexwork-border-strong) !important; background: var(--blueprint-panel-bg) !important; color: var(--nexwork-text-muted) !important; }
+.blueprint-control:hover { border-color: var(--blueprint-node-accent) !important; background: var(--nexwork-accent-soft) !important; color: var(--nexwork-text) !important; }
+.blueprint-scale { background: var(--blueprint-panel-bg) !important; color: var(--nexwork-text-muted) !important; }
+.blueprint-node [class~='border-slate-950'] { border-color: var(--blueprint-shell-bg) !important; }
+
+.blueprint-shell .text-white { color: var(--nexwork-text) !important; }
+.blueprint-shell .text-slate-100, .blueprint-shell .text-slate-200, .blueprint-shell .text-slate-300 { color: var(--nexwork-text) !important; }
+.blueprint-shell .text-slate-400, .blueprint-shell .text-slate-500 { color: var(--nexwork-text-muted) !important; }
+.blueprint-shell [class~='border-white/5'], .blueprint-shell [class~='border-white/10'] { border-color: var(--blueprint-divider) !important; }
+.blueprint-shell [class~='bg-white/5'] { background-color: color-mix(in srgb, var(--nexwork-text) 7%, transparent) !important; }
+
+html[data-theme='light'] .blueprint-shell :where(.text-indigo-200, .text-indigo-300) { color: #4f46e5 !important; }
+html[data-theme='light'] .blueprint-shell :where(.text-cyan-200, .text-cyan-300) { color: #0369a1 !important; }
+html[data-theme='light'] .blueprint-shell :where(.text-amber-200, .text-amber-300) { color: #b45309 !important; }
+html[data-theme='light'] .blueprint-shell :where(.text-emerald-200, .text-emerald-300) { color: #047857 !important; }
+html[data-theme='light'] .blueprint-shell .text-blue-300 { color: #1d4ed8 !important; }
+
+@layer components {
+  .form-control {
+    @apply min-h-12 w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm font-normal text-slate-900 outline-none transition placeholder:text-slate-400 hover:border-slate-300 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-500;
+  }
+}
+
+@layer utilities {
+  .mobile-scroll-gutter {
+    scrollbar-gutter: stable;
   }
 }

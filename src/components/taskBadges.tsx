@@ -210,7 +210,7 @@ export function DeliverySummary({ summary }: { summary: string }) {
 
   return (
     <details className="w-full">
-      <summary className="cursor-pointer text-sm font-medium text-slate-500 hover:text-slate-700">
+      <summary className="flex min-h-11 cursor-pointer items-center text-sm font-medium text-slate-500 hover:text-slate-700">
         {structured ? '结构化交付内容' : '完整交付摘要'}（展开）
       </summary>
       <pre className="mt-2 max-h-80 overflow-auto rounded-xl border border-slate-200 bg-slate-50 p-3 text-xs leading-relaxed text-slate-600">

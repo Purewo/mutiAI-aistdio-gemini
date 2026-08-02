@@ -23,7 +23,7 @@ export default function Login() {
   // Wait for bootstrap rather than flashing the form at a user who already has a session.
   if (state.status === 'loading') {
     return (
-      <div className="flex h-screen w-full items-center justify-center bg-slate-50">
+      <div className="nexwork-login-surface flex min-h-[100dvh] w-full items-center justify-center overflow-y-auto bg-slate-50 px-4 py-6">
         <LoadingState label="正在恢复会话..." />
       </div>
     );
@@ -54,14 +54,14 @@ export default function Login() {
   const expired = state.status === 'unauthenticated' && state.reason === 'session_expired';
 
   return (
-    <div className="flex h-screen w-full items-center justify-center bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-indigo-50 via-slate-50 to-white p-4">
+    <div className="nexwork-login-surface flex min-h-[100dvh] w-full items-start justify-center overflow-y-auto bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-indigo-50 via-slate-50 to-white px-4 py-6 sm:items-center sm:py-10">
       <motion.div
         initial={{ opacity: 0, y: 20, scale: 0.95 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
         transition={{ duration: 0.5, ease: 'easeOut' }}
-        className="w-full max-w-md rounded-3xl border border-white bg-white/80 p-8 shadow-xl shadow-slate-200/50 backdrop-blur-xl"
+        className="nexwork-login-card my-auto w-full max-w-md rounded-3xl border border-white bg-white/80 p-5 shadow-xl shadow-slate-200/50 backdrop-blur-xl sm:p-8"
       >
-        <div className="mb-10 flex flex-col items-center text-center">
+        <div className="mb-7 flex flex-col items-center text-center sm:mb-10">
           <motion.div
             initial={{ scale: 0 }}
             animate={{ scale: 1, rotate: 360 }}
@@ -70,7 +70,7 @@ export default function Login() {
           >
             <Sparkles className="h-6 w-6" aria-hidden="true" />
           </motion.div>
-          <h1 className="bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-3xl font-bold text-transparent">
+          <h1 className="nexwork-login-title bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-3xl font-bold text-transparent">
             Nexwork
           </h1>
           <p className="mt-2 font-medium text-slate-500">登录到您的工作区</p>
@@ -98,7 +98,7 @@ export default function Login() {
               required
               value={username}
               onChange={(event) => setUsername(event.target.value)}
-              className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 transition-all duration-200 focus:border-indigo-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+              className="min-h-12 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 transition-all duration-200 focus:border-indigo-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
             />
           </div>
 
@@ -114,7 +114,7 @@ export default function Login() {
               required
               value={password}
               onChange={(event) => setPassword(event.target.value)}
-              className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 transition-all duration-200 focus:border-indigo-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+              className="min-h-12 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 transition-all duration-200 focus:border-indigo-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
             />
           </div>
 
@@ -134,7 +134,7 @@ export default function Login() {
             whileTap={{ scale: submitting ? 1 : 0.98 }}
             type="submit"
             disabled={submitting || username.length === 0 || password.length === 0}
-            className="flex w-full items-center justify-center rounded-xl bg-gradient-to-r from-indigo-600 to-blue-600 px-4 py-3 font-medium text-white shadow-lg shadow-indigo-200 transition-all duration-200 hover:from-indigo-700 hover:to-blue-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-70"
+            className="flex min-h-12 w-full items-center justify-center rounded-xl bg-gradient-to-r from-indigo-600 to-blue-600 px-4 py-3 font-medium text-white shadow-lg shadow-indigo-200 transition-all duration-200 hover:from-indigo-700 hover:to-blue-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-70"
           >
             {submitting ? <Loader2 className="h-5 w-5 animate-spin" aria-label="登录中" /> : '登录'}
           </motion.button>

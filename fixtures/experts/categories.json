@@ -1,0 +1,30 @@
+[
+  {
+    "category_key": "data-analysis",
+    "display_name": "数据分析",
+    "description": "数据统计、探索和指标分析。",
+    "sort_order": 10,
+    "expert_count": 1
+  },
+  {
+    "category_key": "document-extraction",
+    "display_name": "文档提取",
+    "description": "从图片、PDF 或其他文档提取结构化内容。",
+    "sort_order": 20,
+    "expert_count": 1
+  },
+  {
+    "category_key": "image-generation",
+    "display_name": "图片生成",
+    "description": "根据文字指令生成图片和可访问的结果资源。",
+    "sort_order": 30,
+    "expert_count": 1
+  },
+  {
+    "category_key": "software-development",
+    "display_name": "软件开发",
+    "description": "软件设计、实现、测试和维护。",
+    "sort_order": 40,
+    "expert_count": 0
+  }
+]

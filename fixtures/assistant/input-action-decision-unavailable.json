@@ -1,0 +1,37 @@
+{
+  "kind": "action_decision_unavailable",
+  "message": {
+    "message_id": "input-message-unavailable-id",
+    "conversation_id": "8739e8d5-093a-4a48-921c-d2e3504273b3",
+    "sequence": 5,
+    "role": "user",
+    "status": "accepted",
+    "content_schema_version": "1.0",
+    "text": "确认",
+    "content_blocks": [{"type": "text", "text": "确认"}],
+    "attachment_refs": [],
+    "reply_to_message_id": null,
+    "related_resource_type": "assistant_action_decision",
+    "related_resource_id": "no_pending_action:0",
+    "created_at": "2026-07-26T21:23:25.422000Z",
+    "completed_at": null
+  },
+  "acknowledgement": {
+    "message_id": "input-ack-unavailable-id",
+    "conversation_id": "8739e8d5-093a-4a48-921c-d2e3504273b3",
+    "sequence": 6,
+    "role": "assistant",
+    "status": "completed",
+    "content_schema_version": "1.0",
+    "text": "当前没有可确认或取消的操作。",
+    "content_blocks": [{"type": "text", "text": "当前没有可确认或取消的操作。"}],
+    "attachment_refs": [],
+    "reply_to_message_id": "input-message-unavailable-id",
+    "related_resource_type": null,
+    "related_resource_id": null,
+    "created_at": "2026-07-26T21:23:25.423000Z",
+    "completed_at": "2026-07-26T21:23:25.423000Z"
+  },
+  "reason": "no_pending_action",
+  "pending_action_count": 0
+}

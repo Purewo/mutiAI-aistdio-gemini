@@ -2,7 +2,23 @@
 <html lang="zh-CN">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#f4f8ff" />
+    <script>
+      (() => {
+        try {
+          const stored = window.localStorage.getItem('nexwork:theme');
+          const theme = stored === 'dark' ? 'dark' : 'light';
+          const root = document.documentElement;
+          root.dataset.theme = theme;
+          root.classList.toggle('dark', theme === 'dark');
+          root.style.colorScheme = theme;
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', theme === 'dark' ? '#07111f' : '#f4f8ff');
+        } catch {
+          document.documentElement.dataset.theme = 'light';
+        }
+      })();
+    </script>
     <!-- Inline so no separate request is made and the browser stops requesting /favicon.ico. -->
     <link
       rel="icon"

@@ -5,10 +5,17 @@
  * success. The card only claims an outcome once the backend reports `completed` or `failed`, and it
  * links to the persisted product resource rather than restating the assistant's own words as truth.
  */
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, Check, AlertCircle, Loader2, X } from 'lucide-react';
-import type { AssistantAction, AssistantActionStatus, Task } from '../api/types';
+import { ArrowRight, Check, AlertCircle, Loader2, RefreshCw, X } from 'lucide-react';
+import { getOrganization, listOrganizationVersions, listOrganizations } from '../api/endpoints';
+import type {
+  AssistantAction,
+  AssistantActionStatus,
+  OrganizationDetail,
+  OrganizationVersion,
+  Task,
+} from '../api/types';
 import { describeApiError } from '../api/errors';
 import { formatDateTime } from '../lib/format';
 import TaskInputBindingStatus from './TaskInputBindingStatus';
@@ -33,7 +40,7 @@ const STATUS_PRESENTATION: Record<AssistantActionStatus, { label: string; tone: 
 /** Human labels for the action types the current backend proposes. */
 const ACTION_TYPE_LABELS: Record<string, string> = {
   'organization.confirm': '确认组织方案',
-  'organization.publish': '发布组织',
+  'organization.publish': '确认并发布组织',
   'task.submit': '提交任务',
   'task.replay': '重放任务',
   'task.retry': '重试任务',
@@ -41,11 +48,45 @@ const ACTION_TYPE_LABELS: Record<string, string> = {
   'approval.decide': '处理 Runtime 审批',
 };
 
+type OrganizationRefreshState =
+  | { status: 'idle' }
+  | { status: 'loading' }
+  | { status: 'ready'; organization: OrganizationDetail; version: OrganizationVersion | null }
+  | { status: 'error'; message: string };
+
+function payloadString(action: AssistantAction, key: string): string | null {
+  const value = action.payload[key];
+  return typeof value === 'string' && value.length > 0 ? value : null;
+}
+
+function organizationIdFromAction(action: AssistantAction): string | null {
+  return payloadString(action, 'organization_id') ??
+    (action.target_type === 'organization' ? action.target_id : null);
+}
+
+function organizationVersionIdFromAction(action: AssistantAction): string | null {
+  return payloadString(action, 'spec_version_id') ??
+    (action.target_type === 'organization_version' ? action.target_id : null);
+}
+
+function isOrganizationAction(action: AssistantAction): boolean {
+  return action.action_type === 'organization.publish' || action.action_type === 'organization.confirm';
+}
+
 /** Link to the persisted resource an action targets, when the frontend has a route for it. */
 function targetLink(action: AssistantAction, task: Task | null): { to: string; label: string } | null {
   if (action.action_type === 'task.submit') {
     const taskId = task?.task_id ?? taskIdFromAction(action);
     if (taskId) return { to: `/tasks/${encodeURIComponent(taskId)}`, label: '查看任务' };
+  }
+  if (isOrganizationAction(action)) {
+    const organizationId = organizationIdFromAction(action);
+    if (organizationId) {
+      return {
+        to: `/orgs/${encodeURIComponent(organizationId)}`,
+        label: '查看组织与版本',
+      };
+    }
   }
   if (!action.target_id) return null;
   if (action.target_type === 'organization') {
@@ -68,12 +109,20 @@ export default function AssistantActionCard({
 }) {
   const [busy, setBusy] = useState<'confirm' | 'decline' | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [organizationRefresh, setOrganizationRefresh] = useState<OrganizationRefreshState>({
+    status: 'idle',
+  });
+  const [organizationRefreshToken, setOrganizationRefreshToken] = useState(0);
 
   const presentation = STATUS_PRESENTATION[action.status] ?? {
     label: action.status,
     tone: 'border-slate-200 bg-slate-50 text-slate-600',
   };
   const pending = action.status === 'confirmed' || action.status === 'executing';
+  const organizationAction = isOrganizationAction(action);
+  const organizationId = organizationIdFromAction(action);
+  const organizationVersionId = organizationVersionIdFromAction(action);
+  const organizationTerminal = action.status === 'completed' || action.status === 'failed';
   const link = targetLink(action, task);
   const attachmentInputs = attachmentInputsFromAction(action);
   const actionContracts = (() => {
@@ -95,6 +144,72 @@ export default function AssistantActionCard({
   const replayReason = replayPayload && typeof replayPayload.reason === 'string' ? replayPayload.reason : null;
   const replayFeedback = replayPayload && typeof replayPayload.feedback === 'string' ? replayPayload.feedback : null;
 
+  useEffect(() => {
+    if (!organizationAction || !organizationTerminal || !organizationVersionId) {
+      setOrganizationRefresh({ status: 'idle' });
+      return;
+    }
+
+    const controller = new AbortController();
+    let active = true;
+    setOrganizationRefresh({ status: 'loading' });
+    void (async () => {
+      let resolvedOrganizationId = organizationId;
+      if (!resolvedOrganizationId) {
+        const organizations = await listOrganizations(controller.signal);
+        const matches = await Promise.all(
+          organizations.map(async (organization) => {
+            try {
+              const versions = await listOrganizationVersions(
+                organization.organization_id,
+                controller.signal,
+              );
+              return versions.some((item) => item.spec_version_id === organizationVersionId)
+                ? organization.organization_id
+                : null;
+            } catch {
+              return null;
+            }
+          }),
+        );
+        resolvedOrganizationId = matches.find((item): item is string => item !== null) ?? null;
+      }
+      if (!resolvedOrganizationId) {
+        throw new Error('The organization for this version could not be resolved.');
+      }
+      return Promise.all([
+        getOrganization(resolvedOrganizationId, controller.signal),
+        listOrganizationVersions(resolvedOrganizationId, controller.signal),
+      ]);
+    })()
+      .then(([organization, versions]) => {
+        if (!active) return;
+        setOrganizationRefresh({
+          status: 'ready',
+          organization,
+          version:
+            versions.find((item) => item.spec_version_id === organizationVersionId) ?? null,
+        });
+      })
+      .catch((cause: unknown) => {
+        if (!active) return;
+        setOrganizationRefresh({ status: 'error', message: describeApiError(cause) });
+      });
+
+    return () => {
+      active = false;
+      controller.abort();
+    };
+  }, [
+    action.action_id,
+    action.status,
+    organizationAction,
+    organizationId,
+    organizationRefreshToken,
+    organizationTerminal,
+    organizationVersionId,
+  ]);
+
   const decide = async (decision: 'confirm' | 'decline') => {
     setBusy(decision);
     setError(null);
@@ -108,7 +223,27 @@ export default function AssistantActionCard({
   };
 
   const button =
-    'inline-flex items-center gap-1.5 rounded-xl px-4 py-2 text-sm font-semibold transition-all focus:outline-none focus-visible:ring-4 disabled:cursor-not-allowed disabled:opacity-60';
+    'inline-flex min-h-11 w-full items-center justify-center gap-1.5 rounded-xl px-4 py-2 text-sm font-semibold transition-all focus:outline-none focus-visible:ring-4 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto';
+
+  const organizationVersion = organizationRefresh.status === 'ready' ? organizationRefresh.version : null;
+  const refreshedOrganizationId =
+    organizationRefresh.status === 'ready' ? organizationRefresh.organization.organization_id : null;
+  const resourceLink =
+    link ??
+    (organizationAction && refreshedOrganizationId
+      ? { to: `/orgs/${encodeURIComponent(refreshedOrganizationId)}`, label: '查看组织与版本' }
+      : null);
+  const publishStateMatches =
+    action.action_type === 'organization.publish' &&
+    organizationRefresh.status === 'ready' &&
+    organizationVersion?.status === 'published' &&
+    organizationRefresh.organization.current_published_version_id === organizationVersionId;
+  const showLink = Boolean(
+    resourceLink &&
+      (organizationAction
+        ? organizationTerminal && organizationRefresh.status === 'ready'
+        : action.status === 'completed' || pending),
+  );
 
   return (
     <div className="rounded-2xl border border-slate-200/60 bg-white p-4 shadow-sm">
@@ -126,7 +261,7 @@ export default function AssistantActionCard({
       </div>
 
       {action.target_type && action.target_id ? (
-        <p className="mb-2 truncate font-mono text-[11px] text-slate-400">
+        <p className="mb-2 break-all font-mono text-[11px] text-slate-400">
           目标 {action.target_type} · {action.target_id}
         </p>
       ) : null}
@@ -173,6 +308,55 @@ export default function AssistantActionCard({
             ) : null}
           </span>
         </p>
+      ) : null}
+
+      {organizationAction && organizationTerminal ? (
+        <div className="mb-3">
+          {organizationRefresh.status === 'loading' ? (
+            <p className="flex min-h-11 items-center gap-2 rounded-xl border border-indigo-100 bg-indigo-50/70 px-3 text-xs leading-relaxed text-indigo-700">
+              <Loader2 className="h-4 w-4 shrink-0 animate-spin" aria-hidden="true" />
+              Action 已进入终态，正在刷新组织与版本状态…
+            </p>
+          ) : null}
+          {organizationRefresh.status === 'ready' ? (
+            <p
+              className={`rounded-xl border px-3 py-2 text-xs leading-relaxed ${
+                action.action_type === 'organization.publish' && action.status === 'completed'
+                  ? publishStateMatches
+                    ? 'border-emerald-100 bg-emerald-50 text-emerald-800'
+                    : 'border-amber-200 bg-amber-50 text-amber-800'
+                  : action.action_type === 'organization.publish' &&
+                      action.status === 'failed' &&
+                      organizationVersion?.status === 'proposal'
+                    ? 'border-slate-200 bg-slate-50 text-slate-700'
+                    : 'border-indigo-100 bg-indigo-50/70 text-indigo-800'
+              }`}
+            >
+              {action.action_type === 'organization.publish' && action.status === 'completed'
+                ? publishStateMatches
+                  ? `“${organizationRefresh.organization.name}”已确认并发布，组织与版本状态已刷新。`
+                  : `Action 已完成，但刷新后的版本状态为 ${organizationVersion?.status ?? '未找到'}，请重新核对。`
+                : action.action_type === 'organization.publish' && action.status === 'failed'
+                  ? organizationVersion?.status === 'proposal'
+                    ? '发布未完成；刷新结果确认方案仍为 proposal，没有形成半确认状态。'
+                    : `发布未完成；组织与版本状态已刷新，当前版本状态为 ${organizationVersion?.status ?? '未找到'}。`
+                  : `历史确认 Action 已完成；目标版本当前状态为 ${organizationVersion?.status ?? '未找到'}。`}
+            </p>
+          ) : null}
+          {organizationRefresh.status === 'error' ? (
+            <div className="rounded-xl border border-red-100 bg-red-50 px-3 py-2 text-xs leading-relaxed text-red-700">
+              <p>Action 已进入终态，但组织与版本状态刷新失败：{organizationRefresh.message}</p>
+              <button
+                type="button"
+                onClick={() => setOrganizationRefreshToken((token) => token + 1)}
+                className="mt-2 inline-flex min-h-11 items-center gap-1.5 rounded-lg px-2 font-semibold text-red-700 hover:bg-red-100 focus:outline-none focus-visible:ring-4 focus-visible:ring-red-500/15"
+              >
+                <RefreshCw className="h-3.5 w-3.5" aria-hidden="true" />
+                重新刷新
+              </button>
+            </div>
+          ) : null}
+        </div>
       ) : null}
 
       {showsAttachmentBinding ? (
@@ -227,11 +411,15 @@ export default function AssistantActionCard({
         ) : null}
       </dl>
 
-      <div className="flex flex-wrap items-center justify-end gap-2 border-t border-slate-100 pt-3">
+      <div className="flex flex-col items-stretch gap-2 border-t border-slate-100 pt-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-end">
         {action.status === 'proposed' ? (
           <>
-            <span className="mr-auto text-xs text-slate-400">
-              该操作会改变产品状态，需要您确认。
+            <span className="text-xs leading-relaxed text-slate-400 sm:mr-auto">
+              {action.action_type === 'organization.publish'
+                ? '一次确认将原子完成方案确认与组织发布，不会再要求第二次点击。'
+                : action.action_type === 'organization.confirm'
+                  ? '这是历史兼容确认步骤；新的组织创建流程不会再产生该 Action。'
+                  : '该操作会改变产品状态，需要您确认。'}
             </span>
             <button
               type="button"
@@ -257,23 +445,29 @@ export default function AssistantActionCard({
               ) : (
                 <Check className="h-4 w-4" aria-hidden="true" />
               )}
-              确认
+              {action.action_type === 'organization.publish'
+                ? '确认并发布组织'
+                : action.action_type === 'organization.confirm'
+                  ? '确认组织方案'
+                  : '确认'}
             </button>
           </>
         ) : null}
 
         {pending ? (
-          <span className="mr-auto text-xs text-slate-500">
-            后端正在执行该操作，完成后这里会更新。
+          <span className="text-xs leading-relaxed text-slate-500 sm:mr-auto">
+            {action.action_type === 'organization.publish'
+              ? '后端正在确认并发布；Action 完成前不会提前显示发布成功。'
+              : '后端正在执行该操作，完成后这里会更新。'}
           </span>
         ) : null}
 
-        {link && (action.status === 'completed' || pending) ? (
+        {resourceLink && showLink ? (
           <Link
-            to={link.to}
+            to={resourceLink.to}
             className={`${button} bg-gradient-to-r from-indigo-600 to-blue-600 text-white shadow-md shadow-indigo-200 hover:from-indigo-700 hover:to-blue-700 focus-visible:ring-indigo-500/20`}
           >
-            {link.label}
+            {resourceLink.label}
             <ArrowRight className="h-4 w-4" aria-hidden="true" />
           </Link>
         ) : null}

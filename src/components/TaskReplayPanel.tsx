@@ -21,6 +21,8 @@ import { apiErrorFromThrown, type ApiError } from '../api/errors';
 import type {
   PlanStep,
   Task,
+  TaskReplayArtifactBinding,
+  TaskReplayDeliveryBinding,
   TaskReplayPolicy,
   TaskReplayScope,
   TaskReplayStatus,
@@ -68,36 +70,56 @@ function triggerLabel(trigger: string): string {
   return trigger;
 }
 
-function readBinding(value: Record<string, unknown>): { contractKey: string; artifactId: string } | null {
-  const contractKey = value.contract_key;
-  const artifactId = value.artifact_id;
-  if (typeof contractKey !== 'string' || typeof artifactId !== 'string') return null;
-  return { contractKey, artifactId };
-}
-
 function BindingSummary({
   label,
   values,
 }: {
   label: string;
-  values: readonly Record<string, unknown>[];
+  values: readonly TaskReplayArtifactBinding[];
 }) {
-  const bindings = values.map(readBinding).filter((value): value is NonNullable<typeof value> => value !== null);
-  if (bindings.length === 0) return null;
+  if (values.length === 0) return null;
   return (
     <div>
       <p className="mb-1 text-[11px] font-semibold text-slate-500">{label}</p>
       <div className="flex flex-wrap gap-1.5">
-        {bindings.map((binding) => (
+        {values.map((binding) => (
           <span
-            key={`${binding.contractKey}:${binding.artifactId}`}
-            className="rounded-full border border-blue-200/70 bg-blue-50 px-2 py-0.5 font-mono text-[10px] text-blue-700"
-            title={`已固定 Artifact ${binding.artifactId}`}
+            key={`${binding.contract_key}:${binding.artifact_id}`}
+            className="max-w-full break-all rounded-full border border-blue-200/70 bg-blue-50 px-2 py-0.5 font-mono text-[10px] text-blue-700"
+            title={`已固定 Artifact ${binding.artifact_id}`}
           >
-            {binding.contractKey}
+            {binding.contract_key}
           </span>
         ))}
       </div>
+    </div>
+  );
+}
+
+function DeliveryBindingSummary({ values }: { values: readonly TaskReplayDeliveryBinding[] }) {
+  if (values.length === 0) return null;
+  return (
+    <div className="sm:col-span-2">
+      <p className="mb-1 text-[11px] font-semibold text-slate-500">固定输入 Delivery · 复制血缘</p>
+      <ul className="grid gap-2 lg:grid-cols-2">
+        {values.map((binding) => (
+          <li
+            key={`${binding.contract_key}:${binding.artifact_delivery_id}`}
+            className="rounded-xl border border-violet-200 bg-violet-50/60 px-3 py-2.5"
+          >
+            <div className="flex flex-wrap items-center gap-2 text-xs">
+              <span className="font-mono font-semibold text-violet-900">{binding.contract_key}</span>
+              <span className="rounded-full border border-violet-200 bg-white px-2 py-0.5 font-mono text-[10px] text-violet-700">
+                {binding.partition_key} · #{binding.sequence}
+              </span>
+            </div>
+            <p className="mt-2 break-all font-mono text-[10px] text-violet-700">
+              Delivery {binding.artifact_delivery_id}
+            </p>
+            <p className="mt-1 break-all font-mono text-[10px] text-slate-500">SHA-256 {binding.sha256}</p>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }
@@ -214,6 +236,7 @@ function ReplayHistory({ task }: { task: Task }) {
             <div className="mt-3 grid gap-3 sm:grid-cols-2">
               <BindingSummary label="固定输入 Artifact" values={replay.input_artifact_bindings} />
               <BindingSummary label="本次完成后的有效 Artifact" values={replay.effective_artifact_bindings} />
+              <DeliveryBindingSummary values={replay.input_delivery_bindings} />
             </div>
 
             {replay.issues.length > 0 ? (
@@ -256,6 +279,11 @@ function ReplayComposer({
   onReconnect: () => void;
 }) {
   const baseSteps = useMemo(() => specialistSteps(task), [task]);
+  const incrementalTask = Boolean(
+    (task.base_execution_plan ?? task.execution_plan)?.steps.some(
+      (step) => step.stream_output_contracts.length > 0 || step.stream_input_contracts.length > 0,
+    ),
+  );
   const stepOnlyTargets = baseSteps.filter((step) => step.output_contracts.length > 0);
   const [scope, setScope] = useState<TaskReplayScope>('full');
   const [targetStepId, setTargetStepId] = useState('');
@@ -274,9 +302,14 @@ function ReplayComposer({
     !activeReplay &&
     !exhausted &&
     reason.trim().length > 0 &&
+    (!incrementalTask || scope === 'from_step') &&
     (!needsTarget || targetStepId.length > 0);
 
   useEffect(() => {
+    if (incrementalTask && scope !== 'from_step') {
+      setScope('from_step');
+      return;
+    }
     if (scope === 'full') {
       setTargetStepId('');
       return;
@@ -284,7 +317,7 @@ function ReplayComposer({
     if (!targets.some((step) => step.plan_step_id === targetStepId)) {
       setTargetStepId(targets[0]?.plan_step_id ?? '');
     }
-  }, [scope, targetStepId, targets]);
+  }, [incrementalTask, scope, targetStepId, targets]);
 
   const submit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -349,6 +382,8 @@ function ReplayComposer({
                 current={scope}
                 title="完整重放"
                 description="重新执行所有岗位步骤和负责人验收。"
+                disabled={incrementalTask}
+                disabledHint="增量计划尚不支持 full；必须固定上游 Delivery 并从某一步继续"
                 onChange={setScope}
               />
               <ScopeOption
@@ -365,8 +400,12 @@ function ReplayComposer({
                 current={scope}
                 title="仅重放某一步"
                 description="只产出候选结果，不会直接完成整个 Task。"
-                disabled={stepOnlyTargets.length === 0}
-                disabledHint="没有可单独重放且声明产出的岗位步骤"
+                disabled={incrementalTask || stepOnlyTargets.length === 0}
+                disabledHint={
+                  incrementalTask
+                    ? '增量计划尚不支持 step_only；不能把一个分区执行解释为完整步骤候选'
+                    : '没有可单独重放且声明产出的岗位步骤'
+                }
                 onChange={setScope}
               />
             </div>
@@ -380,7 +419,7 @@ function ReplayComposer({
                 name="replay-target-step"
                 value={targetStepId}
                 onChange={(event) => setTargetStepId(event.target.value)}
-                className="mt-1.5 w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm font-normal text-slate-700 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                className="mt-1.5 min-h-12 w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm font-normal text-slate-700 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
               >
                 {targets.map((step) => (
                   <option key={step.plan_step_id} value={step.plan_step_id}>
@@ -389,6 +428,13 @@ function ReplayComposer({
                 ))}
               </select>
             </label>
+          ) : null}
+
+          {incrementalTask ? (
+            <p className="mt-3 rounded-xl border border-violet-200 bg-violet-50 px-3 py-2 text-xs leading-relaxed text-violet-800">
+              当前是增量计划：仅开放 downstream <span className="font-mono font-semibold">from_step</span>，
+              上游有限分区会按 Stream、Delivery、partition、sequence 与 SHA-256 固定并复制到 Replay 血缘。
+            </p>
           ) : null}
 
           <div className="mt-3 grid gap-3 lg:grid-cols-2">
@@ -402,7 +448,7 @@ function ReplayComposer({
                 rows={3}
                 maxLength={10_000}
                 placeholder="例如：负责人验收发现统计口径与需求不一致。"
-                className="mt-1.5 w-full resize-y rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm font-normal text-slate-700 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                className="mt-1.5 min-h-24 w-full resize-y rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm font-normal text-slate-700 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
               />
             </label>
             <label className="text-xs font-semibold text-slate-700">
@@ -415,19 +461,19 @@ function ReplayComposer({
                 rows={3}
                 maxLength={20_000}
                 placeholder="写清需要保留什么、修正什么，以及新的验收标准。"
-                className="mt-1.5 w-full resize-y rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm font-normal text-slate-700 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                className="mt-1.5 min-h-24 w-full resize-y rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm font-normal text-slate-700 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
               />
             </label>
           </div>
 
-          <div className="mt-3 flex flex-wrap items-center gap-2">
-            <span className="mr-auto text-xs text-slate-500">
+          <div className="mt-3 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
+            <span className="text-xs leading-relaxed text-slate-500 sm:mr-auto">
               上下文：沿用现有岗位 Workspace 与 Thread；重放会消耗 1 次业务额度。
             </span>
             <button
               type="submit"
               disabled={!canSubmit}
-              className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-orange-600 to-rose-600 px-4 py-2.5 text-sm font-semibold text-white shadow-md shadow-orange-200 transition-all hover:from-orange-700 hover:to-rose-700 focus:outline-none focus-visible:ring-4 focus-visible:ring-orange-500/20 disabled:cursor-not-allowed disabled:opacity-50"
+              className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-orange-600 to-rose-600 px-4 py-2.5 text-sm font-semibold text-white shadow-md shadow-orange-200 transition-all hover:from-orange-700 hover:to-rose-700 focus:outline-none focus-visible:ring-4 focus-visible:ring-orange-500/20 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
             >
               {submitting ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" /> : <RotateCcw className="h-4 w-4" aria-hidden="true" />}
               {submitting ? '正在创建重放...' : '确认发起重放'}
@@ -461,7 +507,7 @@ function ScopeOption({
   const selected = current === value;
   return (
     <label
-      className={`relative rounded-xl border px-3 py-2.5 transition-colors ${
+      className={`relative min-h-11 rounded-xl border px-3 py-2.5 transition-colors ${
         disabled
           ? 'cursor-not-allowed border-slate-200 bg-slate-100/70 opacity-60'
           : selected
@@ -568,7 +614,7 @@ export default function TaskReplayPanel({
                 value={policy}
                 onChange={(event) => setPolicy(event.target.value as TaskReplayPolicy)}
                 disabled={saving}
-                className="mt-1.5 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm font-normal text-slate-700 focus:border-indigo-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 disabled:opacity-60"
+                className="mt-1.5 min-h-12 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm font-normal text-slate-700 focus:border-indigo-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 disabled:opacity-60"
               >
                 <option value="manual">仅手动确认</option>
                 <option value="auto_within_limit">额度内自动重放</option>
@@ -588,14 +634,14 @@ export default function TaskReplayPanel({
                   if (Number.isFinite(value)) setLimit(Math.min(10, Math.max(task.replay_count, value)));
                 }}
                 disabled={saving}
-                className="mt-1.5 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm font-normal text-slate-700 focus:border-indigo-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 disabled:opacity-60"
+                className="mt-1.5 min-h-12 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm font-normal text-slate-700 focus:border-indigo-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 disabled:opacity-60"
               />
             </label>
             <button
               type="button"
               onClick={savePolicy}
               disabled={!dirty || saving}
-              className="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-50 focus:outline-none focus-visible:ring-4 focus-visible:ring-indigo-500/15 disabled:cursor-not-allowed disabled:opacity-50"
+              className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-50 focus:outline-none focus-visible:ring-4 focus-visible:ring-indigo-500/15 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
             >
               {saving ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" /> : <Save className="h-4 w-4" aria-hidden="true" />}
               保存策略

@@ -19,6 +19,10 @@ function toneFor(eventType: string): string {
 /** Longest scalar value shown in a one-line event summary. */
 const MAX_VALUE_LENGTH = 80;
 
+// D1-B materialization events may carry an internal relative path for audit purposes. It is not
+// a product-facing fact and must not leak Workspace/storage topology into the task timeline.
+const INTERNAL_KEY_PATTERN = /(^|_)(path|workspace|storage|checkpoint|thread|turn)(_|$)/i;
+
 /**
  * Product-safe payload summary: a few scalar fields, never a raw dump of nested internals.
  *
@@ -28,7 +32,16 @@ const MAX_VALUE_LENGTH = 80;
  */
 function summarize(payload: Record<string, unknown>): string {
   const parts: string[] = [];
-  for (const [key, value] of Object.entries(payload)) {
+  const entries = Object.entries(payload);
+  const priorityKeys = payload.failure_code
+    ? new Set(['failure_code', 'failed_partition_key', 'attempt_number', 'status'])
+    : new Set<string>();
+  const orderedEntries = [
+    ...entries.filter(([key]) => priorityKeys.has(key)),
+    ...entries.filter(([key]) => !priorityKeys.has(key)),
+  ];
+  for (const [key, value] of orderedEntries) {
+    if (INTERNAL_KEY_PATTERN.test(key)) continue;
     if (value === null || value === undefined) continue;
     if (typeof value === 'object') continue;
     if (key.endsWith('_id') && parts.length > 1) continue;

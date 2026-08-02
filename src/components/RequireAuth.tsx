@@ -14,7 +14,7 @@ export default function RequireAuth() {
 
   if (state.status === 'loading') {
     return (
-      <div className="flex h-screen w-full items-center justify-center bg-slate-50">
+      <div className="flex h-[100dvh] w-full items-center justify-center bg-slate-50">
         <LoadingState label="正在恢复会话..." />
       </div>
     );
@@ -22,7 +22,7 @@ export default function RequireAuth() {
 
   if (state.status === 'error') {
     return (
-      <div className="flex h-screen w-full items-center justify-center bg-slate-50 p-8">
+      <div className="flex h-[100dvh] w-full items-center justify-center bg-slate-50 p-4 sm:p-8">
         <div className="w-full max-w-lg">
           <ErrorState error={state.error} title="无法确认登录状态" onRetry={refresh} />
         </div>

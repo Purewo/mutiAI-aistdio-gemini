@@ -20,7 +20,7 @@ import {
   listAssistantActions,
   listAssistantConversations,
   listAssistantMessages,
-  submitAssistantMessage,
+  submitAssistantInput,
 } from '../api/endpoints';
 import { apiErrorFromThrown, type ApiError } from '../api/errors';
 import {
@@ -67,6 +67,8 @@ export interface AssistantConversationState {
   /** Bootstrap state for the conversation itself. */
   status: 'loading' | 'ready' | 'error';
   error: ApiError | null;
+  /** Owner-scoped catalog, including web and channel-bound conversations. */
+  conversations: AssistantConversation[];
   conversation: AssistantConversation | null;
   messages: AssistantMessage[];
   actions: AssistantAction[];
@@ -83,13 +85,14 @@ export interface AssistantConversationState {
 export interface AssistantConversationApi extends AssistantConversationState {
   send: (text: string, attachmentRefs?: AssistantAttachmentRef[]) => Promise<boolean>;
   decide: (actionId: string, decision: 'confirm' | 'decline') => Promise<void>;
+  selectConversation: (conversationId: string) => void;
   reconnect: () => void;
   retryBootstrap: () => void;
 }
 
 type AssistantConversationSnapshot = Pick<
   AssistantConversationState,
-  'conversation' | 'messages' | 'actions' | 'taskBindings' | 'activeTurn'
+  'conversations' | 'conversation' | 'messages' | 'actions' | 'taskBindings' | 'activeTurn'
 >;
 
 /**
@@ -106,6 +109,7 @@ function initialStateFor(cacheKey: string): AssistantConversationState {
   return {
     status: snapshot ? 'ready' : 'loading',
     error: null,
+    conversations: snapshot?.conversations ?? [],
     conversation: snapshot?.conversation ?? null,
     messages: snapshot?.messages ?? [],
     actions: snapshot?.actions ?? [],
@@ -147,6 +151,9 @@ const TASK_INPUT_BINDING_EVENT = 'assistant.task_input_bindings.updated';
 
 export function useAssistantConversation(cacheKey: string): AssistantConversationApi {
   const [state, setState] = useState<AssistantConversationState>(() => initialStateFor(cacheKey));
+  const [requestedConversationId, setRequestedConversationId] = useState<string | null>(
+    () => conversationSnapshots.get(cacheKey)?.conversation?.conversation_id ?? null,
+  );
 
   const eventLog = useRef(new AssistantEventLog());
   const streamAbort = useRef<AbortController | null>(null);
@@ -158,14 +165,20 @@ export function useAssistantConversation(cacheKey: string): AssistantConversatio
   /** Mirrors state for callbacks that must not re-subscribe when state changes. */
   const stateRef = useRef(state);
   stateRef.current = state;
+  /** Updated synchronously by patch so fast bootstrap responses cannot race a React render. */
+  const activeConversationId = useRef(state.conversation?.conversation_id ?? null);
 
   const patch = useCallback(
     (update: Partial<AssistantConversationState>) => {
       if (!mounted.current) return;
+      if (Object.prototype.hasOwnProperty.call(update, 'conversation')) {
+        activeConversationId.current = update.conversation?.conversation_id ?? null;
+      }
       setState((current) => {
         const next = { ...current, ...update };
         if (next.conversation) {
           conversationSnapshots.set(cacheKey, {
+            conversations: next.conversations,
             conversation: next.conversation,
             messages: next.messages,
             actions: next.actions,
@@ -182,20 +195,25 @@ export function useAssistantConversation(cacheKey: string): AssistantConversatio
   /* ----------------------------------------------------------- reconciliation */
 
   const refreshMessages = useCallback(
-    async (conversationId: string) => {
+    async (conversationId: string, signal?: AbortSignal) => {
       const collected: AssistantMessage[] = [];
       let cursor: string | undefined;
       // Walk every page so history is complete after a reload or a long absence.
       for (;;) {
-        const page = await listAssistantMessages(conversationId, {
-          cursor,
-          limit: MESSAGE_PAGE_LIMIT,
-        });
+        const page = await listAssistantMessages(
+          conversationId,
+          {
+            cursor,
+            limit: MESSAGE_PAGE_LIMIT,
+          },
+          signal,
+        );
         collected.push(...page.items);
         if (!page.next_cursor) break;
         cursor = page.next_cursor;
       }
       collected.sort((a, b) => a.sequence - b.sequence);
+      if (activeConversationId.current !== conversationId) return;
       patch({ messages: collected });
     },
     [patch],
@@ -203,7 +221,11 @@ export function useAssistantConversation(cacheKey: string): AssistantConversatio
 
   /** Reconcile attachment-backed Actions against the authoritative Task resource. */
   const refreshTaskBindingsForActions = useCallback(
-    async (actions: readonly AssistantAction[]) => {
+    async (
+      actions: readonly AssistantAction[],
+      conversationId?: string,
+      signal?: AbortSignal,
+    ) => {
       const candidates = actions
         .filter((action) => actionUsesAttachmentInputs(action))
         .map((action) => ({ actionId: action.action_id, taskId: taskIdFromAction(action) }))
@@ -213,7 +235,7 @@ export function useAssistantConversation(cacheKey: string): AssistantConversatio
       const results = await Promise.all(
         candidates.map(async ({ actionId, taskId }) => {
           try {
-            return { actionId, task: await getTask(taskId) };
+            return { actionId, task: await getTask(taskId, signal) };
           } catch {
             // An Action may be visible before its Task transaction is queryable. The event stream
             // will retry the same reconciliation; keep the Action itself usable in the meantime.
@@ -221,6 +243,10 @@ export function useAssistantConversation(cacheKey: string): AssistantConversatio
           }
         }),
       );
+      if (
+        conversationId &&
+        activeConversationId.current !== conversationId
+      ) return;
       const next = { ...stateRef.current.taskBindings };
       for (const result of results) {
         if (result) next[result.actionId] = result.task;
@@ -260,18 +286,24 @@ export function useAssistantConversation(cacheKey: string): AssistantConversatio
   );
 
   const refreshActions = useCallback(
-    async (conversationId: string) => {
-      const actions = await listAssistantActions(conversationId);
+    async (conversationId: string, signal?: AbortSignal) => {
+      const actions = await listAssistantActions(conversationId, signal);
       actions.sort((a, b) => a.proposed_at.localeCompare(b.proposed_at));
+      if (activeConversationId.current !== conversationId) return;
       patch({ actions });
-      await refreshTaskBindingsForActions(actions);
+      await refreshTaskBindingsForActions(actions, conversationId, signal);
     },
     [patch, refreshTaskBindingsForActions],
   );
 
   const refreshConversation = useCallback(
     async (conversationId: string) => {
-      patch({ conversation: await getAssistantConversation(conversationId) });
+      const conversation = await getAssistantConversation(conversationId);
+      if (activeConversationId.current !== conversationId) return;
+      patch({
+        conversation,
+        conversations: replaceConversation(stateRef.current.conversations, conversation),
+      });
     },
     [patch],
   );
@@ -414,7 +446,13 @@ export function useAssistantConversation(cacheKey: string): AssistantConversatio
   useEffect(() => {
     mounted.current = true;
     const controller = new AbortController();
-    const hasSnapshot = conversationSnapshots.has(cacheKey);
+    const cachedSnapshot = conversationSnapshots.get(cacheKey);
+    const cachedSnapshotConversationId = cachedSnapshot?.conversation?.conversation_id ?? null;
+    const hasSnapshot = Boolean(
+      cachedSnapshotConversationId &&
+      (!requestedConversationId ||
+        cachedSnapshotConversationId === requestedConversationId),
+    );
 
     void (async () => {
       patch({
@@ -422,16 +460,45 @@ export function useAssistantConversation(cacheKey: string): AssistantConversatio
         error: null,
       });
       try {
-        // V1 presents one active conversation; create it on first use.
         const existing = await listAssistantConversations(controller.signal);
-        const active = existing.find((item) => item.status === 'active') ?? null;
+        const requested = requestedConversationId
+          ? existing.find(
+              (item) =>
+                item.conversation_id === requestedConversationId && item.status === 'active',
+            ) ?? null
+          : null;
+        const cachedConversationId = stateRef.current.conversation?.conversation_id ?? null;
+        const cached = cachedConversationId
+          ? existing.find(
+              (item) => item.conversation_id === cachedConversationId && item.status === 'active',
+            ) ?? null
+          : null;
+        // Preserve the user's explicit/cached selection. On a cold start, prefer the web-native
+        // assistant instead of jumping into whichever channel peer happened to message last.
+        const active =
+          requested ??
+          cached ??
+          existing.find((item) => item.status === 'active' && item.origin === 'web') ??
+          existing.find((item) => item.status === 'active') ??
+          null;
         const conversation = active ?? (await createAssistantConversation(controller.signal));
         if (!mounted.current) return;
 
-        patch({ conversation, status: 'ready' });
+        if (
+          stateRef.current.conversation &&
+          stateRef.current.conversation.conversation_id !== conversation.conversation_id
+        ) {
+          eventLog.current = new AssistantEventLog();
+          failureCount.current = 0;
+        }
+        patch({
+          conversations: active ? existing : [conversation, ...existing],
+          conversation,
+          status: 'ready',
+        });
         await Promise.all([
-          refreshMessages(conversation.conversation_id),
-          refreshActions(conversation.conversation_id),
+          refreshMessages(conversation.conversation_id, controller.signal),
+          refreshActions(conversation.conversation_id, controller.signal),
         ]);
         if (!mounted.current) return;
         connect(conversation.conversation_id);
@@ -453,7 +520,15 @@ export function useAssistantConversation(cacheKey: string): AssistantConversatio
       streamAbort.current?.abort();
       if (reconnectTimer.current !== null) window.clearTimeout(reconnectTimer.current);
     };
-  }, [bootstrapToken, cacheKey, connect, patch, refreshActions, refreshMessages]);
+  }, [
+    bootstrapToken,
+    cacheKey,
+    connect,
+    patch,
+    refreshActions,
+    refreshMessages,
+    requestedConversationId,
+  ]);
 
   /* ----------------------------------------------------------------- actions */
 
@@ -465,7 +540,7 @@ export function useAssistantConversation(cacheKey: string): AssistantConversatio
 
       patch({ submitting: true, submitError: null });
       try {
-        const submission = await submitAssistantMessage(
+        const submission = await submitAssistantInput(
           conversation.conversation_id,
           {
             text: body,
@@ -473,11 +548,41 @@ export function useAssistantConversation(cacheKey: string): AssistantConversatio
           },
           crypto.randomUUID(),
         );
-        // The backend accepted the message and queued a Turn; the reply arrives by event.
-        patch({
-          activeTurn: submission.turn,
-          messages: mergeMessage(stateRef.current.messages, submission.message),
-        });
+        if (submission.kind === 'assistant_turn') {
+          // Only ordinary conversation queues Runtime work; its reply arrives through the event
+          // stream and the Turn resource remains authoritative for progress.
+          patch({
+            activeTurn: submission.turn,
+            messages: mergeMessage(stateRef.current.messages, submission.message),
+          });
+        } else {
+          // Deterministic decisions and unavailable decisions both persist a product-owned
+          // acknowledgement. Render those messages immediately without inventing a Runtime Turn.
+          const messages = mergeMessage(
+            mergeMessage(stateRef.current.messages, submission.message),
+            submission.acknowledgement,
+          );
+          if (submission.kind === 'action_decision') {
+            patch({
+              messages,
+              actions: mergeAction(stateRef.current.actions, submission.action),
+            });
+          } else {
+            patch({ messages });
+          }
+        }
+
+        // Refresh persisted projections after the immediate response is visible. A failed follow-up
+        // read must not turn an already accepted input into a false submission error; the SSE batch
+        // and the next reconnect will retry reconciliation.
+        const reconciliation = [
+          refreshMessages(conversation.conversation_id),
+          refreshConversation(conversation.conversation_id),
+        ];
+        if (submission.kind === 'action_decision') {
+          reconciliation.push(refreshActions(conversation.conversation_id));
+        }
+        void Promise.allSettled(reconciliation);
         connect(conversation.conversation_id);
         return true;
       } catch (cause) {
@@ -487,7 +592,7 @@ export function useAssistantConversation(cacheKey: string): AssistantConversatio
         patch({ submitting: false });
       }
     },
-    [connect, patch],
+    [connect, patch, refreshActions, refreshConversation, refreshMessages],
   );
 
   const decide = useCallback(
@@ -503,6 +608,38 @@ export function useAssistantConversation(cacheKey: string): AssistantConversatio
     [connect, patch],
   );
 
+  const selectConversation = useCallback(
+    (conversationId: string) => {
+      const target = stateRef.current.conversations.find(
+        (item) => item.conversation_id === conversationId,
+      );
+      if (
+        !target ||
+        target.status !== 'active' ||
+        stateRef.current.conversation?.conversation_id === conversationId
+      ) return;
+
+      streamAbort.current?.abort();
+      if (reconnectTimer.current !== null) window.clearTimeout(reconnectTimer.current);
+      eventLog.current = new AssistantEventLog();
+      failureCount.current = 0;
+      patch({
+        status: 'loading',
+        error: null,
+        conversation: null,
+        messages: [],
+        actions: [],
+        taskBindings: {},
+        activeTurn: null,
+        connection: 'connecting',
+        submitting: false,
+        submitError: null,
+      });
+      setRequestedConversationId(conversationId);
+    },
+    [patch],
+  );
+
   const reconnect = useCallback(() => {
     const conversation = stateRef.current.conversation;
     if (!conversation) return;
@@ -513,7 +650,19 @@ export function useAssistantConversation(cacheKey: string): AssistantConversatio
 
   const retryBootstrap = useCallback(() => setBootstrapToken((token) => token + 1), []);
 
-  return { ...state, send, decide, reconnect, retryBootstrap };
+  return { ...state, send, decide, selectConversation, reconnect, retryBootstrap };
+}
+
+function replaceConversation(
+  conversations: readonly AssistantConversation[],
+  conversation: AssistantConversation,
+): AssistantConversation[] {
+  const next = conversations.filter(
+    (item) => item.conversation_id !== conversation.conversation_id,
+  );
+  next.push(conversation);
+  next.sort((a, b) => b.updated_at.localeCompare(a.updated_at));
+  return next;
 }
 
 function mergeMessage(

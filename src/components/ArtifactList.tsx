@@ -7,7 +7,7 @@
  * never as a reason to read the filesystem directly.
  */
 import { useState } from 'react';
-import { Download, Eye, FileText, Loader2 } from 'lucide-react';
+import { Download, Eye, FileText, Loader2, ShieldAlert } from 'lucide-react';
 import { fetchArtifactContent, resolveBackendUrl } from '../api/http';
 import { apiErrorFromThrown, describeApiError } from '../api/errors';
 import type { Artifact, ArtifactStatus } from '../api/types';
@@ -52,6 +52,7 @@ function ArtifactRow({
     tone: 'border-slate-200 bg-slate-50 text-slate-600',
   };
   const previewable = isTextPreviewable(artifact.media_type);
+  const contentAvailable = artifact.status === 'released';
 
   const loadPreview = async () => {
     if (preview !== null) {
@@ -85,21 +86,21 @@ function ArtifactRow({
     <li className="rounded-2xl border border-slate-200/60 bg-white p-4 shadow-sm">
       <div className="flex flex-wrap items-center gap-2">
         <FileText className="h-4 w-4 flex-shrink-0 text-slate-400" aria-hidden="true" />
-        <span className="text-sm font-semibold text-slate-800">{artifact.file_name}</span>
+        <span className="min-w-0 break-all text-sm font-semibold text-slate-800">{artifact.file_name}</span>
         <span className={`rounded-full border px-2 py-0.5 text-[11px] font-semibold ${status.tone}`}>
           {status.label}
         </span>
-        <span className="truncate rounded-full border border-slate-200 bg-slate-50 px-2 py-0.5 font-mono text-[10px] text-slate-500">
+        <span className="max-w-full break-all rounded-full border border-slate-200 bg-slate-50 px-2 py-0.5 font-mono text-[10px] text-slate-500 sm:truncate">
           {artifact.contract_key}
         </span>
 
-        <div className="ml-auto flex items-center gap-1.5">
-          {previewable ? (
+        <div className="flex w-full items-center justify-end gap-1.5 sm:ml-auto sm:w-auto">
+          {contentAvailable && previewable ? (
             <button
               type="button"
               onClick={loadPreview}
               disabled={loading}
-              className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 px-2.5 py-1.5 text-xs font-medium text-slate-600 transition-colors hover:bg-slate-50 focus:outline-none focus-visible:ring-4 focus-visible:ring-indigo-500/15 disabled:cursor-not-allowed disabled:opacity-60"
+              className="inline-flex min-h-11 flex-1 items-center justify-center gap-1.5 rounded-lg border border-slate-200 px-3 py-2 text-xs font-medium text-slate-600 transition-colors hover:bg-slate-50 focus:outline-none focus-visible:ring-4 focus-visible:ring-indigo-500/15 disabled:cursor-not-allowed disabled:opacity-60 sm:flex-none"
             >
               {loading ? (
                 <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden="true" />
@@ -109,14 +110,21 @@ function ArtifactRow({
               {preview === null ? '预览' : '收起'}
             </button>
           ) : null}
-          {/* Download goes through the backend-issued URL; the browser handles the transfer. */}
-          <a
-            href={resolveBackendUrl(artifact.download_url)}
-            className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 px-2.5 py-1.5 text-xs font-medium text-slate-600 transition-colors hover:bg-slate-50 focus:outline-none focus-visible:ring-4 focus-visible:ring-indigo-500/15"
-          >
-            <Download className="h-3.5 w-3.5" aria-hidden="true" />
-            下载
-          </a>
+          {contentAvailable ? (
+            /* Download goes through the backend-issued URL; the browser handles the transfer. */
+            <a
+              href={resolveBackendUrl(artifact.download_url)}
+              className="inline-flex min-h-11 flex-1 items-center justify-center gap-1.5 rounded-lg border border-slate-200 px-3 py-2 text-xs font-medium text-slate-600 transition-colors hover:bg-slate-50 focus:outline-none focus-visible:ring-4 focus-visible:ring-indigo-500/15 sm:flex-none"
+            >
+              <Download className="h-3.5 w-3.5" aria-hidden="true" />
+              下载
+            </a>
+          ) : (
+            <span className="inline-flex min-h-11 flex-1 items-center justify-center gap-1.5 rounded-lg border border-red-100 bg-red-50 px-3 py-2 text-xs font-semibold text-red-700 sm:flex-none">
+              <ShieldAlert className="h-3.5 w-3.5" aria-hidden="true" />
+              仅审计
+            </span>
+          )}
         </div>
       </div>
 
@@ -154,6 +162,12 @@ function ArtifactRow({
       {artifact.validation_summary ? (
         <p className="mt-2 text-xs leading-relaxed text-slate-500">
           校验：{artifact.validation_summary}
+        </p>
+      ) : null}
+
+      {artifact.status === 'rejected' ? (
+        <p className="mt-2 rounded-xl border border-red-100 bg-red-50 px-3 py-2 text-xs leading-5 text-red-700">
+          该候选产物未通过产品校验，仅作为不可变失败证据保留；后续成功交付会生成新的已发布版本。
         </p>
       ) : null}
 

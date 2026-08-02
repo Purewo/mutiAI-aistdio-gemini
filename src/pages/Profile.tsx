@@ -21,10 +21,10 @@ const PASSWORD_MAX = 128;
 const DISPLAY_NAME_MAX = 100;
 
 const FIELD_CLASS =
-  'w-full max-w-md rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm transition-all duration-200 focus:border-indigo-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 disabled:cursor-not-allowed disabled:opacity-60';
+  'min-h-12 w-full max-w-none rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm transition-all duration-200 focus:border-indigo-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 disabled:cursor-not-allowed disabled:opacity-60 sm:max-w-md';
 
 const SUBMIT_CLASS =
-  'inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-indigo-600 to-blue-600 px-5 py-2.5 text-sm font-semibold text-white shadow-md shadow-indigo-200 transition-all hover:from-indigo-700 hover:to-blue-700 focus:outline-none focus-visible:ring-4 focus-visible:ring-indigo-500/20 disabled:cursor-not-allowed disabled:opacity-50';
+  'inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-indigo-600 to-blue-600 px-5 py-2.5 text-sm font-semibold text-white shadow-md shadow-indigo-200 transition-all hover:from-indigo-700 hover:to-blue-700 focus:outline-none focus-visible:ring-4 focus-visible:ring-indigo-500/20 disabled:cursor-not-allowed disabled:opacity-50';
 
 export default function Profile() {
   const { state } = useAuth();
@@ -32,7 +32,7 @@ export default function Profile() {
   return (
     <div className="flex h-full flex-col bg-slate-50/50">
       <PageHeader title="个人中心" />
-      <div className="flex-1 overflow-y-auto p-6 sm:p-8">
+      <div className="mobile-scroll-gutter flex-1 overflow-y-auto px-4 py-5 sm:p-8">
         <div className="mx-auto max-w-2xl space-y-6">
           {state.status !== 'authenticated' ? (
             <LoadingState label="加载账户信息中..." />
@@ -81,7 +81,7 @@ function ProfileCard() {
 
   return (
     <section className="overflow-hidden rounded-3xl border border-slate-200/60 bg-white shadow-sm">
-      <div className="p-8">
+      <div className="p-5 sm:p-8">
         <div className="mb-6 flex items-center gap-3">
           <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-indigo-100 bg-indigo-50 text-indigo-600">
             <UserIcon className="h-5 w-5" aria-hidden="true" />
@@ -193,7 +193,7 @@ function PasswordCard() {
 
   return (
     <section className="overflow-hidden rounded-3xl border border-slate-200/60 bg-white shadow-sm">
-      <div className="p-8">
+      <div className="p-5 sm:p-8">
         <div className="mb-6 flex items-center gap-3">
           <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-blue-100 bg-blue-50 text-blue-600">
             <Shield className="h-5 w-5" aria-hidden="true" />

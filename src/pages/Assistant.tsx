@@ -1,6 +1,22 @@
 import React, { useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { File, Loader2, Paperclip, Send, Sparkles, X } from 'lucide-react';
-import type { AssistantAction, AssistantAttachment, AssistantMessage, Task } from '../api/types';
+import {
+  ChevronDown,
+  File,
+  Globe2,
+  Loader2,
+  MessageCircle,
+  Paperclip,
+  Send,
+  Sparkles,
+  X,
+} from 'lucide-react';
+import type {
+  AssistantAction,
+  AssistantAttachment,
+  AssistantConversation,
+  AssistantMessage,
+  Task,
+} from '../api/types';
 import { useAssistantConversation } from '../assistant/useAssistantConversation';
 import { useAuthenticatedUser } from '../auth/context';
 import {
@@ -40,6 +56,7 @@ export default function Assistant() {
   const {
     status,
     error,
+    conversations,
     messages,
     actions,
     taskBindings,
@@ -49,6 +66,7 @@ export default function Assistant() {
     submitError,
     send,
     decide,
+    selectConversation,
     reconnect,
     retryBootstrap,
   } = conversation;
@@ -163,10 +181,25 @@ export default function Assistant() {
 
   return (
     <div className="flex h-full flex-col bg-slate-50/50">
-      <PageHeader title="平台小助理" description="通过对话设计并发布您的 AI 组织" />
+      <PageHeader
+        title="平台小助理"
+        description="通过对话设计并发布您的 AI 组织"
+        actions={
+          conversation.conversation ? (
+            <ConversationCatalog
+              conversations={conversations}
+              selected={conversation.conversation}
+              onSelect={selectConversation}
+            />
+          ) : undefined
+        }
+      />
 
-      <div ref={scrollRef} className="flex-1 overflow-y-auto px-4 py-6 sm:px-8">
+      <div ref={scrollRef} className="mobile-scroll-gutter flex-1 overflow-y-auto px-3 py-4 sm:px-8 sm:py-6">
         <div className="mx-auto flex max-w-3xl flex-col gap-5">
+          {conversation.conversation?.origin === 'channel' ? (
+            <ChannelContinuationNotice conversation={conversation.conversation} />
+          ) : null}
           {connection !== 'live' ? (
             <ReconnectBanner
               status={connection}
@@ -196,7 +229,7 @@ export default function Assistant() {
 
           {trailingActions.length > 0 ? (
             <div className="flex gap-3">
-              <div className="w-9 flex-shrink-0" aria-hidden="true" />
+              <div className="hidden w-9 flex-shrink-0 sm:block" aria-hidden="true" />
               <div className="min-w-0 flex-1 space-y-3">
                 {trailingActions.map((action) => (
                     <AssistantActionCard
@@ -220,7 +253,7 @@ export default function Assistant() {
                   type="button"
                   onClick={() => void send(suggestion)}
                   disabled={submitting || turnRunning}
-                  className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm text-slate-600 shadow-sm transition-colors hover:border-indigo-200 hover:text-indigo-700 focus:outline-none focus-visible:ring-4 focus-visible:ring-indigo-500/15 disabled:cursor-not-allowed disabled:opacity-60"
+                  className="min-h-11 rounded-full border border-slate-200 bg-white px-4 py-2 text-sm text-slate-600 shadow-sm transition-colors hover:border-indigo-200 hover:text-indigo-700 focus:outline-none focus-visible:ring-4 focus-visible:ring-indigo-500/15 disabled:cursor-not-allowed disabled:opacity-60"
                 >
                   {suggestion}
                 </button>
@@ -230,7 +263,7 @@ export default function Assistant() {
         </div>
       </div>
 
-      <div className="border-t border-slate-200/60 bg-white/80 p-4 backdrop-blur-md sm:p-5">
+      <div className="border-t border-slate-200/60 bg-white/90 p-3 backdrop-blur-md sm:p-5">
         <div className="mx-auto max-w-3xl">
           {submitError ? (
             <div className="mb-3">
@@ -261,7 +294,7 @@ export default function Assistant() {
             </div>
           ) : null}
           <form
-            className="flex items-end gap-2 rounded-2xl border border-slate-300 bg-white p-2 shadow-sm transition-all duration-200 focus-within:border-indigo-500 focus-within:ring-4 focus-within:ring-indigo-500/10"
+            className="flex items-end gap-1.5 rounded-2xl border border-slate-300 bg-white p-1.5 shadow-sm transition-all duration-200 focus-within:border-indigo-500 focus-within:ring-4 focus-within:ring-indigo-500/10 sm:gap-2 sm:p-2"
             onSubmit={(event) => {
               event.preventDefault();
               void submit();
@@ -289,7 +322,7 @@ export default function Assistant() {
               }
               aria-label="添加附件"
               title="添加 JSON、PDF、XLSX、图片、CSV、Markdown 或文本（单个不超过 20 MiB）"
-              className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl text-slate-500 transition-colors hover:bg-slate-100 hover:text-indigo-700 focus:outline-none focus-visible:ring-4 focus-visible:ring-indigo-500/15 disabled:cursor-not-allowed disabled:opacity-40"
+              className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl text-slate-500 transition-colors hover:bg-slate-100 hover:text-indigo-700 focus:outline-none focus-visible:ring-4 focus-visible:ring-indigo-500/15 disabled:cursor-not-allowed disabled:opacity-40"
             >
               {pendingAttachments.uploadingCount > 0 ? (
                 <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
@@ -323,7 +356,7 @@ export default function Assistant() {
                 input.trim().length === 0
               }
               aria-label="发送"
-              className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-600 to-blue-600 text-white shadow-md shadow-indigo-200 transition-all hover:from-indigo-700 hover:to-blue-700 focus:outline-none focus-visible:ring-4 focus-visible:ring-indigo-500/20 disabled:cursor-not-allowed disabled:opacity-50"
+              className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-600 to-blue-600 text-white shadow-md shadow-indigo-200 transition-all hover:from-indigo-700 hover:to-blue-700 focus:outline-none focus-visible:ring-4 focus-visible:ring-indigo-500/20 disabled:cursor-not-allowed disabled:opacity-50"
             >
               {submitting || turnRunning ? (
                 <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
@@ -350,9 +383,151 @@ function Shell({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex h-full flex-col bg-slate-50/50">
       <PageHeader title="平台小助理" description="通过对话设计并发布您的 AI 组织" />
-      <div className="flex-1 overflow-y-auto p-6 sm:p-8">{children}</div>
+      <div className="mobile-scroll-gutter flex-1 overflow-y-auto px-4 py-5 sm:p-8">{children}</div>
     </div>
   );
+}
+
+function ConversationCatalog({
+  conversations,
+  selected,
+  onSelect,
+}: {
+  conversations: AssistantConversation[];
+  selected: AssistantConversation;
+  onSelect: (conversationId: string) => void;
+}) {
+  const selectedBinding = channelBindings(selected)[0] ?? null;
+  const selectedTitle = conversationTitle(selected);
+
+  return (
+    <details className="group relative w-full sm:w-80">
+      <summary className="flex min-h-11 cursor-pointer list-none items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 text-left shadow-sm transition-colors hover:border-indigo-200 focus:outline-none focus-visible:ring-4 focus-visible:ring-indigo-500/15 [&::-webkit-details-marker]:hidden">
+        <span
+          className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${
+            conversationOrigin(selected) === 'channel'
+              ? 'bg-emerald-50 text-emerald-700'
+              : 'bg-indigo-50 text-indigo-700'
+          }`}
+        >
+          {conversationOrigin(selected) === 'channel' ? (
+            <MessageCircle className="h-4 w-4" aria-hidden="true" />
+          ) : (
+            <Globe2 className="h-4 w-4" aria-hidden="true" />
+          )}
+        </span>
+        <span className="min-w-0 flex-1">
+          <span className="block truncate text-xs font-bold text-slate-800">{selectedTitle}</span>
+          <span className="mt-0.5 block truncate text-[11px] text-slate-500">
+            {selectedBinding
+              ? `${providerLabel(selectedBinding.provider_key)} · ${selectedBinding.connection_display_name}`
+              : '网页会话'}
+          </span>
+        </span>
+        <ChevronDown className="h-4 w-4 shrink-0 text-slate-400 transition-transform group-open:rotate-180" aria-hidden="true" />
+      </summary>
+
+      <div className="absolute right-0 z-30 mt-2 w-full min-w-[18rem] overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl shadow-slate-900/10 sm:min-w-[22rem]">
+        <div className="border-b border-slate-100 px-4 py-3">
+          <p className="text-xs font-bold uppercase tracking-[0.12em] text-slate-400">会话目录</p>
+          <p className="mt-1 text-xs leading-5 text-slate-500">网页会话与渠道会话彼此隔离，选择后继续同一份产品记录。</p>
+        </div>
+        <div className="max-h-80 space-y-1 overflow-y-auto p-2">
+          {conversations.map((item) => {
+            const binding = channelBindings(item)[0] ?? null;
+            const isSelected = item.conversation_id === selected.conversation_id;
+            const archived = item.status === 'archived';
+            return (
+              <button
+                key={item.conversation_id}
+                type="button"
+                disabled={isSelected || archived}
+                onClick={(event) => {
+                  onSelect(item.conversation_id);
+                  event.currentTarget.closest('details')?.removeAttribute('open');
+                }}
+                className={`w-full rounded-xl border px-3 py-3 text-left transition-colors focus:outline-none focus-visible:ring-4 focus-visible:ring-indigo-500/15 ${
+                  isSelected
+                    ? 'border-indigo-200 bg-indigo-50/70'
+                    : archived
+                      ? 'cursor-not-allowed border-transparent opacity-55'
+                      : 'border-transparent hover:border-slate-200 hover:bg-slate-50'
+                }`}
+              >
+                <span className="flex items-start gap-3">
+                  <span
+                    className={`mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${
+                      conversationOrigin(item) === 'channel'
+                        ? 'bg-emerald-50 text-emerald-700'
+                        : 'bg-indigo-50 text-indigo-700'
+                    }`}
+                  >
+                    {conversationOrigin(item) === 'channel' ? (
+                      <MessageCircle className="h-4 w-4" aria-hidden="true" />
+                    ) : (
+                      <Globe2 className="h-4 w-4" aria-hidden="true" />
+                    )}
+                  </span>
+                  <span className="min-w-0 flex-1">
+                    <span className="flex items-center gap-2">
+                      <span className="min-w-0 flex-1 truncate text-sm font-bold text-slate-800">
+                        {conversationTitle(item)}
+                      </span>
+                      <span className="shrink-0 text-[10px] font-bold text-slate-400">
+                        {archived ? '已归档' : conversationOrigin(item) === 'channel' ? providerLabel(binding?.provider_key) : '网页'}
+                      </span>
+                    </span>
+                    <span className="mt-1 block truncate text-xs text-slate-500">
+                      {item.last_message?.text_preview || (binding ? binding.connection_display_name : '暂无消息')}
+                    </span>
+                  </span>
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+    </details>
+  );
+}
+
+function ChannelContinuationNotice({ conversation }: { conversation: AssistantConversation }) {
+  const binding = channelBindings(conversation)[0] ?? null;
+  return (
+    <div className="flex items-start gap-3 rounded-2xl border border-emerald-200 bg-emerald-50/80 px-4 py-3 text-sm text-emerald-900">
+      <MessageCircle className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
+      <p className="leading-6">
+        正在网页继续{binding ? `${providerLabel(binding.provider_key)}联系人“${conversationTitle(conversation)}”` : '渠道'}会话。
+        从这里发送的消息只在网页获得回复，不会改变渠道绑定，也不会产生渠道 outbox 回复。
+      </p>
+    </div>
+  );
+}
+
+function conversationTitle(conversation: AssistantConversation): string {
+  const binding = channelBindings(conversation)[0] ?? null;
+  const title = conversation.title?.trim();
+  if (conversation.origin === 'channel') {
+    if (!title || title === binding?.external_peer_id) return `${providerLabel(binding?.provider_key)}联系人`;
+    return title;
+  }
+  return title || '网页小助理';
+}
+
+/** F0 and earlier additive backend branches omit the optional channel catalog projection. */
+function channelBindings(
+  conversation: AssistantConversation,
+): AssistantConversation['channel_bindings'] {
+  const value = (conversation as AssistantConversation & { channel_bindings?: unknown }).channel_bindings;
+  return Array.isArray(value) ? (value as AssistantConversation['channel_bindings']) : [];
+}
+
+function conversationOrigin(conversation: AssistantConversation): 'web' | 'channel' {
+  return conversation.origin === 'channel' ? 'channel' : 'web';
+}
+
+function providerLabel(providerKey?: string): string {
+  return providerKey === 'weixin-ilink' ? '微信' : providerKey || '渠道';
 }
 
 function MessageRow({
@@ -440,7 +615,7 @@ function PendingAttachmentChip({
         onClick={onRevoke}
         disabled={revoking}
         aria-label={`移除附件 ${attachment.file_name}`}
-        className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-md text-slate-400 transition-colors hover:bg-red-50 hover:text-red-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500/20 disabled:cursor-wait"
+        className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-lg text-slate-400 transition-colors hover:bg-red-50 hover:text-red-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500/20 disabled:cursor-wait sm:h-8 sm:w-8"
       >
         {revoking ? (
           <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden="true" />
@@ -454,7 +629,7 @@ function PendingAttachmentChip({
 
 function AssistantAvatar() {
   return (
-    <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full border border-indigo-200/50 bg-gradient-to-br from-indigo-100 to-blue-100 shadow-sm">
+    <div className="hidden h-9 w-9 flex-shrink-0 items-center justify-center rounded-full border border-indigo-200/50 bg-gradient-to-br from-indigo-100 to-blue-100 shadow-sm sm:flex">
       <Sparkles className="h-4 w-4 text-indigo-600" aria-hidden="true" />
     </div>
   );

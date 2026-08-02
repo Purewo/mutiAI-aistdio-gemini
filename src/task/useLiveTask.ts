@@ -31,6 +31,8 @@ const MATERIAL_EVENT_PREFIXES = [
   'runtime.',
   'plan.',
   'artifact.',
+  'artifact_stream.',
+  'artifact_delivery.',
   'lead.',
 ];
 
@@ -96,12 +98,18 @@ export function useLiveTask(taskId: string): LiveTaskApi {
     patch({ usage: usage ?? null, approvals: approvals ?? [] });
   }, [patch, taskId]);
 
-  const connect = useCallback(() => {
+  const connect = useCallback((recovering = false) => {
     streamAbort.current?.abort();
     if (reconnectTimer.current !== null) window.clearTimeout(reconnectTimer.current);
     const controller = new AbortController();
     streamAbort.current = controller;
-    patch({ connection: eventLog.current.size > 0 ? 'reconnecting' : 'connecting' });
+    patch({
+      connection: recovering
+        ? 'reconnecting'
+        : eventLog.current.size > 0
+          ? 'live'
+          : 'connecting',
+    });
 
     let sawMaterialEvent = false;
 
@@ -135,7 +143,9 @@ export function useLiveTask(taskId: string): LiveTaskApi {
             patch({ connection: 'closed' });
             return;
           }
-          patch({ connection: 'reconnecting' });
+          // A finite SSE batch closing normally is not a transport failure. Stay visually live
+          // while the next replay request is scheduled; only `onError` enters reconnecting.
+          patch({ connection: 'live' });
           reconnectTimer.current = window.setTimeout(connect, RECONNECT_DELAY_MS);
         })();
       },
@@ -150,7 +160,7 @@ export function useLiveTask(taskId: string): LiveTaskApi {
         }
         patch({ connection: 'reconnecting' });
         reconnectTimer.current = window.setTimeout(
-          connect,
+          () => connect(true),
           failureBackoffMs(failureCount.current),
         );
       },
@@ -194,7 +204,7 @@ export function useLiveTask(taskId: string): LiveTaskApi {
 
   const reconnect = useCallback(() => {
     failureCount.current = 0;
-    connect();
+    connect(true);
   }, [connect]);
 
   const retry = useCallback(() => setRetryToken((token) => token + 1), []);
